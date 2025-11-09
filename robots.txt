@@ -1,0 +1,23 @@
+# robots.txt for Nick House Buyer
+# Allow all well-behaved crawlers except API and admin endpoints
+
+User-agent: *
+Disallow: /api/
+Disallow: /admin/
+Allow: /
+
+# Small crawl delay to reduce load (note: not all crawlers respect this)
+Crawl-delay: 5
+
+# Explicitly allow major LLM/AI crawlers where appropriate
+User-agent: OpenAI
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: bingbot
+Allow: /
+
+# Sitemap: this server exposes a dynamic sitemap at /sitemap.xml
+Sitemap: /sitemap.xml

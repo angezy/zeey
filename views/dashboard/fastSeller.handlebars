@@ -1,0 +1,136 @@
+</head>
+
+<body class="g-sidenav-show   bg-gray-100">
+  <div class="min-height-300 bg-primary position-absolute w-100"></div>
+  {{> __dsidenav}}
+  <main class="main-content position-relative border-radius-lg ">
+    {{> __dashnavbar}}
+
+
+    <div class="row">
+      {{#each fastSeller}}
+      <div class="col-md-4 p-2">
+        <div class="card card-profile">
+          <div class="row justify-content-center">
+          </div>
+          <div class="card-header text-center border-0 pt-0 pt-lg-2 pb-4 pb-lg-3">
+            <div class="d-flex justify-content-between">
+              <a href=mailto:"{{this.ContactEmail}}" class="btn btn-sm btn-dark float-right mb-0 d-none d-md-block">
+                Email <i class="ni ni-email-83"></i>
+              </a>
+              <a href="sms:{{this.ContactPhone}}" class="btn btn-sm btn-dark float-right mb-0 d-block d-md-block">
+                SMS <i class="ni ni-send"></i>
+              </a>
+              <a href="tel:{{this.ContactPhone}}" class="btn btn-sm btn-dark float-right mb-0 d-block d-md-block">
+                Call <i class="fa-solid fa-phone"></i></a>
+            </div>
+          </div>
+          <div class="card-body pt-0">
+
+            <div class="row">
+              <div class="col">
+                <div class="d-flex justify-content-center">
+                  <div class="d-grid text-center">
+                    <span class="text-lg font-weight-bolder">{{this.Bedrooms}}</span>
+                    <span class="text-sm opacity-8">Bedrooms</span>
+                  </div>
+                  <div class="d-grid text-center mx-4">
+                    <span class="text-lg font-weight-bolder">{{this.Bathrooms}}</span>
+                    <span class="text-sm opacity-8">Bathrooms</span>
+                  </div>
+                  <div class="d-grid text-center">
+                    <span class="text-lg font-weight-bolder">{{this.SquareFootage}}</span>
+                    <span class="text-sm opacity-8">Square Footage</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="text-center mt-4">
+              <h5>
+                {{this.PropertyAddress}}
+              </h5>
+
+              <div class="row">
+                <div class="col">
+                  <div class="d-flex justify-content-center">
+                    <div class="d-grid text-center">
+                      <span class="text-sm opacity-8">Type</span>
+                      <span class="text-lg font-weight-bolder">{{this.PropertyType}}</span>
+                    </div>
+                    <div class="d-grid text-center mx-4">
+                      <span class="text-sm opacity-8">Year Built</span>
+                      <span class="text-lg font-weight-bolder">{{this.YearBuilt}}</span>
+                    </div>
+                    <div class="d-grid text-center">
+                      <span class="text-sm opacity-8">Condition</span>
+                      <span class="text-lg font-weight-bolder">{{this.PropertyCondition}}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <i class="ni education_hat mr-2"></i>{{this.AdditionalComments}}
+              </div>
+
+              <div class="h6 mt-4">
+                <i class="ni business_briefcase-24 mr-2"></i>{{this.ReasonForSelling}}
+              </div>
+
+              <div class="h6 mt-4">
+                <i class="ni business_briefcase-24 mr-2"></i>{{this.TimeFrame}}
+              </div>
+
+
+              <a href="javascript:;" data-id="{{this.fastSellId}}" class="fastsell-detail btn btn-sm btn-primary">
+                Detail <i class="ni ni-collection"></i>
+              </a>
+              <div>
+                <i class="ni education_hat mr-2"></i>
+                <a href="https://ipinfo.io/{{this.SellerIP}}" target="_blank">Seller Ip Location</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {{/each}}
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>const fastSellers = {{{ json fastSeller }}};
+      document.addEventListener('DOMContentLoaded', function () {
+        console.log('fastSellers:', fastSellers);
+        document.querySelectorAll('.fastsell-detail').forEach(button => {
+          button.addEventListener('click', function () {
+            const fastSellId = this.getAttribute('data-id');
+            console.log('Clicked Fast Sell ID:', fastSellId);
+
+            const fastSellData = fastSellers.find(item => String(item.fastSellId) === String(fastSellId));
+            if (fastSellData) {
+              console.log('Found Fast Sell Data:', fastSellData);
+
+              let tableHTML = '<table class="table table-bordered">';
+              tableHTML += '<thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>';
+              for (const [key, value] of Object.entries(fastSellData)) {
+                tableHTML += `<tr><td>${key}</td><td>${value}</td></tr>`;
+              }
+              tableHTML += '</tbody></table>';
+
+              Swal.fire({
+                title: 'Fast Sell Details',
+                html: tableHTML,
+                icon: 'info',
+                confirmButtonText: 'Close',
+                width: '80%',
+              });
+            } else {
+              Swal.fire({
+                title: 'Error',
+                text: `Fast Sell data not found for ID: ${fastSellId}`,
+                icon: 'error',
+                confirmButtonText: 'Close',
+              });
+            }
+          });
+        });
+      });
+    </script>

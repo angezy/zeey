@@ -1,0 +1,226 @@
+<div class="col-md-6 mx-auto">
+  <div class="border shadow-0 mb-3 glass-card rounded-4" style="min-height: 350px; width: 100%;">
+    <div class="card-body text-light p-4">
+      <form id="Preview-form" action="/api/fastSell3" method="POST" novalidate>
+
+        <!-- Section 1 -->
+        <div id="section-1" class="form-section active-section">
+          <h4 class="text-white mb-3">Basic Information</h4>
+          <div class="row mb-4">
+            <div class="col">
+              <div class="form-outline">
+                <input name="FullName" type="text" id="name" class="form-control text-dark" required />
+                <label class="form-label" for="name">Full Name</label>
+              </div>
+            </div>
+            <div class="col">
+              <div class="form-outline">
+                <input name="PhoneNumber" type="tel" id="number" class="form-control text-dark" required />
+                <label class="form-label" for="number">Phone Number</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="row mb-4">
+            <div class="col">
+              <div class="form-outline">
+                <input name="PropertyAddress" type="text" id="PropertyAddress" class="form-control text-dark" required />
+                <label class="form-label" for="PropertyAddress">Property Address</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="text-center">
+            <button type="button" class="btn btn-success" onclick="showNextSection(9)">Next</button>
+          </div>
+        </div>
+
+        <!-- Section 9 -->
+        <div id="section-9" class="form-section hidden-section">
+          <h4 class="text-white mb-3">Additional Information</h4>
+          <div class="mb-4">
+            <div class="form-outline">
+              <textarea class="form-control text-dark" id="additionalInfo" name="SpecificRequests" rows="4"></textarea>
+              <label class="form-label" for="additionalInfo">Any specific requests or expectations?</label>
+            </div>
+          </div>
+
+          <div class="mb-4 text-center">
+            <label class="custom-checkbox">
+              <input type="checkbox" id="termsCheck" name="tos" required />
+              <span class="checkmark"></span>
+              I agree to the <a href="/terms-of-service" target="_blank">Terms of Service</a>
+            </label>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center">
+            <button type="button" class="btn btn-secondary" onclick="showPreviousSection(1)">Back</button>
+            <button type="submit" id="submitBtn" class="btn btn-success">
+              <span id="submitText">Submit</span>
+              <span id="submitSpinner" class="spinner-border spinner-border-sm d-none ms-2" role="status" aria-hidden="true"></span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Section 10 -->
+        <div id="section-10" class="form-section hidden-section text-center">
+          <h4 class="text-white mb-3">Thank You!</h4>
+          <p id="responseMessage" class="text-light"></p>
+          <div class="mt-4">
+            <a href="/" class="btn btn-primary">Home</a>
+            <a href="/blogs" class="btn btn-outline-light">Our Blogs</a>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- MDB + SweetAlert -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.1.0/mdb.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+  .hidden-section { display: none; opacity: 0; transition: opacity 0.4s ease; }
+  .active-section { display: block; opacity: 1; }
+
+  /* Blue custom checkbox */
+  .custom-checkbox {
+    position: relative;
+    padding-left: 30px;
+    cursor: pointer;
+    font-size: 16px;
+    user-select: none;
+    color: #fff;
+  }
+
+  .custom-checkbox input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .checkmark {
+    position: absolute;
+    left: 0;
+    top: 2px;
+    height: 20px;
+    width: 20px;
+    background-color: transparent;
+    border: 2px solid #0d6efd;
+    border-radius: 4px;
+    transition: 0.3s;
+  }
+
+  .custom-checkbox input:checked ~ .checkmark {
+    background-color: #0d6efd;
+  }
+
+  .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+  }
+
+  .custom-checkbox input:checked ~ .checkmark:after {
+    display: block;
+  }
+
+  .custom-checkbox .checkmark:after {
+    left: 6px;
+    top: 1px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+</style>
+
+<script>
+  // Show next section
+  function showNextSection(nextSectionId) {
+    const currentSection = document.querySelector('.form-section.active-section');
+    const nextSection = document.getElementById('section-' + nextSectionId);
+
+    // Validate required inputs in current section
+    const inputs = currentSection.querySelectorAll('input[required]');
+    for (const input of inputs) {
+      if (!input.value.trim()) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Missing Field',
+          text: `Please fill out the ${input.name} field.`,
+        });
+        input.focus();
+        return;
+      }
+    }
+
+    currentSection.classList.remove('active-section');
+    currentSection.classList.add('hidden-section');
+    nextSection.classList.remove('hidden-section');
+    nextSection.classList.add('active-section');
+  }
+
+  // Go to previous section
+  function showPreviousSection(prevSectionId) {
+    const currentSection = document.querySelector('.form-section.active-section');
+    const prevSection = document.getElementById('section-' + prevSectionId);
+    currentSection.classList.remove('active-section');
+    currentSection.classList.add('hidden-section');
+    prevSection.classList.remove('hidden-section');
+    prevSection.classList.add('active-section');
+  }
+
+  // Handle form submit
+  document.getElementById('Preview-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const submitBtn = document.getElementById('submitBtn');
+    const spinner = document.getElementById('submitSpinner');
+    const submitText = document.getElementById('submitText');
+
+    // Disable submit and show spinner
+    if (submitBtn) submitBtn.disabled = true;
+    if (spinner) spinner.classList.remove('d-none');
+    if (submitText) submitText.textContent = 'Submitting...';
+
+    const formData = {
+      FullName: e.target.FullName?.value || '',
+      PhoneNumber: e.target.PhoneNumber?.value || '',
+      PropertyAddress: e.target.PropertyAddress?.value || '',
+      SpecificRequests: e.target.SpecificRequests?.value || '',
+    };
+
+    try {
+      const res = await fetch('/api/fastSell3', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      // Hide section 9 and show thank-you
+      document.getElementById('section-9').classList.remove('active-section');
+      document.getElementById('section-9').classList.add('hidden-section');
+      document.getElementById('section-10').classList.remove('hidden-section');
+      document.getElementById('section-10').classList.add('active-section');
+
+      document.getElementById('responseMessage').textContent = data.message || "We'll reach out to you soon.";
+    } catch (err) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Submission Failed',
+        text: 'Something went wrong. Please try again later.',
+      });
+    } finally {
+      if (submitBtn) submitBtn.disabled = false;
+      if (spinner) spinner.classList.add('d-none');
+      if (submitText) submitText.textContent = 'Submit';
+    }
+  });
+</script>
+

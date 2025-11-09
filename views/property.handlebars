@@ -1,0 +1,242 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+</head>
+<body>
+  {{> __newnav}}
+
+  <main class="container py-4">
+    <div class="row g-4">
+      <div class="col-12">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <h1 class="h3 mb-1">{{sanitize listPost.Title}}</h1>
+            <div class="text-muted"><i class="ion-ios-pin me-1"></i>{{sanitize listPost.PropertyAddress}}</div>
+            <div class="mt-2 d-flex gap-2 align-items-center">
+              {{#if listPost.IsPro}}<span class="badge bg-warning text-dark">PRO</span>{{/if}}
+              <div class="h5 mb-0 text-primary fw-bold">${{listPost.AskingPrice}}</div>
+              <div class="text-muted small">Posted: {{formatDate listPost.CreatedAt}}</div>
+            </div>
+          </div>
+          <div class="d-none d-md-block">
+            <a href="/properties" class="btn btn-outline-secondary me-2">Back to listings</a>
+            <a href="#contact-card" class="btn btn-win">Contact Seller</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gallery + thumbnails -->
+      <div class="col-lg-8">
+        <div class="card shadow-sm rounded-4 overflow-hidden">
+          <div class="card-body p-0">
+            <div id="propertyCarousel" class="carousel slide" data-bs-ride="carousel">
+              <div class="carousel-inner" id="propertyCarouselInner" style="min-height:320px; background:#f8f9fa;"></div>
+              <button class="carousel-control-prev" type="button" data-bs-target="#propertyCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+              </button>
+              <button class="carousel-control-next" type="button" data-bs-target="#propertyCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+              </button>
+            </div>
+            <div class="p-3">
+              <div id="thumbnailStrip" class="d-flex gap-2 overflow-auto" style="-webkit-overflow-scrolling: touch;" aria-label="Gallery thumbnails"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="card mt-3 border-0 shadow-sm rounded-4">
+          <div class="card-body">
+            <h5 class="card-title">Description</h5>
+            <p class="card-text">{{#if listPost.Description}}{{sanitize listPost.Description}}{{else}}No description provided.{{/if}}</p>
+          </div>
+        </div>
+
+        <!-- Features / Comps -->
+        <div class="row mt-3 g-3">
+          <div class="col-md-6">
+            <div class="card border-0 shadow-sm rounded-4">
+              <div class="card-body">
+                <h5 class="card-title">Key features</h5>
+                <ul class="list-unstyled mb-0">
+                  <li class="py-1"><strong>Bedrooms:</strong> {{listPost.Bedrooms}}</li>
+                  <li class="py-1"><strong>Bathrooms:</strong> {{listPost.Bathrooms}}</li>
+                  <li class="py-1"><strong>Area:</strong> {{formatSqft listPost.SquareFootage listPost.FloorArea}}</li>
+                  <li class="py-1"><strong>Lot Area:</strong> {{sanitize listPost.LotArea}}</li>
+                  <li class="py-1"><strong>Year Built:</strong> {{listPost.YearBuilt}}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card border-0 shadow-sm rounded-4">
+              <div class="card-body">
+                <h5 class="card-title">Comparable sales</h5>
+                {{#if listPost.Comps1}}<p class="small mb-2">{{sanitize listPost.Comps1}}</p>{{/if}}
+                {{#if listPost.Comps2}}<p class="small mb-2">{{sanitize listPost.Comps2}}</p>{{/if}}
+                {{#if listPost.Comps3}}<p class="small mb-0">{{sanitize listPost.Comps3}}</p>{{/if}}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Details / Contact column (Details shown above contact to avoid falling below sidebar) -->
+      <aside class="col-lg-4">
+        <div class="card mb-3 border-0 shadow-sm rounded-4">
+          <div class="card-body small">
+            <h6 class="mb-2">Details</h6>
+            <ul class="list-unstyled mb-0">
+              <li><strong>Status:</strong> {{#if listPost.Available}}<span class="badge bg-success">Available</span>{{else}}<span class="badge bg-secondary">Unavailable</span>{{/if}}</li>
+              <li><strong>Garage:</strong> {{listPost.Garage}}</li>
+              <li><strong>Stories:</strong> {{listPost.Stories}}</li>
+              <li><strong>Contact:</strong> {{listPost.FullName}} &bull; {{listPost.Phone}}</li>
+            </ul>
+          </div>
+        </div>
+
+        <div id="contact-card" class="card shadow-sm rounded-4 sticky-top" style="top:1.5rem;">
+          <div class="card-body">
+            <h5 class="card-title">Contact seller</h5>
+            <p class="small text-muted">Listing ID: <strong>{{listPost.listingId}}</strong></p>
+            <form id="propertyContactForm">
+              <input type="hidden" name="listingId" id="pListingId" value="{{listPost.listingId}}">
+              <div class="mb-2">
+                <label for="pName" class="form-label">Your name</label>
+                <input id="pName" name="FullName" class="form-control" required>
+              </div>
+              <div class="mb-2">
+                <label for="pEmail" class="form-label">Email</label>
+                <input id="pEmail" name="Email" type="email" class="form-control" required>
+              </div>
+              <div class="mb-3">
+                <label for="pMessage" class="form-label">Message</label>
+                <textarea id="pMessage" name="message" class="form-control" rows="4">I'm interested in {{sanitize listPost.Title}} (ID: {{listPost.listingId}}). Please contact me.</textarea>
+              </div>
+              <div class="d-grid">
+                <button type="submit" class="btn btn-primary">Send message</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <style>
+    /* Page polish */
+    .btn-win{ background: linear-gradient(180deg,#0078d4,#0066b3); color:#fff; }
+    .card { border-radius: 12px; }
+    #thumbnailStrip img{ width:96px; height:64px; object-fit:cover; cursor:pointer; border-radius:6px; }
+    #thumbnailStrip img.active{ outline:3px solid rgba(13,110,253,0.15); }
+    @media (max-width:768px){ #thumbnailStrip img{ width:72px; height:48px; } }
+  </style>
+
+  <script>
+    // Build gallery using injected listing data + lightbox and UX improvements
+    (function(){
+      try{
+        var post = {{{json listPost}}} || {};
+        var inner = document.getElementById('propertyCarouselInner');
+        var thumbs = document.getElementById('thumbnailStrip');
+        if(!inner) return;
+
+        var images = [];
+        if(post.PhotoFile){
+          var parts = String(post.PhotoFile).split(',').map(function(s){ return s.trim(); }).filter(Boolean);
+          parts.forEach(function(p){ images.push({ type:'image', src:p }); });
+        }
+        if(post.PhotoURL){
+          var url = String(post.PhotoURL).trim();
+          if(url){
+            var isImg = /\.(jpe?g|png|gif|webp|bmp)(\?|$)/i.test(url);
+            images.push({ type: isImg ? 'image' : 'iframe', src: url });
+          }
+        }
+        if(images.length === 0) images.push({ type:'placeholder', src:'/public/images/placeholder.png' });
+
+        images.forEach(function(item, idx){
+          var slide = document.createElement('div');
+          slide.className = 'carousel-item' + (idx===0 ? ' active' : '');
+          slide.style.textAlign = 'center';
+
+          if(item.type === 'image'){
+            var src = item.src;
+            if(!/^https?:\/\//i.test(src) && !src.startsWith('/')) src = '/' + src;
+            var img = document.createElement('img');
+            img.src = src;
+            img.setAttribute('loading','lazy');
+            img.alt = (post.Title || 'Photo') + ' - image ' + (idx+1);
+            img.style.width = '100%'; img.style.height = '480px'; img.style.objectFit = 'cover';
+            img.style.cursor = 'zoom-in';
+            img.tabIndex = 0;
+            img.addEventListener('click', function(){ openLightbox(idx); });
+            img.addEventListener('keydown', function(e){ if(e.key==='Enter') openLightbox(idx); });
+            slide.appendChild(img);
+
+            if(thumbs){
+              var t = document.createElement('img'); t.src = src; t.setAttribute('loading','lazy'); if(idx===0) t.classList.add('active'); t.alt = 'Thumbnail ' + (idx+1);
+              t.addEventListener('click', function(){ var carousel = bootstrap.Carousel.getOrCreateInstance(document.getElementById('propertyCarousel')); carousel.to(idx); document.querySelectorAll('#thumbnailStrip img').forEach(i=>i.classList.remove('active')); this.classList.add('active'); });
+              thumbs.appendChild(t);
+            }
+          } else if(item.type === 'iframe'){
+            var iframe = document.createElement('iframe'); iframe.src = item.src; iframe.width = '100%'; iframe.height = '480'; iframe.frameBorder = 0; slide.appendChild(iframe);
+            if(thumbs){ var t = document.createElement('div'); t.className='p-2 bg-light rounded'; t.textContent = 'External'; thumbs.appendChild(t); }
+          } else {
+            var img = document.createElement('img'); img.src = item.src; img.alt='No photo'; slide.appendChild(img);
+          }
+
+          inner.appendChild(slide);
+        });
+
+        // lightbox modal builder
+        var lightboxModal = null;
+        function openLightbox(startIndex){
+          if(!lightboxModal){
+            var m = document.createElement('div'); m.className='modal fade'; m.id='galleryLightbox'; m.tabIndex=-1; m.setAttribute('aria-hidden','true');
+            m.innerHTML = '\n              <div class="modal-dialog modal-fullscreen-sm-down modal-xl">\n                <div class="modal-content bg-dark">\n                  <div class="modal-body p-0 position-relative">\n                    <button type="button" class="btn-close btn-close-white position-absolute" style="right:1rem;top:1rem;z-index:1051;" data-bs-dismiss="modal" aria-label="Close"></button>\n                    <div id="lightboxInner" class="h-100 d-flex align-items-center justify-content-center"></div>\n                    <button id="lightPrev" class="btn btn-sm btn-light position-absolute" style="left:1rem;top:50%;transform:translateY(-50%);z-index:1051;">‹</button>\n                    <button id="lightNext" class="btn btn-sm btn-light position-absolute" style="right:1rem;top:50%;transform:translateY(-50%);z-index:1051;">›</button>\n                  </div>\n                </div>\n              </div>\n            ';
+            document.body.appendChild(m);
+            lightboxModal = new bootstrap.Modal(m);
+            m.querySelector('#lightPrev').addEventListener('click', function(){ showIndex(currentIndex-1); });
+            m.querySelector('#lightNext').addEventListener('click', function(){ showIndex(currentIndex+1); });
+            m.addEventListener('hidden.bs.modal', function(){ currentIndex = -1; });
+          }
+          showIndex(startIndex);
+          lightboxModal.show();
+        }
+
+        var currentIndex = -1;
+        function showIndex(i){
+          if(i < 0) i = images.length - 1;
+          if(i >= images.length) i = 0;
+          currentIndex = i;
+          var container = document.getElementById('lightboxInner');
+          if(!container) return;
+          container.innerHTML = '';
+          var it = images[i];
+          if(it.type === 'image'){
+            var im = document.createElement('img');
+            var src = it.src; if(!/^https?:\/\//i.test(src) && !src.startsWith('/')) src = '/' + src;
+            im.src = src; im.style.maxWidth = '95%'; im.style.maxHeight = '92vh'; im.alt = post.Title || 'Photo'; im.style.objectFit = 'contain'; im.setAttribute('loading','eager');
+            container.appendChild(im);
+          } else if(it.type === 'iframe'){
+            var ifr = document.createElement('iframe'); ifr.src = it.src; ifr.width = '100%'; ifr.height = '100%'; ifr.style.minHeight='80vh'; ifr.frameBorder = 0; container.appendChild(ifr);
+          }
+        }
+
+        document.addEventListener('keydown', function(e){ var m = document.getElementById('galleryLightbox'); if(m && m.classList.contains('show')){ if(e.key==='ArrowLeft') showIndex(currentIndex-1); if(e.key==='ArrowRight') showIndex(currentIndex+1); }});
+
+        // number formatting for price and area
+        try{
+          function formatNumber(n){ if(n==null||n==='') return n; var num = Number(String(n).replace(/[^0-9.-]+/g,'')); if(isNaN(num)) return n; return num.toLocaleString(); }
+          var priceEl = document.querySelector('.text-primary.fw-bold');
+          if(priceEl){ var raw = post.AskingPrice || priceEl.textContent; priceEl.textContent = '$' + formatNumber(raw); }
+          // ensure area uses helper but add data attribute for client fallback
+          var areaNode = document.querySelector('li:contains("Area:")');
+        }catch(e){ console.warn('formatting error', e); }
+
+      }catch(e){ console.error('Gallery error', e); }
+    })();
+  </script>

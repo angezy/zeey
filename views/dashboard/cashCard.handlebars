@@ -1,0 +1,183 @@
+</head>
+
+<body class="g-sidenav-show   bg-gray-100">
+    <div class="min-height-300 bg-primary position-absolute w-100"></div>
+    {{> __dsidenav}}
+    <main class="main-content position-relative border-radius-lg ">
+        {{> __dashnavbar}}
+
+        <div class="row">
+            {{#each cashbuyer}}
+            <div class="col-md-4 p-2">
+                <div class="card card-profile shadow-sm h-100">
+                    <div class="row justify-content-center">
+                    </div>
+                    <div class="card-header text-center border-0 pt-0 pb-0 pb-lg-1">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0 text-truncate">{{this.FullName}}</h6>
+                                <small class="text-muted">{{this.YearsInBusiness}} years</small>
+                            </div>
+                            <div class="btn-group btn-group-sm" role="group" aria-label="contact-actions">
+                                <a href="mailto:{{this.Email}}" class="btn btn-outline-dark" title="Email"><i class="ni ni-email-83"></i></a>
+                                <a href="sms:{{this.CellPhone}}" class="btn btn-outline-dark" title="SMS"><i class="ni ni-send"></i></a>
+                                <a href="tel:{{this.CellPhone}}" class="btn btn-outline-dark" title="Call"><i class="fa-solid fa-phone"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body pt-2 d-flex flex-column">
+                        <div class="row">
+                            <div class="col">
+                                <div class="d-flex justify-content-center">
+                                    <div class="d-grid text-center">
+                                        <span class="badge bg-success" data-bs-toggle="tooltip" data-bs-placement="top" title="{{this.FundingInPlace}}">Cash</span>
+                                    </div>
+                                    <div class="d-grid text-center">
+                                        <span class="badge bg-info text-dark" data-bs-toggle="tooltip" data-bs-placement="top" title="{{this.ProofOfFunds}}">Proof</span>
+                                    </div>
+                                    <div class="d-grid text-center">
+                                        <span class="badge bg-secondary" data-bs-toggle="tooltip" data-bs-placement="top" title="{{this.Quickly}}">Quickly</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-start gap-3 mt-3">
+                            <div class="flex-shrink-0">
+                                {{#if this.ProofOfFundsFile}}
+                                <img src="/{{this.ProofOfFundsFile}}" alt="proof" class="img-fluid rounded" style="max-width:110px; max-height:110px; object-fit:cover;"/>
+                                {{else}}
+                                <div class="placeholder bg-light rounded" style="width:110px;height:110px;display:flex;align-items:center;justify-content:center;color:#aaa;">No Photo</div>
+                                {{/if}}
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">{{this.FullName}}</h6>
+                                <div class="text-muted small"><i class="ni location_pin mr-2"></i><span class="price-range" data-raw="{{this.PriceRanges}}">{{this.PriceRanges}}</span></div>
+                                <div class="mt-2 small text-muted">{{this.PreferredAreas}}</div>
+                                <div class="small text-muted">{{this.PropertyType}}</div>
+                                <div class="mt-3">
+                                    <a href="javascript:;" data-id="{{this.buyerID}}" class="buyer-detail btn btn-sm btn-primary">Details <i class="ni ni-collection"></i></a>
+                                </div>
+                                <div class="mt-2 small text-muted">IP: <a href="https://ipinfo.io/{{this.CashBuyerIP}}" target="_blank">{{this.CashBuyerIP}}</a></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{/each}}
+        </div>
+                <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                <script>const cashbuyers = {{{ json cashbuyer }}};
+                        document.addEventListener('DOMContentLoaded', function () {
+                                // Use a Bootstrap modal for pretty details view
+                                const modalContainer = document.createElement('div');
+                                modalContainer.innerHTML = `
+                                <div class="modal fade" id="buyerDetailModal" tabindex="-1" aria-labelledby="buyerDetailModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="buyerDetailModalLabel">Buyer Details</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body" id="buyerDetailBody"></div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>`;
+                                document.body.appendChild(modalContainer);
+
+                                const buyerModalEl = document.getElementById('buyerDetailModal');
+                                const buyerModal = new bootstrap.Modal(buyerModalEl);
+
+                                                function formatRow(key, value) {
+                                                    if (!value && value !== 0) return '';
+                                                    let display = value;
+                                                    // Make URLs clickable
+                                                    if (typeof value === 'string' && /https?:\/\//.test(value)) {
+                                                        display = `<a href="${value}" target="_blank">${value}</a>`;
+                                                    }
+                                                    // Special formatting for email and phone: include copy button
+                                                    if (key === 'Email') {
+                                                        display = `<span>${value}</span> <button class="btn btn-sm btn-outline-secondary ms-2 copy-btn" data-copy-text="${value}" title="Copy email"><i class="ni ni-email-83"></i></button>`;
+                                                    }
+                                                    if (key === 'CellPhone' || key === 'Cell Phone' || key === 'Phone') {
+                                                        display = `<span>${value}</span> <button class="btn btn-sm btn-outline-secondary ms-2 copy-btn" data-copy-text="${value}" title="Copy phone"><i class="fa fa-copy"></i></button>`;
+                                                    }
+                                                    return `<tr><th style="width:30%;text-transform:capitalize;">${key}</th><td>${display}</td></tr>`;
+                                                }
+
+                                document.querySelectorAll('.buyer-detail').forEach(button => {
+                                        button.addEventListener('click', function () {
+                                                const buyerID = this.getAttribute('data-id');
+                                                const buyerData = cashbuyers.find(buyer => String(buyer.buyerID) === String(buyerID));
+                                                if (buyerData) {
+                                                        // Build a cleaner table and include proof image if present
+                                                        let left = '';
+                                                        if (buyerData.ProofOfFundsFile) {
+                                                            left = `<div class="mb-3 text-center"><img src="/${buyerData.ProofOfFundsFile}" class="img-fluid rounded" style="max-height:200px;object-fit:cover;"/></div>`;
+                                                        }
+                                                        let tableHTML = '<div class="row"><div class="col-md-4">' + left + '</div><div class="col-md-8"><table class="table table-sm table-striped">';
+                                                        for (const [key, value] of Object.entries(buyerData)) {
+                                                                tableHTML += formatRow(key, value);
+                                                        }
+                                                        tableHTML += '</table></div></div>';
+                                                                                    document.getElementById('buyerDetailBody').innerHTML = tableHTML;
+                                                                                    // Attach copy handlers
+                                                                                    try {
+                                                                                        document.querySelectorAll('#buyerDetailBody .copy-btn').forEach(function(b){
+                                                                                            const txt = b.getAttribute('data-copy-text');
+                                                                                            window.attachCopyHandler(b, txt);
+                                                                                        });
+                                                                                    } catch (e) {}
+                                                                                    buyerModal.show();
+                                                } else {
+                                                        // fallback to toast
+                                                        Swal.fire({title: 'Error', text: `Buyer data not found for ID: ${buyerID}`, icon: 'error'});
+                                                }
+                                        });
+                                });
+                        });
+                </script>
+        <style>
+            /* Card hover and visual polish */
+            .card-profile { border-radius: 12px; transition: transform .18s ease, box-shadow .18s ease; }
+            .card-profile:hover { transform: translateY(-6px); box-shadow: 0 12px 30px rgba(18,38,63,.12); }
+            .card-profile .badge { font-weight:600; }
+            .buyer-detail { min-width: 96px; }
+            .price-range { font-weight:700; color:#0d6efd; }
+            .placeholder { font-size: 0.9rem; }
+        </style>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                // Initialize Bootstrap tooltips if bootstrap is available
+                try {
+                    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                    tooltipTriggerList.map(function (el) { return new bootstrap.Tooltip(el); });
+                } catch (e) {}
+
+                // Pretty-format price ranges like "100000 - 750000" -> "$100,000 - $750,000"
+                try {
+                    document.querySelectorAll('.price-range').forEach(function (el) {
+                        var raw = el.getAttribute('data-raw') || el.textContent || '';
+                        var nums = (raw.match(/\d+/g) || []).map(function(n){ return Number(n); });
+                        if (nums.length >= 2) {
+                            function fmt(n){ return '$' + n.toLocaleString(); }
+                            el.textContent = fmt(nums[0]) + ' - ' + fmt(nums[1]);
+                        }
+                    });
+                } catch (e) { console.error('price format', e); }
+
+                // Copy-to-clipboard helper used in modal
+                window.attachCopyHandler = function(button, text) {
+                    if (!button) return;
+                    button.addEventListener('click', function () {
+                        navigator.clipboard && navigator.clipboard.writeText(text).then(function(){
+                            button.classList.add('btn-success');
+                            setTimeout(()=>button.classList.remove('btn-success'),1200);
+                        }).catch(()=>{});
+                    });
+                };
+            });
+        </script>

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Submit Your Property Listing</title>
+  <meta name="description"
+    content="listing your deal.">
+  <meta name="keywords"
+    content="listing your deal to close it fast">
+  <meta name="author" content="Nick's Real Estate Services">
+  <meta name="robots" content="index, follow">
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+  <!-- MDB -->
+  <link
+  href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.2.0/mdb.min.css"
+  rel="stylesheet"
+/>
+
+  <link rel="stylesheet" href="/public/css/mdb.min.css" />
+  <link rel="stylesheet" href="/assets/css/cs.css">
+</head>
+
+<body>
+  <section id="bg">
+    <div class="container py-5">
+      <div class="row d-flex align-items-center justify-content-center">
+
+        <p class="text-muted  text-center">.</p>
+
+        <div class="col-md-6">
+          <div class=" border  shadow-0 mb-3 glass-card" style="width: 100%;">
+            <div class="card-body rounded-4 text-light px-5 pt-4 pb-2">
+              <h2 class="text-center">Submit Your Property Listing</h2>
+              <form id="listingForm" class="needs-validation" action="/api/listing" method="POST" enctype="multipart/form-data" novalidate>
+                <div class="row gx-3">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="Title" class="form-label">Listing title *</label>
+                      <input id="Title" name="Title" type="text" class="form-control" placeholder="Cozy 3BR in Downtown" required />
+                      <div class="invalid-feedback">Please provide a title.</div>
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="FullName" class="form-label">Your full name *</label>
+                      <input id="FullName" name="FullName" type="text" class="form-control" placeholder="John Doe" required />
+                      <div class="invalid-feedback">Please enter your name.</div>
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="Email" class="form-label">Email *</label>
+                      <input id="Email" name="Email" type="email" class="form-control" placeholder="you@example.com" required />
+                      <div class="invalid-feedback">Enter a valid email address.</div>
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="Phone" class="form-label">Phone number *</label>
+                      <input id="Phone" name="Phone" type="tel" class="form-control" placeholder="(555) 555-5555" pattern="[0-9()+\-\s]{7,}" required />
+                      <div class="invalid-feedback">Enter a valid phone number.</div>
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="PropertyAddress" class="form-label">Property address *</label>
+                      <input id="PropertyAddress" name="PropertyAddress" type="text" class="form-control" placeholder="123 Main St, City, State" required />
+                      <div class="form-text">Include apartment/unit if applicable. Example: "123 Main St, Apt 4B"</div>
+                      <div class="invalid-feedback">Please enter the property address.</div>
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="PropertyType" class="form-label">Property type</label>
+                      <select id="PropertyType" name="PropertyType" class="form-select">
+                        <option value="">Choose type</option>
+                        <option value="Single Family Home">Single Family Home</option>
+                        <option value="Multi Family">Multi Family</option>
+                        <option value="Condo">Condo</option>
+                        <option value="Townhouse">Townhouse</option>
+                        <option value="Apartment">Apartment</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="row">
+                      <div class="col-sm-6 mb-3">
+                        <label for="Bedrooms" class="form-label">Bedrooms</label>
+                        <input id="Bedrooms" name="Bedrooms" type="number" class="form-control" min="0" />
+                      </div>
+                      <div class="col-sm-6 mb-3">
+                        <label for="Bathrooms" class="form-label">Bathrooms</label>
+                        <input id="Bathrooms" name="Bathrooms" type="number" class="form-control" min="0" />
+                      </div>
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="AskingPrice" class="form-label">Asking price (USD)</label>
+                      <input id="AskingPrice" name="AskingPrice" type="number" class="form-control" min="0" step="0.01" />
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="Description" class="form-label">Description</label>
+                      <textarea id="Description" name="Description" class="form-control" rows="4" placeholder="Add details buyers should know"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="ReasonForSelling" class="form-label">Reason for selling</label>
+                      <input id="ReasonForSelling" name="ReasonForSelling" type="text" class="form-control" />
+                    </div>
+
+                    <div class="mb-3">
+                      <label class="form-label">Photos (upload up to 10)</label>
+                      <input id="PhotoFiles" name="PhotoFiles" type="file" class="form-control mb-2" accept="image/*" multiple />
+                      <input id="PhotoURL" name="PhotoURL" type="url" class="form-control" placeholder="https://drive.google.com/.... (optional)" />
+                      <div class="form-text">Upload up to 10 photos, or provide a Google Drive URL for additional images.</div>
+                      <div id="preview" class="mt-2 d-flex flex-wrap gap-2"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <hr />
+                <div class="row">
+                  <div class="col-md-4 mb-3">
+                    <label for="LotArea" class="form-label">Lot area (sq ft)</label>
+                    <input id="LotArea" name="LotArea" type="number" class="form-control" min="0" />
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label for="FloorArea" class="form-label">Floor area (sq ft)</label>
+                    <input id="FloorArea" name="FloorArea" type="number" class="form-control" min="0" />
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label for="YearBuilt" class="form-label">Year built</label>
+                    <input id="YearBuilt" name="YearBuilt" type="number" class="form-control" min="1800" max="2100" />
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-4 mb-3">
+                    <label for="Garage" class="form-label">Garage</label>
+                    <input id="Garage" name="Garage" type="number" class="form-control" min="0" />
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label for="Stories" class="form-label">Stories</label>
+                    <input id="Stories" name="Stories" type="number" class="form-control" min="0" />
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label for="Roofing" class="form-label">Roofing</label>
+                    <input id="Roofing" name="Roofing" type="text" class="form-control" />
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="Comps1" class="form-label">Comps (optional)</label>
+                  <input id="Comps1" name="Comps1" type="text" class="form-control mb-2" placeholder="Comps 1" />
+                  <input id="Comps2" name="Comps2" type="text" class="form-control mb-2" placeholder="Comps 2" />
+                  <input id="Comps3" name="Comps3" type="text" class="form-control" placeholder="Comps 3" />
+                </div>
+
+                <div class="d-grid mt-3">
+                  <button id="submitBtn" type="submit" class="btn btn-primary btn-lg">Submit listing</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- MDB -->
+<script
+  type="text/javascript"
+  src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.2.0/mdb.umd.min.js"
+></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- Core JS Files -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="/assets/js/listing.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  <script>
+    (function(){
+      // Preview selected images
+      const photoFiles = document.getElementById('PhotoFiles');
+      const preview = document.getElementById('preview');
+      if(photoFiles && preview){
+        photoFiles.addEventListener('change', function(){
+          preview.innerHTML = '';
+          const files = Array.from(this.files || []);
+          
+          // Limit to 10 files
+          if(files.length > 10) {
+            alert('Please select up to 10 photos only');
+            this.value = '';
+            return;
+          }
+
+          files.forEach(file => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'position-relative';
+            wrapper.style.width = '150px';
+            
+            const img = document.createElement('img');
+            img.style.width = '150px';
+            img.style.height = '150px';
+            img.style.objectFit = 'cover';
+            img.className = 'rounded border';
+            img.src = URL.createObjectURL(file);
+            
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'btn btn-danger btn-sm position-absolute top-0 end-0 m-1';
+            removeBtn.innerHTML = '×';
+            removeBtn.onclick = function() {
+              wrapper.remove();
+              // Create new FileList without this file
+              const dt = new DataTransfer();
+              const files = Array.from(photoFiles.files);
+              files.forEach(f => {
+                if(f !== file) dt.items.add(f);
+              });
+              photoFiles.files = dt.files;
+            };
+            
+            wrapper.appendChild(img);
+            wrapper.appendChild(removeBtn);
+            preview.appendChild(wrapper);
+          });
+        });
+      }
+
+      // Bootstrap-style validation + submit handling that supports JSON or server redirects
+      const form = document.getElementById('listingForm');
+      const submitBtn = document.getElementById('submitBtn');
+      if(!form) return;
+
+      form.addEventListener('submit', async function(e){
+        e.preventDefault();
+
+        // Basic browser validation
+        if (!form.checkValidity()){
+          form.classList.add('was-validated');
+          return;
+        }
+
+        // Require either uploaded photo or PhotoURL
+        const photoUrlVal = (document.getElementById('PhotoURL')||{}).value || '';
+        const hasFile = (document.getElementById('PhotoFile')||{}).files && document.getElementById('PhotoFile').files.length>0;
+        if(!hasFile && !photoUrlVal){
+          Swal.fire({ icon: 'warning', title: 'Photo required', text: 'Please upload a photo or provide an external Photo URL.' });
+          return;
+        }
+
+        // Disable button and show spinner
+        submitBtn.disabled = true;
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sending...';
+
+        try{
+          const fd = new FormData(form);
+          const resp = await fetch(form.action || '/api/listing', { method: 'POST', body: fd, redirect: 'follow' });
+
+          const ct = resp.headers.get('content-type') || '';
+          if(ct.includes('application/json')){
+            const json = await resp.json();
+            if(json && json.success){
+              await Swal.fire({ icon: 'success', title: 'Listing submitted', text: json.message || 'We received your listing.' });
+              // clear form
+              form.reset();
+              preview.innerHTML = '';
+            } else {
+              const msg = (json && json.message) || (json && json.error) || 'Submission failed';
+              await Swal.fire({ icon: 'error', title: 'Error', text: msg });
+            }
+          } else if (resp.redirected) {
+            // server-side redirect (legacy) — follow it
+            window.location = resp.url;
+          } else {
+            // Fallback: try to parse text and show a success toast
+            const text = await resp.text();
+            // crude check for success query in returned HTML
+            if(text && text.includes('success')){
+              await Swal.fire({ icon: 'success', title: 'Submitted', text: 'Listing submitted. You may be redirected.' });
+            } else {
+              await Swal.fire({ icon: 'error', title: 'Submission error', text: 'Unexpected server response.' });
+            }
+          }
+
+        }catch(err){
+          console.error('Submit error', err);
+          Swal.fire({ icon: 'error', title: 'Network error', text: 'Unable to submit listing. Try again later.' });
+        }finally{
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalText;
+        }
+      });
+    })();
+  </script>
+</body>
+
+</html>

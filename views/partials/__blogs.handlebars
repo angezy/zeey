@@ -1,0 +1,56 @@
+<section>
+  <div class="container">
+    <div class="row">
+      <div class="row text-center my-sm-3 mt-5">
+        <div class="btn bg-gradient-primary col-lg-6 mx-auto">
+
+          <h2 class="">Sell Your Florida Home Fast <br> No Matter the Situation</h2>
+        </div>
+          <p class="lead">We recognize that every homeowner faces unique challenges<br>
+             and no matter your situation<br>
+             we’re here to provide tailored solutions to help you move forward with confidence. </p>
+      </div>
+    </div>
+  </div>
+  <div class="container mt-5">
+    <div class="row">
+
+      <div class="col-md-8">
+        <div class="row mt-4">
+              {{#each blogs}}
+          <div class="col-md-6">
+            <a href=/blog/{{this.postId}} class="center">
+              <div class="card move-on-hover">
+                <img class="w-100" src={{this.Imag}} alt={{this.Title}}>
+                 <h4 class="">{{this.Title}} </h4>
+                 <h6 class="text-secondary font-weight-normal">{{this.Description}}</h6>
+              </div>
+              <div class="mt-2 ms-2">
+
+              </div>
+            </a>
+          </div>
+          {{/each}}
+
+
+        </div>
+      </div>
+      <div class="col-md-3 mx-auto mt-md-0 mt-5">
+        <div class="position-sticky" style="top:100px !important">
+          <h4 class="">At Nick House Buyer,<br>
+            our mission is to make selling your home effortless and stress-free.</h4>
+          <h6 class="text-secondary font-weight-normal">
+              We'll take care of all the paperwork and closing costs,
+              and we'll work around your schedule to make the process as smooth and stress-free as possible.
+            </h6>
+            <h6 class="text-secondary font-weight-normal">
+              Explore our blog to gain valuable insights into managing your property situation and 
+              preparing yourself for a hassle-free selling experience with Nick House Buyer.
+              <br>We're here to make it easy for you, every step of the way!
+            </h6>
+            <a href="/blogs"
+            class="badge bg-success mb-3">Explore articles</a>
+        </div>
+      </div>
+    </div>
+</section>

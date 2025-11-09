@@ -1,0 +1,332 @@
+</head>
+
+<body class="g-sidenav-show   bg-gray-100">
+  <div class="min-height-300 bg-primary position-absolute w-100"></div>
+  {{> __dsidenav}}
+  <main class="main-content position-relative border-radius-lg ">
+    {{> __dashnavbar}}
+
+    <div class="row">
+      <div class="col-md-12 mt-4">
+        <div class="card">
+          <div class="card-header pb-0 p-3">
+            <h6 class="mb-0">Kanban Feature</h6>
+          </div>
+          <div class="card-body pt-4 p-3">
+            <form id="kanbanForm" method="POST" action="/api/kanban">
+              <!-- Facebook Name -->
+              <div class="mb-3">
+                <label for="facebookName" class="form-label">Facebook Name</label>
+                <input type="text" class="form-control" id="facebookName" name="facebookName" required
+                  placeholder="Enter Facebook Name">
+              </div>
+
+              <!-- Role Selection -->
+              <div class="mb-3">
+                <label class="form-label">Role</label>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="role" id="wholesaler" value="Wholesaler" required>
+                  <label class="form-check-label" for="wholesaler">Wholesaler</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="role" id="cashBuyer" value="CashBuyer">
+                  <label class="form-check-label" for="cashBuyer">Cash Buyer</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="role" id="homeSeller" value="HomeSeller">
+                  <label class="form-check-label" for="homeSeller">Home Seller</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="role" id="otherRole" value="Other">
+                  <label class="form-check-label" for="otherRole">Other</label>
+                </div>
+              </div>
+
+              <!-- Specify Role (Visible only when "Other" is selected) -->
+              <div class="mb-3" id="otherRoleInputContainer" style="display: none;">
+                <label for="specificRole" class="form-label">Specify Role</label>
+                <input type="text" class="form-control" id="specificRole" name="specificRole"
+                  placeholder="Enter their role">
+              </div>
+
+              <!-- Chat Result -->
+              <div class="mb-3">
+                <label for="chatResult" class="form-label">Chat Result</label>
+                <textarea class="form-control" id="chatResult" name="chatResult" required></textarea>
+              </div>
+
+              <!-- Email -->
+              <div class="mb-3">
+                <label for="email" class="form-label">Email (Optional)</label>
+                <input type="email" class="form-control" id="email" name="email">
+              </div>
+
+              <!-- Phone Number -->
+              <div class="mb-3">
+                <label for="phoneNumber" class="form-label">Phone Number (Optional)</label>
+                <input type="text" class="form-control" id="phoneNumber" name="phoneNumber">
+              </div>
+
+
+              <!-- Submit Button -->
+              <button type="submit" class="btn btn-primary">Add Entry</button>
+            </form>
+
+            <!-- Date picker for filtering entries -->
+            <div class="mt-3">
+              <label for="filterDate" class="form-label">View entries for date</label>
+              <div class="d-flex align-items-center gap-2">
+                <input type="date" id="filterDate" class="form-control" value="{{selectedDate}}">
+                <button id="applyDateFilter" class="btn btn-outline-primary">Show</button>
+                <button id="todayBtn" class="btn btn-link">Today</button>
+              </div>
+              <small class="text-muted">Select a date to view Kanban entries for that day. Defaults to today.</small>
+            </div>
+
+
+            <hr>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h6 class="mb-0">Existing Entries</h6>
+              <div>
+                <span class="text-sm text-secondary">Showing <strong>{{entriesCount}}</strong> entries for <strong>{{selectedDate}}</strong></span>
+              </div>
+            </div>
+            <table class="table align-items-center mb-0">
+              <thead>
+                <tr>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                    FaceBook Name</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                    Chat Result</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                    Role</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                    Chat Date
+                  </th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                     Contact</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                    Status
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {{#if kanban.length}}
+                  {{#each kanban}}
+                  <tr>
+                  <td>
+                    <div class="d-flex px-2 py-1">
+                      <div>
+                        <!-- Initial avatar: will show first letter of FacebookName -->
+                        <div class="avatar avatar-sm me-3 initials" data-name="{{this.FacebookName}}" aria-hidden="true" style="border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:#6c757d;color:#fff;font-weight:600;"></div>
+                      </div>
+                      <div class="d-flex flex-column justify-content-center">
+                        <h6 class="mb-0 text-sm">{{this.FacebookName}}</h6>
+                        <p class="text-xs text-secondary mb-0"><a href="mailto:{{this.Email}}"
+                            class="text-secondary font-weight-bold text-xs">{{this.Email}}</a></p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="align-middle text-center">
+                    <span class="text-secondary text-xs font-weight-bold">{{this.ChatResult}}</span>
+                  </td>
+                  <td class="align-middle text-center">
+                    {{#if (eq this.Role "Other")}}
+                      <span class="badge badge-sm bg-gradient-secondary">{{this.SpecificRole}}</span>
+                    {{else}}
+                      {{#if (eq this.Role "Wholesaler")}}
+                        <span class="badge badge-sm bg-gradient-info">{{this.Role}}</span>
+                      {{else}}
+                        {{#if (eq this.Role "CashBuyer")}}
+                          <span class="badge badge-sm bg-gradient-primary">{{this.Role}}</span>
+                        {{else}}
+                          {{#if (eq this.Role "HomeSeller")}}
+                            <span class="badge badge-sm bg-gradient-warning">{{this.Role}}</span>
+                          {{else}}
+                            <span class="badge badge-sm bg-gradient-success">{{this.Role}}</span>
+                          {{/if}}
+                        {{/if}}
+                      {{/if}}
+                    {{/if}}
+                  </td>
+                  <td class="align-middle text-center">
+                    <span class="text-secondary text-xs font-weight-bold">{{formatDate this.ChatDate}}</span>
+                  </td>
+                  <td class="align-middle text-center">
+                    {{#if this.PhoneNumber}}
+                    <div class="d-flex gap-2 justify-content-center align-items-center">
+                      <button class="btn btn-sm btn-outline-success gv-btn" data-phone="{{this.PhoneNumber}}" title="Call with Google Voice">
+                        Google Voice
+                      </button>
+                    </div>
+                    {{/if}}
+                  </td>
+                  </tr>
+                  {{/each}}
+                {{else}}
+                  <tr>
+                    <td colspan="6" class="text-center text-muted py-4">No entries for selected date — try another day.</td>
+                  </tr>
+                {{/if}}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const otherRoleRadio = document.getElementById('otherRole');
+        const otherRoleInputContainer = document.getElementById('otherRoleInputContainer');
+        const roleRadios = document.querySelectorAll('input[name="role"]');
+
+        roleRadios.forEach(radio => {
+          radio.addEventListener('change', () => {
+            if (otherRoleRadio.checked) {
+              otherRoleInputContainer.style.display = 'block';
+            } else {
+              otherRoleInputContainer.style.display = 'none';
+            }
+          });
+        });
+      });
+    </script>
+
+      <script>
+        (function () {
+          const applyBtn = document.getElementById('applyDateFilter');
+          const filterInput = document.getElementById('filterDate');
+          const todayBtn = document.getElementById('todayBtn');
+
+          function goToDate(val) {
+            if (!val) return;
+            // Redirect to the same path with ?date=YYYY-MM-DD
+            window.location.href = window.location.pathname + '?date=' + val;
+          }
+
+          if (applyBtn && filterInput) {
+            applyBtn.addEventListener('click', (e) => { e.preventDefault(); goToDate(filterInput.value); });
+            filterInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); goToDate(filterInput.value); } });
+          }
+
+          if (todayBtn) {
+            todayBtn.addEventListener('click', (e) => {
+              e.preventDefault();
+              const d = new Date();
+              const mm = String(d.getMonth() + 1).padStart(2, '0');
+              const dd = String(d.getDate()).padStart(2, '0');
+              const s = d.getFullYear() + '-' + mm + '-' + dd;
+              goToDate(s);
+            });
+          }
+        })();
+      </script>
+
+
+    <script>
+      (function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const successMessage = urlParams.get('success');
+        const errorMessage = urlParams.get('error');
+
+        if (successMessage) {
+          Swal.fire({ title: 'Success', text: successMessage, icon: 'success' }); // Show success message
+          // Remove query params so the message doesn't reappear on refresh
+          try { window.history.replaceState({}, document.title, window.location.pathname); } catch (e) { /* ignore */ }
+        }
+
+        if (errorMessage) {
+          Swal.fire({ title: 'Error', text: errorMessage, icon: 'error' }); // Show error message
+          try { window.history.replaceState({}, document.title, window.location.pathname); } catch (e) { /* ignore */ }
+        }
+      })();
+    </script>
+
+    <script>
+      // Google Voice button handler
+      document.addEventListener('DOMContentLoaded', () => {
+        const gvButtons = document.querySelectorAll('.gv-btn');
+
+        function formatForVoiceUrl(raw) {
+          if (!raw) return null;
+          // Keep digits and leading + if present
+          let s = String(raw).trim();
+          // Replace Persian/Arabic digits with ASCII digits if any
+          s = s.replace(/[۰-۹]/g, function(d) { return '۰۱۲۳۴۵۶۷۸۹'.indexOf(d); });
+          // Remove everything except digits and +
+          s = s.replace(/[^0-9+]/g, '');
+
+          // If it already has a + and digits after, return as-is
+          if (s.startsWith('+')) return s;
+
+          // Now s contains only digits
+          // If 10 digits (US local), prepend country code 1
+          if (s.length === 10) {
+            return '+1' + s;
+          }
+
+          // If 11 digits and starts with '1', assume it's US number without +
+          if (s.length === 11 && s.startsWith('1')) {
+            return '+' + s;
+          }
+
+          // For other lengths, if >=8 assume international but without +, just prefix +
+          if (s.length >= 8) {
+            return '+' + s;
+          }
+
+          // Fallback: return digits as-is
+          return s;
+        }
+
+        gvButtons.forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const raw = btn.getAttribute('data-phone') || '';
+            const phone = formatForVoiceUrl(raw);
+            if (!phone) {
+              Swal.fire({ title: 'No phone number', text: 'This entry has no phone number to call.', icon: 'warning' });
+              return;
+            }
+            // Construct Google Voice web call URL. User must be logged into Google account with Voice enabled.
+            // Note: Google Voice URLs may vary; this works in most setups to open the call composer.
+            const encoded = encodeURIComponent(phone.replace('+','%2B'));
+            const url = `https://voice.google.com/u/0/calls?a=nc,%2B${encodeURIComponent(phone.replace('+',''))}`;
+            // Open in new tab
+            window.open(url, '_blank', 'noopener');
+          });
+        });
+      });
+    </script>
+
+    <script>
+      // Fill initials avatars using the FacebookName data attribute
+      document.addEventListener('DOMContentLoaded', () => {
+        const nodes = document.querySelectorAll('.initials');
+        const colors = ['#6f42c1','#0d6efd','#198754','#d63384','#fd7e14','#20c997','#6610f2','#0dcaf0'];
+
+        function pickColor(name) {
+          if (!name) return colors[0];
+          let h = 0;
+          for (let i = 0; i < name.length; i++) h = name.charCodeAt(i) + ((h << 5) - h);
+          return colors[Math.abs(h) % colors.length];
+        }
+
+        nodes.forEach(el => {
+          const name = (el.getAttribute('data-name') || '').trim();
+          if (!name) {
+            el.style.display = 'none';
+            return;
+          }
+          // Get first visible letter (skip whitespace)
+          const first = name.replace(/^\s+/, '').charAt(0).toUpperCase();
+          el.textContent = first;
+          el.style.background = pickColor(name);
+          el.style.width = '40px';
+          el.style.height = '40px';
+          el.style.fontSize = '16px';
+          el.style.lineHeight = '1';
+        });
+      });
+    </script>

@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+    <title>Fast Sell Your Florida House</title>
+  <meta name="description"
+    content="Register as a cash buyer with Nick's Real Estate Services to access high-quality investment properties. Tailor your buying criteria and discover profitable real estate deals today.">
+  <meta name="keywords"
+    content="cash buyer form, real estate deals, investment properties, wholesale real estate, buy investment properties, real estate buyers, high ROI real estate">
+  <meta name="author" content="Nick's Real Estate Services">
+  <meta name="robots" content="index, follow">
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+  <!-- MDB -->
+  <link rel="stylesheet" href="/public/css/mdb.min.css" />
+  <link rel="stylesheet" href="/assets/css/fastSell.css">
+</head>
+
+<body>
+  <section id="bg">
+    <div class="container py-5">
+      <div class="row d-flex align-items-center justify-content-center">
+        <h2 class="text-center text-dark-emphasis"></h2>
+        <p class="text-muted  text-center">.</p>
+
+        <div class="col-md-6">
+          <div class=" border  shadow-0 mb-3 glass-card" style="width: 100%;">
+            <div class="card-body rounded-4 text-light px-5 pt-4 pb-2">
+
+              <form id="Preview-form" action="/api/fastSell" method="POST" class="text-center" enctype="multipart/form-data" novalidate>
+                <!-- Section 1: Basic Information -->
+                <div id="section-1" class="form-section">
+                  <h4 class="text-white">Seller Information</h4>
+                  <br><br>
+                  <div class="row mb-4">
+                    <div class="col">
+                      <div data-mdb-input-init class="form-outline">
+                        <input name="FullName" type="text" id="name" class=" text-dark form-control" required />
+                        <label class="form-label" for="name">Full Name</label>
+                      </div>
+                    </div>
+                    <div class="col">
+                      <div data-mdb-input-init class="form-outline">
+                        <input name="ContactEmail" type="email" id="contactEmail" class=" text-dark form-control"
+                          required />
+                        <label class="form-label" for="contactEmail">Contact Email</label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row mb-4">
+                    <div class="col">
+                      <div data-mdb-input-init class="form-outline">
+                        <input name="ContactPhone" type="tel" id="number" class=" text-dark form-control" required />
+                        <label class="form-label" for="number">Phone Number</label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="text-center bg-transparent">
+                    <button type="button" class="btn btn-primary" onclick="navigateSection(1, 2)">Next</button>
+                  </div>
+                </div>
+
+                <!-- Section 2: Property Information -->
+                <div id="section-2" class="form-section hidden-section">
+                  <h4>Property Information</h4>
+                  <br>
+                  <div class="row mb-4">
+                    <div class="col">
+                      <div data-mdb-input-init class="form-outline">
+                        <input name="PropertyAddress" type="text" id="propertyAddress" placeholder="123 Main St"
+                          class="text-dark form-control" required autocomplete="off" />
+                        <label class="form-label" for="propertyAddress">Property Address</label>
+                      </div>
+                      <div id="autocomplete-results" class="list-group" style="display: none;"></div>
+                    </div>
+                  </div>
+
+                  <div class="row mb-4">
+                    <div class="col">
+                      <div data-mdb-input-init class="form-outline">
+                        <input name="SquareFootage" type="number" id="squareFootage" placeholder="1500"
+                          class="text-dark form-control" required />
+                        <label class="form-label" for="squareFootage">Square Footage</label>
+                      </div>
+                    </div>
+                    <div class="col">
+                      <div data-mdb-input-init class="form-outline">
+                        <input name="LotSize" type="number" id="lotSize" class="text-dark form-control" required />
+                        <label class="form-label" for="lotSize">Lot Size</label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row mb-4">
+                    <div class="col">
+                      <div data-mdb-input-init class="form-outline">
+                        <input name="Bedrooms" type="number" id="bedrooms" placeholder="3"
+                          class="text-dark form-control" required />
+                        <label class="form-label" for="bedrooms"><small>Number of Bedrooms</small></label>
+                      </div>
+                    </div>
+
+                    <div class="col">
+                      <div data-mdb-input-init class="form-outline">
+                        <input name="Bathrooms" type="number" id="bathrooms" placeholder="2"
+                          class="text-dark form-control" required />
+                        <label class="form-label" for="bathrooms"><small>Number of Bathrooms</small></label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row mb-4">
+                    <div class="col">
+                      <div data-mdb-input-init class="form-outline">
+                        <input name="YearBuilt" type="number" id="yearBuilt" class="text-dark rounded form-control" required />
+                        <label class="form-label" for="yearBuilt">Year Built</label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row mb-4">
+                    <div class="col">
+                      <div  class="form-outline">
+                        <select name="PropertyType" id="propertyType" class="text-dark form-control" required>
+                          <option value=""> </option>
+                          <option value="Single Family Home">Single Family Home</option>
+                          <option value="Multi Family">Multi Family</option>
+                          <option value="Condo">Condo</option>
+                          <option value="Townhouse">Townhouse</option>
+                          <option value="Apartment">Apartment</option>
+                          <option value="Triplex">Triplex</option>
+                          {{!-- <option value="Fourplex">Fourplex</option> --}}
+                          <option value="Other">Other</option>
+                        </select>
+                        <label class="form-label" for="propertyType">Property Type</label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row mb-4">
+                    <div class="col">
+                      <div data-mdb-input-init class="form-outline">
+                        <input name="ReasonForSelling" type="text" id="reasonForSelling" class="text-dark form-control"
+                          required />
+                        <label class="form-label" for="reasonForSelling">Reason for Selling</label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row mb-4">
+                    <div class="col">
+                      <div data-mdb-input-init class="form-outline">
+                        <input name="Timeframe" type="text" id="timeframe" class="text-dark form-control" required />
+                        <label class="form-label" for="timeframe">Timeframe</label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="text-center bg-transparent">
+                    <button type="button" class="btn btn-secondary" onclick="navigateSection(2, 1)">Previous</button>
+                    <button type="button" class="btn btn-primary" onclick="navigateSection(2, 3)">Next</button>
+                  </div>
+                </div>
+                <!-- Section 3: Property Condition -->
+                <div id="section-3" class="form-section hidden-section">
+                  <h4>Property Condition</h4>
+                  <div class="row mb-4">
+                    <div class="col">
+                      <label class="text-dark form-label">What is the current condition of the property?</label>
+                      <br>
+                      <div class="form-check form-check-inline">
+                        <input name="PropertyCondition" class="form-check-input" type="radio" value="Excellent"
+                          id="Excellent" />
+                        <label class="form-check-label" for="Excellent">Excellent</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input name="PropertyCondition" class="form-check-input" type="radio" value="Good" id="Good" />
+                        <label class="form-check-label" for="Good">Good</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input name="PropertyCondition" class="form-check-input" type="radio" value="Fair" id="Fair" />
+                        <label class="form-check-label" for="Fair">Fair</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input name="PropertyCondition" class="form-check-input" type="radio" value="Poor" id="Poor" />
+                        <label class="form-check-label" for="Poor">Poor</label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row mb-4">
+                    <div class="col">
+                      <div data-mdb-input-init class="form-outline">
+                        <textarea name="AdditionalComments" id="additionalComments"
+                          placeholder="Please describe the property" class="text-dark form-control" rows="3"></textarea>
+                        <label class="form-label" for="additionalComments">Property Description</label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="text-center bg-transparent">
+                    <button type="button" class="btn btn-secondary" onclick="navigateSection(3, 2)">Previous</button>
+                    <button type="button" class="btn btn-primary" onclick="navigateSection(3, 4)">Next</button>
+                  </div>
+                </div>
+                <!-- Section 4: Additional Information -->
+                <div id="section-4" class="form-section hidden-section">
+                  <h4>Additional Information</h4>
+                  <br><br>
+                  <div class="row mb-4">
+                    <div class="col">
+                      <div data-mdb-input-init class="form-outline">
+                        <input name="AskingPrice" type="number" id="askingPrice" placeholder="500000"
+                          class="text-dark form-control" required />
+                        <label class="form-label" for="askingPrice">Asking Price</label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row mb-4">
+                    <div class="col">
+                      <div class="form-outline">
+                        <label class="form-label d-block text-start" for="propertyImages">Property Images (Max 10 images)</label>
+                        <input type="file" name="propertyImages" id="propertyImages" class="form-control" accept="image/*" multiple 
+                          onchange="previewImages(event)" />
+                      </div>
+                      <div id="imagePreview" class="mt-3 d-flex flex-wrap gap-2"></div>
+                    </div>
+                  </div>
+                  <div class="row mb-4">
+                    <div class="col">
+                      <div data-mdb-input-init class="form-outline">
+                        <textarea name="AdditionalComments" id="additionalComments"
+                          placeholder="Please provide any additional comments or questions"
+                          class="text-dark form-control" rows="4"></textarea>
+                        <label class="form-label" for="additionalComments">Additional Comments or Questions</label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="text-center bg-transparent">
+                    <button type="button" class="btn btn-secondary" onclick="navigateSection(4, 3)">Previous</button>
+                    <button type="submit" class="btn btn-primary" onclick="submitForm()">Submit</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js">
+  </script>
+  <!-- MDB -->
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.1.0/mdb.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!--   Core JS Files   -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="/assets/js/form.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Image preview functionality
+    function previewImages(event) {
+      const preview = document.getElementById('imagePreview');
+      preview.innerHTML = '';
+      const files = event.target.files;
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        if (!file.type.startsWith('image/')) continue;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const div = document.createElement('div');
+          div.className = 'position-relative';
+          div.style.width = '100px';
+          div.style.height = '100px';
+          
+          const img = document.createElement('img');
+          img.src = e.target.result;
+          img.className = 'img-fluid';
+          img.style.width = '100%';
+          img.style.height = '100%';
+          img.style.objectFit = 'cover';
+          
+          div.appendChild(img);
+          preview.appendChild(div);
+        }
+        reader.readAsDataURL(file);
+      }
+    }
+
+    // Add autocomplete functionality
+    const addressInput = document.getElementById('propertyAddress');
+    const resultsContainer = document.getElementById('autocomplete-results');
+
+    addressInput.addEventListener('input', async function () {
+      const query = this.value;
+      if (query.length < 3) {
+        resultsContainer.style.display = 'none';
+        return;
+      }
+
+      console.log('Query being sent to backend:', query); // Debugging line
+      console.log('Query length:', query.length); // Log the length of the query
+      const response = await fetch(`/api/autocomplete?query=${encodeURIComponent(query)}`);
+      const results = await response.json();
+
+      resultsContainer.innerHTML = '';
+      results.forEach(result => {
+        const item = document.createElement('a');
+        item.className = 'list-group-item list-group-item-action';
+        item.textContent = result.display_name;
+        item.onclick = () => {
+          addressInput.value = result.display_name; // Set the input value to the selected address
+          resultsContainer.style.display = 'none'; // Hide results
+        };
+        resultsContainer.appendChild(item);
+      });
+
+      resultsContainer.style.display = results.length ? 'block' : 'none'; // Show or hide results
+    });
+  </script>
+</body>
+
+</html>

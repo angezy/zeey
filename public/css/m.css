@@ -1,0 +1,11 @@
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.6); /* Light translucent background */
+    backdrop-filter: blur(10px);         /* Frosted glass effect */
+    -webkit-backdrop-filter: blur(10px); /* Support for older browsers */
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Subtle border */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);  /* Slight shadow for depth */
+    border-radius: 16px;              /* Smooth corners */
+  }
+  
+  

@@ -1,0 +1,84 @@
+<section>
+
+  <div class="container">
+    <div class="row">
+      <div class="row text-center my-sm-2 mt-5">
+        <div class="faq-section mb-3 col-lg-10 mx-auto">
+  
+        <div class="faq-header bg-gradient-primary">
+            Some Frequently Asked Questions
+        </div>
+        <div class="faq-item">
+            <div class="faq-question bg-gradient-primary">
+                Will you be listing my house on the MLS or actually buying it?
+                <i class="fas fa-plus"></i>
+            </div>
+            <div class="faq-answer"style="display: block;" >
+                <p>As professional home buyers, we don’t act as real estate agents and we don’t list houses. Instead, we purchase houses in the Central Florida area that meet our specific purchasing criteria.</p>
+                <p>Once we buy your house, we may choose to repair it and resell it to another homeowner, keep it as a rental property, or sell it to a financial partner.</p>
+                <p>Regardless of what we do with the property, you’ll receive the agreed-upon price for your house.</p>
+            </div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question bg-gradient-primary">
+                Do you pay fair prices for properties?
+                <i class="fas fa-plus"></i>
+            </div>
+                        <div class="faq-answer" >
+                <p> We typically purchase houses at a discount to the top market value, as we need to resell them at a profit to another homeowner.<br>
+However, we always strive to provide a fair and reasonable price for the property we are purchasing.<br>
+
+We understand that many sellers need to sell their home quickly, and we are able to offer a quick and hassle-free cash sale, without requiring the seller to make any repairs or pay any agent fees.<br>
+
+If you are looking for a fast and easy sale, we are happy to work with you to find a price that works for both parties.<br>
+And of course, our no-obligation pricing commitment means that you are under no obligation to move forward with the offer we provide. </p>
+            </div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question bg-gradient-primary">
+                How do you determine the price to offer on my house?
+                <i class="fas fa-plus"></i>
+            </div>
+                        <div class="faq-answer" >
+                <p>Our approach is transparent and straightforward. We evaluate the location of the property, <br>its current condition, any repairs that may be needed, and recent sales of comparable properties in the area.
+<br>Based on these factors, we are able to offer a fair price that works for both parties.
+<br>
+We always take the time to explain our reasoning and calculations to our clients, so they can be confident that they are receiving a fair offer.</p>
+            </div>
+        </div>
+        <a href="/faq" class="btn bg-gradient-primary read-more">READ MORE</a>
+    </div>
+    
+      </div>
+    </div>
+</div>
+</section>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+ <script>
+    document.querySelectorAll('.faq-question').forEach(item => {
+    item.addEventListener('click', () => {
+        const answer = item.nextElementSibling;
+        const allAnswers = document.querySelectorAll('.faq-answer');
+        allAnswers.forEach(ans => ans.style.display = 'none');
+        if (answer.style.display === 'block') {
+            answer.style.display = 'none';
+        } else {
+            answer.style.display = 'block';
+        }
+    });
+});
+document.querySelectorAll('.faq-answer').forEach(item => {
+    item.style.transition = 'max-height 0.5s ease-in-out';
+});
+document.querySelectorAll('.faq-question').forEach(item => {
+    item.addEventListener('click', () => {
+        const answer = item.nextElementSibling;
+        if (answer.style.maxHeight) {
+            answer.style.maxHeight = null;
+        } else {
+            answer.style.maxHeight = answer.scrollHeight + 'px';
+        }
+    });
+});
+</script>

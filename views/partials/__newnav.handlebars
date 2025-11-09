@@ -1,0 +1,118 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-white ftco_navbar sticky-top" id="ftco-navbar" role="navigation">
+                                <style>
+                                                /* compact, local navbar fixes to keep visibility consistent across pages */
+                                                #ftco-navbar.ftco_navbar{ z-index:1100; }
+                                                #ftco-navbar { background-color: #fff !important; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+                                                #ftco-navbar .navbar-brand img{ height:48px; max-height:48px; }
+                                                /* Default links: dark text on white navbar */
+                                                #ftco-navbar .nav-link{ color: rgba(0,0,0,0.85) !important; }
+                                                #ftco-navbar .nav-link:hover{ color: rgba(0,0,0,0.95) !important; }
+                                                @media (max-width:575.98px){ #ftco-navbar .navbar-brand img{ height:38px; } }
+
+                                                /* Keep the navbar white on small screens as well */
+                                                @media (max-width: 767.98px) {
+                                                        #ftco-navbar { background-color: #fff !important; box-shadow: 0 1px 6px rgba(0,0,0,0.06) !important; }
+                                                        #ftco-navbar .nav-link { color: rgba(0,0,0,0.85) !important; }
+                                                }
+
+                                                /* Custom hamburger lines (dark toggler to contrast white bg) */
+                                                .hamburger{ display:inline-block; width:26px; height:18px; position:relative; }
+                                                .hamburger span{ display:block; height:2px; background:#000; margin:4px 0; border-radius:2px; transition:all .2s ease; }
+
+                                                /* Make the Home link always use site blue */
+                                                #ftco-navbar .nav-link.home-link{ color: #0d6efd !important; font-weight:600; }
+                                                /* Active link visual (when different from Home) */
+                                                #ftco-navbar .nav-link.active{ color: #0d6efd !important; font-weight:600; }
+
+                                                /* Windows-style CTA button */
+                                                .btn-win{
+                                                    background: linear-gradient(180deg,#0078d4,#0066b3); /* Windows blue */
+                                                    color:#fff;
+                                                    border-radius:6px;
+                                                    padding:6px 12px;
+                                                    border:1px solid rgba(0,0,0,0.08);
+                                                    box-shadow: 0 1px 0 rgba(0,0,0,0.12);
+                                                }
+                                                .btn-win:hover{ background: linear-gradient(180deg,#0088ff,#0078d4); color:#fff; }
+
+                                </style>
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center" href="/" rel="tooltip" title="Nick House Buyer" data-placement="bottom">
+            <img src="/public/images/241.png" alt="Nick House Buyer" class="d-inline-block align-top me-2">
+            <span class="font-weight-bolder ms-1 text-sm">Nick House Buyer</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#ftco-nav"
+         data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" 
+         aria-label="Toggle navigation">
+            <span class="hamburger" aria-hidden="true">
+                <span></span>
+                <span></span>
+                <span></span>
+            </span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="ftco-nav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a href="/" class="nav-link home-link">Home</a></li>
+                <li class="nav-item"><a href="/faq" class="nav-link">About</a></li>
+                <li class="nav-item "><a href="/properties" class="nav-link">Listing</a></li>
+                <li class="nav-item"><a href="/Blogs" class="nav-link">Blog</a></li>
+                <li class="nav-item"><a href="/Contactus" class="nav-link">Contact</a></li>
+                <!-- Cash Offer CTA: desktop and mobile (desktop shown on md+, mobile inside collapsed menu) -->
+                <li class="nav-item d-none d-md-flex align-items-center ms-3">
+                    <a href="/forms/fastSell" class="btn btn-win mb-0 mt-2 mt-md-0" aria-label="Cash Offer">
+                        <i class="material-symbols-rounded opacity-6 me-2 text-md">payments</i>
+                        Cash Offer
+                    </a>
+                </li>
+                <!-- Mobile CTA: visible only inside collapsed menu on small screens (Windows-style button) -->
+                <li class="nav-item d-md-none mt-2">
+                    <a href="/forms/fastSell" class="btn btn-win w-100 py-2 text-center" aria-label="Cash Offer">
+                        Cash Offer
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<!-- END nav -->
+<script>
+    // small helper: mark current nav link active based on pathname
+    (function(){
+        try{
+            const links = document.querySelectorAll('#ftco-navbar .nav-link');
+            const path = window.location.pathname.replace(/\/+$/,'').toLowerCase() || '/';
+            links.forEach(a => {
+                try{
+                    const href = new URL(a.href, window.location.origin).pathname.replace(/\/+$/,'').toLowerCase();
+                    if(href === path || (href !== '/' && path.startsWith(href))){
+                        a.classList.add('active');
+                    } else {
+                        a.classList.remove('active');
+                    }
+                }catch(e){}
+            });
+        }catch(e){}
+    })();
+</script>
+<script>
+    // toggler fallback: if Bootstrap's collapse isn't available, toggle 'show' class on the navbar collapse
+    (function(){
+        try{
+            const btn = document.querySelector('#ftco-navbar .navbar-toggler');
+            const target = document.querySelector('#ftco-nav');
+            if(btn && target){
+                btn.addEventListener('click', function(e){
+                    // If the collapse behavior is not provided by Bootstrap, toggle manually
+                    const isBootstrapCollapse = typeof bootstrap !== 'undefined' && typeof bootstrap.Collapse === 'function';
+                    if(!isBootstrapCollapse){
+                        target.classList.toggle('show');
+                        // toggle aria-expanded
+                        const expanded = btn.getAttribute('aria-expanded') === 'true';
+                        btn.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+                    }
+                });
+            }
+        }catch(e){/* ignore */}
+    })();
+</script>

@@ -1,0 +1,355 @@
+<script src="https://cdn.tiny.cloud/1/zgff7jvpasa13lgao61j8hsw32ovxkmhy9o9e7rbu4amlzhu/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tinymce/tinymce-jquery@2/dist/tinymce-jquery.min.js"></script>
+
+</head>
+
+<body class="g-sidenav-show   bg-gray-100">
+  <div class="min-height-300 bg-primary position-absolute w-100"></div>
+      {{> __dsidenav}}
+  <main class="main-content position-relative border-radius-lg ">
+{{> __dashnavbar}}
+  
+  <div class="row">
+  <div class="col-md-12 mt-4">
+    <div class="card">
+      <div class="card-header pb-0 p-3">
+        <div class="row">
+          <div class="col-6 d-flex align-items-center">
+            <h6 class="mb-0">Edit Articles</h6>
+          </div>
+          <div class="col-6 text-end">
+            <a class="btn bg-gradient-dark mb-0" href="#" data-bs-toggle="modal" data-bs-target="#addBlogModal">
+              <i class="fas fa-plus"></i>&nbsp;&nbsp;Add New Article
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="card-body pt-4 p-3">
+        <ul class="list-group">
+          {{#each blogs}}
+          <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
+            <div class="d-flex flex-column">
+              <h6 class="mb-3 text-sm">{{this.Title}}</h6>
+              <span class="mb-2 text-xs">Description:
+                <span class="text-dark font-weight-bold ms-sm-2">{{this.Description}}</span>
+              </span>
+            </div>
+            <div class="ms-auto text-end">
+              <a class="btn btn-link text-danger text-gradient px-3 mb-0 delete-btn" href="javascript:;"
+                data-id={{this.postId}}>
+                <i class="far fa-trash-alt me-2"></i>Delete
+              </a>
+              <a class="btn btn-link text-dark px-3 mb-0 edit-btn" href="javascript:;" data-id={{this.postId}}
+                data-title="{{this.Title}} " data-description="{{this.Description}} " data-image={{this.Imag}}
+                data-contents="{{this.Contents}} " data-en="{{this.En}} ">
+                <i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i>Edit
+              </a>
+            </div>
+             <div>
+               <img src=/{{this.Imag}} class="blog-card-img" alt={{this.Imag}} 
+               style=" height: 100px; max-width: 100%; margin-top: 10px;">
+
+            </div>           
+
+          </li>
+          {{/each}}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- Edit Blog Modal -->
+<div class="modal modal-xl fade" id="editBlogModal" style="z-index:9999" tabindex="-1"
+  aria-labelledby="editBlogModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="POST" action="/api/edit-blog/" id="editBlogForm" enctype="multipart/form-data">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editBlogModalLabel">Edit Article</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="editBlogId" name="postId">
+          <div class="mb-3">
+            <label for="editTitle" class="form-label">Article Title</label>
+            <input type="text" class="form-control" id="editTitle" name="title">
+          </div>
+          <div class="mb-3">
+            <label for="editDescription" class="form-label">Article Description</label>
+            <textarea class="form-control" id="editDescription" name="description" rows="2"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="editImage" class="form-label">Upload New Image (Optional)</label>
+            <input type="file" class="form-control" id="editImage" name="imag" accept="image/*">
+          </div>
+
+          <div class="mb-3">
+            <label for="editContents" class="form-label">Content</label>
+            <textarea id="editContents" name="contents"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteBlogModal" tabindex="-1" aria-labelledby="deleteBlogModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="POST" action="/api/delete-blog" id="deleteBlogForm">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteBlogModalLabel">Delete Article</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to delete this article? This action cannot be undone.</p>
+          <input type="hidden" id="deleteBlogId" name="id">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-danger">Delete</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Add Blog Modal -->
+<div class="modal modal-xl fade" id="addBlogModal" style="z-index:99999" tabindex="-1"
+  aria-labelledby="addBlogModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="POST" action="/api/add-blog" enctype="multipart/form-data">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addBlogModalLabel">Add New Article</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="title" class="form-label">Article Title</label>
+            <input type="text" class="form-control" id="title" name="title" required>
+          </div>
+          <div class="mb-3">
+            <label for="description" class="form-label">Article Description</label>
+            <textarea class="form-control" id="description" name="description" rows="2" required></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="imag" class="form-label">Upload Image</label>
+            <input type="file" class="form-control" id="image" name="imag" accept="image/*" required>
+          </div>
+          <div class="mb-3">
+            <label for="contents" class="form-label">Content</label>
+            <textarea id="contents" name="contents"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Submit Article</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+
+
+<script>
+  $('textarea#contents').tinymce({
+    height: 500,
+    menubar: false,
+    plugins: [
+      'autolink', 'lists', 'link', 'image',
+      'charmap', 'preview', 'anchor', 'searchreplace', 'visualblocks',
+      'fullscreen', 'insertdatetime', 'media', 'table', 'code',
+      'help', 'wordcount'
+    ],
+    toolbar: 'undo redo | formatselect | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | template code | help',
+    content_style: "body { font-family:Arial, Helvetica, sans-serif; font-size:14px }",
+    fontsize_formats: '8pt 10pt 12pt 14pt 18pt 24pt 36pt', // Custom font sizes
+  });
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Handle delete button click
+    document.querySelectorAll('.delete-btn').forEach(button => {
+      button.addEventListener('click', () => {
+        const id = button.dataset.id;
+        document.getElementById('deleteBlogId').value = id;
+
+        // Set the form action to include the ID in the URL
+        document.getElementById('deleteBlogForm').setAttribute('action', `/api/delete-blog/${id}`);
+
+        // Show the delete modal
+        const deleteModal = new bootstrap.Modal(document.getElementById('deleteBlogModal'));
+        deleteModal.show();
+      });
+    });
+
+    // Pre-fill the edit modal when the edit button is clicked
+    document.querySelectorAll('.edit-btn').forEach(button => {
+      button.addEventListener('click', function () {
+        const id = this.getAttribute('data-id');
+        const title = this.getAttribute('data-title');
+        const description = this.getAttribute('data-description');
+        const image = this.getAttribute('data-image');
+        const contents = this.getAttribute('data-contents');
+
+
+        // Set form action to include the postId
+        const editForm = document.getElementById('editBlogForm');
+        editForm.setAttribute('action', `/api/edit-blog/${id}`);
+
+
+        // Populate the form fields
+        document.getElementById('editBlogId').value = id; // Set ID
+        document.getElementById('editTitle').value = title; // Set Title
+        document.getElementById('editDescription').value = description; // Set Description
+        document.getElementById('editContents').value = contents; // Set Contents
+
+
+        // Handle TinyMCE content
+        const contentField = document.getElementById('editContents');
+        contentField.value = contents; // Set the raw content for fallback
+        if (tinymce.get('editContents')) {
+          tinymce.get('editContents').setContent(contents); // Set content in TinyMCE
+        }
+
+
+        // Show the edit modal
+        const editModal = new bootstrap.Modal(document.getElementById('editBlogModal'));
+        editModal.show();
+      });
+
+    });
+  });
+
+  // Initialize TinyMCE for the edit modal
+  tinymce.init({
+    selector: '#editContents',
+    height: 500,
+    menubar: 'file edit view insert format tools table help',
+    plugins: [
+      'autolink', 'lists', 'link', 'image',
+      'charmap', 'preview', 'anchor', 'searchreplace', 'visualblocks',
+      'fullscreen', 'insertdatetime', 'media', 'table', 'code',
+      'help', 'wordcount'
+    ],
+    toolbar: 'undo redo | formatselect | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | template code | help',
+    content_style: "body { font-family:Arial, Helvetica, sans-serif; font-size:14px }",
+    fontsize_formats: '8pt 10pt 12pt 14pt 18pt 24pt 36pt', // Custom font sizes
+  });
+</script>
+
+
+
+
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const successMessage = urlParams.get('success');
+  const errorMessage = urlParams.get('error');
+
+  if (successMessage) {
+    Swal.fire({ title: 'Success', text: successMessage, icon: 'success' }); // Show success message
+  }
+
+  if (errorMessage) {
+    Swal.fire({ title: 'Error', text: errorMessage, icon: 'error' }); // Show error message
+  }
+
+</script>
+
+
+
+{{!-- 
+  <div class="col-md-5 mt-4">
+    <div class="card h-100 mb-4">
+      <div class="card-header pb-0 px-3">
+        <div class="row">
+          <div class="col-md-6">
+            <h6 class="mb-0">تراکنش‌های شما</h6>
+          </div>
+          <div class="col-md-6 d-flex justify-content-end align-items-center">
+            <i class="far fa-calendar-alt me-2"></i>
+            <small>23 - 30 مارس 2020</small>
+          </div>
+        </div>
+      </div>
+      <div class="card-body pt-4 p-3">
+        <h6 class="text-uppercase text-body text-xs font-weight-bolder mb-3">جدیدترین</h6>
+        <ul class="list-group">
+          <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
+            <div class="d-flex align-items-center">
+              <button class="btn btn-icon-only btn-rounded btn-outline-danger mb-0 me-3 btn-sm d-flex align-items-center justify-content-center"><i class="fas fa-arrow-down"></i></button>
+              <div class="d-flex flex-column">
+                <h6 class="mb-1 text-dark text-sm">نتفلیکس</h6>
+                <span class="text-xs">27 مارس 2020، ساعت 12:30 بعد از ظهر</span>
+              </div>
+            </div>
+            <div class="d-flex align-items-center text-danger text-gradient text-sm font-weight-bold">
+              - $ 2,500
+            </div>
+          </li>
+          <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
+            <div class="d-flex align-items-center">
+              <button class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 btn-sm d-flex align-items-center justify-content-center"><i class="fas fa-arrow-up"></i></button>
+              <div class="d-flex flex-column">
+                <h6 class="mb-1 text-dark text-sm">اپل</h6>
+                <span class="text-xs">27 مارس 2020، ساعت 04:30 صبح</span>
+              </div>
+            </div>
+            <div class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold">
+              + $ 2,000
+            </div>
+          </li>
+        </ul>
+        <h6 class="text-uppercase text-body text-xs font-weight-bolder my-3">دیروز</h6>
+        <ul class="list-group">
+          <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
+            <div class="d-flex align-items-center">
+              <button class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 btn-sm d-flex align-items-center justify-content-center"><i class="fas fa-arrow-up"></i></button>
+              <div class="d-flex flex-column">
+                <h6 class="mb-1 text-dark text-sm">استرایپ</h6>
+                <span class="text-xs">26 مارس 2020، ساعت 13:45 بعد از ظهر</span>
+              </div>
+            </div>
+            <div class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold">
+              + $ 750
+            </div>
+          </li>
+          <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
+            <div class="d-flex align-items-center">
+              <button class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 btn-sm d-flex align-items-center justify-content-center"><i class="fas fa-arrow-up"></i></button>
+              <div class="d-flex flex-column">
+                <h6 class="mb-1 text-dark text-sm">هاب‌اسپات</h6>
+                <span class="text-xs">26 مارس 2020، ساعت 12:30 بعد از ظهر</span>
+              </div>
+            </div>
+            <div class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold">
+              + $ 1,000
+            </div>
+          </li>
+          <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
+            <div class="d-flex align-items-center">
+              <button class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 btn-sm d-flex align-items-center justify-content-center"><i class="fas fa-arrow-up"></i></button>
+              <div class="d-flex flex-column">
+                <h6 class="mb-1 text-dark text-sm">نیکس وب پروژکتس</h6>
+                <span class="text-xs">26 مارس 2020، ساعت 09:00 صبح</span>
+              </div>
+            </div>
+            <div class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold">
+              + $ 1,500
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+   --}}

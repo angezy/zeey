@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <title>
+    Star Dashboard 
+  </title>
+  <!--     Fonts and icons     -->
+<link href= "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&icon_names=paid&display=block" rel="stylesheet" />
+  <!-- Nucleo Icons -->
+  <link href="../assets/css/nucleo-icons.css" rel="stylesheet" />
+  <link href="../assets/css/nucleo-svg.css" rel="stylesheet" />
+  <!-- Font Awesome Icons -->
+  <script src="https://kit.fontawesome.com/c417bf6d22.js" crossorigin="anonymous"></script>
+  <link href="/assets/css/nucleo-svg.css" rel="stylesheet" />
+  <!-- CSS Files -->
+  <link id="pagestyle" href="/assets/css/argon-dashboard.css?v=2.0.4" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+
+
+
+
+  {{{body}}}
+
+
+{{> __dashfooter}}
+    </div>
+  </main>
+
+      {{> __dashconfig}}
+
+
+<!-- Core JS Files -->
+<script src="../assets/js/core/popper.min.js"></script>
+<script src="../assets/js/core/bootstrap.min.js"></script>
+<script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
+<script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
+<script src="../assets/js/plugins/chartjs.min.js"></script>
+
+
+
+<script>
+  // Initialize scrollbar if on Windows
+  var win = navigator.platform.indexOf('Win') > -1;
+  if (win && document.querySelector('#sidenav-scrollbar')) {
+    var options = {
+      damping: '0.5'
+    }
+    Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+  }
+</script>
+
+
+    <script>
+        // Function to handle sign out
+        async function signOut() {
+            try {
+                const response = await fetch('/auth/signout', {
+                    method: 'POST',
+                    credentials: 'include', // Ensures cookies are sent with the request
+                });
+
+                if (response.ok) {
+                    Swal.fire({
+                      icon: 'success',
+                      title: 'Signed Out',
+                      text: 'You have been signed out successfully.',
+                    });
+                    window.location.href = '/'; // Redirect to the homepage
+                } else {
+                    const error = await response.json();
+                    Swal.fire({
+                      icon: 'error',
+                      title: 'Error',
+                      text: error.message,
+                    });
+                }
+            } catch (err) {
+                console.error('Error signing out:', err);
+                alert('An error occurred. Please try again.');
+            }
+        }
+    </script>
+
+<!-- Github buttons -->
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+
+<!-- Control Center for Soft Dashboard -->
+<script src="../assets/js/argon-dashboard.min.js?v=2.0.4"></script>
+
+<!-- Script to add active class to the current page link -->
+<script>
+  // Get the current page path from the URL
+  const currentPath = window.location.pathname.split('/').pop();
+
+  // Select all sidebar links
+  const navLinks = document.querySelectorAll('#sidenav-main .nav-link');
+
+  // Loop through each link to find the one that matches the current path
+  navLinks.forEach(link => {
+    // Get the href value of each link (relative path)
+    const linkPath = link.getAttribute('href');
+
+    // If the link's href matches the current page path, add the 'active' class
+    if (linkPath === currentPath) {
+      link.classList.add('active');
+    } else {
+      // Remove 'active' class if it's not the current page
+      link.classList.remove('active');
+    }
+  });
+</script>
+</body>
+</html>

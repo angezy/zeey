@@ -1,0 +1,125 @@
+<section class="contact-section my-5">
+      <div class="container">
+    <div class="row">
+      <div class="row text-center my-sm-2 mt-5">
+        <div class=" btn bg-gradient-primary mb-3 col-lg-6 mx-auto">
+          <h2 class="text-center my-sm-2 py-2">Get in Touch</h2>
+          <p class="text-center my-sm-2 mt-5">We are eager to guide and help you sell your home FAST</p>  
+        </div>
+      </div>
+    </div>
+</div>
+
+    <div class="container  py-5">
+        <div class="row">
+
+            <div class="col-md-6">
+                <p class="mt-3 mb-4 text-muted">
+                    We're here to answer your questions <br>about anything related to
+                    Fast Cash For Your Home
+                </p>
+
+                <div>
+                    <i class="fas fa-map-marker-alt"></i>
+                    <h6 class="font-weight-medium">Our Address</h6>
+                    <p class="text-muted">100 N Ashley Dr, Tampa</p>
+                    <p class="text-muted"> Florida, 33602</p>
+                </div>
+                <div>
+                    <i class="fas fa-phone"></i>
+                    <h6 class="font-weight-medium">Contact</h6>
+                    <p class="text-muted">Mobile: +1 (323) 533-1922</p>
+                    <p class="text-muted">Mail: <a href="mailto:Info@nickhousebuyer.online"> Info@Nickhousebuyer.online</a></p>
+                </div>
+
+            </div>
+            <div class="col-md-6">
+                <div class="card move-on-hover border shadow-0 mb-3 glass-card position-sticky"
+                 style="top:100px !important; height: 300px; width: 100%;">
+                    <div class="card-body rounded-4 text-light px-5 pt-4 pb-2">
+                        <form id="contact-form" name="contact-form" action="/api/contactus" method="POST">
+                            <div class="row mb-4">
+                                <div class="col">
+                                    <div data-mdb-input-init class="form-outline">
+                                        <input name="FullName" type="text" id="FullName" class="text-dark form-control"
+                                            required />
+                                        <label class="form-label" for="FullName">Full Name</label>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div data-mdb-input-init class="form-outline">
+                                        <input name="Email" type="email" id="Email" class="text-secondary form-control"
+                                            required />
+                                        <label class="form-label" for="Email">Email</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mb-4">
+                                <div class="col">
+                                    <div data-mdb-input-init class="form-outline">
+                                        <input type="text" id="subject" name="subject" class="form-control">
+                                        <label for="subject" class="form-label">Subject</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div data-mdb-input-init class="form-outline">
+                                        <textarea type="text" id="message" name="message" rows="2"
+                                            class="form-control md-textarea"></textarea>
+                                        <label for="message" class="form-label">Your message</label>
+                                    </div>
+                                </div>
+                            </div>
+                        <br>
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-success">Submit</button>
+                        </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+</section>
+
+<!-- MDB -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.1.0/mdb.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.getElementById('contact-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const formData = {
+            FullName: document.getElementById('FullName').value,
+            Email: document.getElementById('Email').value,
+            subject: document.getElementById('subject').value,
+            message: document.getElementById('message').value,
+        };
+
+        const response = await fetch('/api/contactus', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData),
+        });
+
+        if (response.ok) {
+            Swal.fire({
+                title: 'Success!',
+                text: 'Your message has been sent.',
+                icon: 'success',
+                confirmButtonText: 'OK',
+            });
+        } else {
+            const error = await response.json();
+            Swal.fire({
+                title: 'Error!',
+                text: error.error || 'Failed to send message',
+                icon: 'error',
+                confirmButtonText: 'OK',
+            });
+        }
+    });
+</script>

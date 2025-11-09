@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <title>Cash Buyer Registration Form - Find High-Quality Real Estate Investment Deals</title>
+  <meta name="description"
+    content="Register as a cash buyer with Nick's Real Estate Services to access high-quality investment properties. Tailor your buying criteria and discover profitable real estate deals today.">
+  <meta name="keywords"
+    content="cash buyer form, real estate deals, investment properties, wholesale real estate, buy investment properties, real estate buyers, high ROI real estate">
+  <meta name="author" content="Nick's Real Estate Services">
+  <meta name="robots" content="index, follow">
+  <!-- MDB -->
+  <link rel="stylesheet" href="/public/css/mdb.min.css" />
+  <link rel="stylesheet" href="/assets/css/cs.css">
+</head>
+
+<body>
+  <section id="bg">
+    <div class="container py-5">
+      <div class="row d-flex align-items-center justify-content-center">
+        <h2 class="text-center text-dark-emphasis">Nick's Cash Buyer Form</h2>
+        <p class="text-dark  text-center">We ensure you receive high-quality properties tailored to your criteria.</p>
+
+        <div class="col-md-6">
+          <div class=" border  shadow-0 mb-3 glass-card" style="width: 100%;">
+            <div class="card-body rounded-4 text-light px-5 pt-4 pb-2">
+
+
+{{> __cash}}
+            
+            <!-- Restore previous form values (if any) -->
+            <script>
+              // formValues passed from server (may be empty)
+              window.__formValues = {{{ json formValues }}} || {};
+              window.__formErrors = {{{ json formErrors }}} || null;
+            </script>
+            <script>
+              (function restoreFormValues() {
+                if (!window.__formValues) return;
+                // Wait until DOM elements from the partial exist
+                document.addEventListener('DOMContentLoaded', function () {
+                  try {
+                    const fv = window.__formValues || {};
+                    Object.keys(fv).forEach(function (key) {
+                      const val = fv[key];
+                      if (typeof val === 'undefined' || val === null) return;
+
+                      // If the value is an array (checkbox groups) handle individually
+                      if (Array.isArray(val)) {
+                        val.forEach(function (v) {
+                          const els = document.querySelectorAll('[name="' + key + '"]');
+                          els.forEach(function (el) {
+                            if ((el.type === 'checkbox' || el.type === 'radio') && String(el.value) === String(v)) el.checked = true;
+                          });
+                        });
+                        return;
+                      }
+
+                      const elements = document.querySelectorAll('[name="' + key + '"]');
+                      if (!elements || !elements.length) return;
+                      elements.forEach(function (el) {
+                        const tag = el.tagName.toLowerCase();
+                        const type = el.type ? el.type.toLowerCase() : '';
+                        if (type === 'radio') {
+                          if (String(el.value) === String(val)) el.checked = true;
+                        } else if (type === 'checkbox') {
+                          // single checkbox with a value
+                          if (String(el.value) === String(val)) el.checked = true;
+                        } else if (tag === 'input' || tag === 'textarea' || tag === 'select') {
+                          el.value = val;
+                        }
+                      });
+                    });
+
+                    // If there are errors passed in, expose them to the query param behavior used by cb.js
+                    if (window.__formErrors && window.__formErrors.length) {
+                      try {
+                        const qs = new URLSearchParams(window.location.search);
+                        qs.set('errors', encodeURIComponent(JSON.stringify(window.__formErrors.map(e=> e.msg || e))));
+                        const base = window.location.pathname + '?' + qs.toString();
+                        history.replaceState({}, '', base);
+                      } catch (e) {
+                        // ignore
+                      }
+                    }
+                  } catch (e) {
+                    console.error('restoreFormValues error', e);
+                  }
+                });
+              })();
+            </script>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js">
+  </script>
+  <!-- MDB -->
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.1.0/mdb.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!--   Core JS Files   -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="/assets/js/cb.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

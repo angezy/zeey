@@ -1,0 +1,86 @@
+  <!-- Navbar -->
+<nav class="navbar navbar-expand-lg position-sticky z-index-sticky  top-0 navbar-light bg-white py-3">
+  <div class="container-fluid px-0">
+    <a class="navbar-brand font-weight-bolder ms-sm-3 text-sm" href="/" rel="tooltip" title="Nick House Buyer"
+     data-placement="bottom" >
+      <img src="/public/images/24.png" alt="Nick House Buyer" style="height: 50px; margin-left: 8px;">
+       
+    </a>
+    <button class="navbar-toggler shadow-none ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#navigation" aria-controls="navigation" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon mt-2">
+        <span class="navbar-toggler-bar bar1"></span>
+        <span class="navbar-toggler-bar bar2"></span>
+        <span class="navbar-toggler-bar bar3"></span>
+      </span>
+    </button>
+    <div class="collapse navbar-collapse pt-3 pb-2 py-lg-0 w-100" id="navigation">
+      <ul class="navbar-nav navbar-nav-hover ms-auto">
+
+
+        <li class="nav-item ms-lg-auto">
+          <a class="nav-link nav-link-icon me-2" href="/" >
+            <i class="material-symbols-rounded opacity-6 me-2 text-md">home</i>
+            <p class="d-inline text-sm z-index-1 font-weight-semibold" data-bs-toggle="tooltip"
+             data-bs-placement="bottom" title="Home">Home</p>
+          </a>
+        </li>
+
+
+
+        <li class="nav-item ms-lg-auto">
+          <a class="nav-link nav-link-icon me-2" href="/Blogs" >
+            <i class="material-symbols-rounded opacity-6 me-2 text-md">article</i>
+            <p class="d-inline text-sm z-index-1 font-weight-semibold" data-bs-toggle="tooltip"
+             data-bs-placement="bottom" title="Blogs">Blogs</p>
+          </a>
+        </li>
+
+
+        <li class="nav-item ms-lg-auto">
+          <a class="nav-link nav-link-icon me-2" href="/Faq" >
+            <i class="material-symbols-rounded opacity-6 me-2 text-md">shield_question</i>
+            <p class="d-inline text-sm z-index-1 font-weight-semibold" data-bs-toggle="tooltip"
+             data-bs-placement="bottom" title="FAQ's">FAQ's</p>
+          </a>
+        </li>
+
+
+
+        <li class="nav-item ms-lg-auto">
+          <a class="nav-link nav-link-icon me-2" href="/Contactus" >
+            <i class="material-symbols-rounded opacity-6 me-2 text-md">phone_callback</i>
+            <p class="d-inline text-sm z-index-1 font-weight-semibold" data-bs-toggle="tooltip"
+             data-bs-placement="bottom" title="Contact us">Contact Us</p>
+          </a>
+        </li>
+
+
+
+        <li class="nav-item my-auto ms-3 ms-lg-0"> 
+          
+          
+          <a href="/forms/fastSell" class="btn btn-danger  mb-0 mt-2 mt-md-0"
+          ><i class="material-symbols-rounded opacity-6 me-2 text-md">payments</i>Cash Offer</a>
+          
+        </li>
+
+
+      </ul>
+    </div>
+  </div>
+</nav>
+<!-- End Navbar -->
+<script>
+  // Get the navbar toggle button and the navigation menu
+  const navbarToggler = document.querySelector('.navbar-toggler');
+  const navbarCollapse = document.querySelector('#navigation');
+
+  // Listen for the scroll event
+  window.addEventListener('scroll', function () {
+    // Check if the navbar is collapsed and user is not in the header section
+    if (navbarCollapse.classList.contains('show')) {
+      // Remove the 'show' class to close the hamburger menu
+      navbarCollapse.classList.remove('show');
+    }
+  });
+</script>

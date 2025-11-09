@@ -1,0 +1,62 @@
+<head>
+    <title>Contacts</title>
+</head>
+
+<body class="g-sidenav-show bg-gray-100">
+    <div class="min-height-300 bg-primary position-absolute w-100"></div>
+    {{> __dsidenav}}
+    <main class="main-content position-relative border-radius-lg ">
+        {{> __dashnavbar}}
+
+        <div class="row">
+            {{#each contacts}}
+            <div class="col-md-4 p-2">
+                <div class="card card-profile">
+                    <div class="row justify-content-center">
+                    </div>
+                    <div class="card-header text-center border-0 pt-0 pt-lg-2 pb-4 pb-lg-3">
+                        <div class="d-flex justify-content-between">
+                            <a href="mailto:{{this.Email}}"
+                                class="btn btn-sm btn-dark float-right mb-0 d-none d-md-block">
+                                Email <i class="ni ni-email-83"></i>
+                            </a>
+                            <a href="sms:{{this.PhoneNumber}}"
+                                class="btn btn-sm btn-dark float-right mb-0 d-block d-md-block">
+                                SMS <i class="ni ni-send"></i>
+                            </a>
+                            <a href="tel:{{this.PhoneNumber}}"
+                                class="btn btn-sm btn-dark float-right mb-0 d-block d-md-block">
+                                Call <i class="fa-solid fa-phone"></i></a>
+                        </div>
+                    </div>
+                    <div class="card-body pt-0">
+                        <div class="text-center mt-4">
+                            <h5>
+                                {{this.FacebookName}}<span class="font-weight-light"><br>
+                                    {{#if (eq this.Role "specific Role:")}}
+                                    {{this.Role}} {{this.SpecificRole}}
+                                    {{else}}
+                                    {{this.Role}}
+                                    {{/if}}</span>
+                            </h5>
+                            <div class="h6 font-weight-300">
+                                <i class="ni location_pin mr-2"></i>{{this.ChatResult}}
+                            </div>
+                            <div class="h6 mt-4">
+                                <i class="ni business_briefcase-24 mr-2"></i>{{this.Email}}
+                            </div>
+                            <div>
+                                <i class="ni education_hat mr-2"></i>{{this.PhoneNumber}}
+                            </div>
+                            <div>
+                                <i class="ni education_hat mr-2"></i>
+                                <a href="https://ipinfo.io/{{this.ContactIP}}" 
+                                target="_blank">Contact Ip Location</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{/each}}
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
