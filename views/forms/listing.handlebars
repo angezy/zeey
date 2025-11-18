@@ -159,6 +159,12 @@
                   <input id="Comps3" name="Comps3" type="text" class="form-control" placeholder="Comps 3" />
                 </div>
 
+                <div class="mb-3">
+                  <label class="form-label">Preview your photos</label>
+                  <div id="photoPreview" class="d-flex flex-wrap gap-2"></div>
+                  <small id="photoPreviewStatus" class="form-text text-muted"></small>
+                </div>
+
                 <div class="d-grid mt-3">
                   <button id="submitBtn" type="submit" class="btn btn-primary btn-lg">Submit listing</button>
                 </div>
@@ -187,7 +193,8 @@
     (function(){
       // Preview selected images
       const photoFiles = document.getElementById('PhotoFiles');
-      const preview = document.getElementById('preview');
+      const preview = document.getElementById('photoPreview');
+      const previewStatus = document.getElementById('photoPreviewStatus');
       if(photoFiles && preview){
         photoFiles.addEventListener('change', function(){
           preview.innerHTML = '';
@@ -197,6 +204,7 @@
           if(files.length > 10) {
             alert('Please select up to 10 photos only');
             this.value = '';
+            if(previewStatus) previewStatus.textContent = '0 files selected';
             return;
           }
 
@@ -215,7 +223,8 @@
             const removeBtn = document.createElement('button');
             removeBtn.type = 'button';
             removeBtn.className = 'btn btn-danger btn-sm position-absolute top-0 end-0 m-1';
-            removeBtn.innerHTML = '×';
+            removeBtn.innerHTML = '&times;';
+            removeBtn.title = 'Remove';
             removeBtn.onclick = function() {
               wrapper.remove();
               // Create new FileList without this file
@@ -225,12 +234,19 @@
                 if(f !== file) dt.items.add(f);
               });
               photoFiles.files = dt.files;
+              if(previewStatus) previewStatus.textContent = `${photoFiles.files.length} file(s) selected`;
             };
             
+            const meta = document.createElement('div');
+            meta.className = 'small text-muted mt-1';
+            meta.textContent = `${file.name} (${Math.round(file.size/1024)} KB)`;
+
             wrapper.appendChild(img);
             wrapper.appendChild(removeBtn);
+            wrapper.appendChild(meta);
             preview.appendChild(wrapper);
           });
+          if(previewStatus) previewStatus.textContent = `${files.length} file(s) selected`;
         });
       }
 
@@ -259,7 +275,7 @@
         // Disable button and show spinner
         submitBtn.disabled = true;
         const originalText = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sending...';
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" ari&times;hidden="true"></span> Sending...';
 
         try{
           const fd = new FormData(form);
@@ -304,3 +320,5 @@
 </body>
 
 </html>
+
+

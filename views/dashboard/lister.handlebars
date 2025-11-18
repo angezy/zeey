@@ -8,7 +8,7 @@
     <div class="row g-3">
       {{#each listings}}
       <div class="col-12 mb-3">
-        <div class="card h-100 shadow-sm listing-card">
+        <div class="card h-100 shadow-sm listing-card" data-id="{{this.listingId}}">
           <div class="row g-0 h-100">
             <div class="col-5 col-md-4">
                     <div class="card-img-left">
@@ -22,26 +22,28 @@
             <div class="col-7 col-md-8">
               <div class="card-body d-flex flex-column h-100">
                 <div class="d-flex justify-content-between align-items-start">
-                  <h6 class="mb-1 text-truncate" title="{{this.Title}}">{{this.Title}}</h6>
+                  <h6 class="mb-1 text-truncate listing-title" title="{{this.Title}}">{{this.Title}}</h6>
                   <div class="text-end">
-                    <div class="text-primary fw-bold">${{this.AskingPrice}}</div>
+                    <div class="text-primary fw-bold listing-price">${{this.AskingPrice}}</div>
                     <div class="text-muted small">{{formatDate this.SubmitDate}}</div>
                   </div>
                 </div>
 
-                <p class="mb-1 text-muted small text-truncate">{{this.PropertyAddress}}</p>
+                <p class="mb-1 text-muted small text-truncate listing-address">{{this.PropertyAddress}}</p>
 
                 <div class="d-flex gap-2 mb-2 mt-auto align-items-center">
-                  <span class="badge bg-info text-dark"><i class="flaticon-bed"></i> {{this.Bedrooms}}</span>
-                  <span class="badge bg-info text-dark"><i class="flaticon-bathtub"></i> {{this.Bathrooms}}</span>
-                  <span class="badge bg-light text-muted">{{formatSqft this.SquareFootage this.FloorArea}}</span>
+                  <span class="badge bg-info text-dark listing-bedrooms"><i class="flaticon-bed"></i> {{this.Bedrooms}}</span>
+                  <span class="badge bg-info text-dark listing-bathrooms"><i class="flaticon-bathtub"></i> {{this.Bathrooms}}</span>
+                  <span class="badge bg-light text-muted listing-sqft">{{formatSqft this.SquareFootage this.FloorArea}}</span>
                 </div>
 
                 <div class="d-flex justify-content-between align-items-center mt-2">
-                  <div class="btn-group" role="group">
+                  <div class="btn-group flex-wrap" role="group">
                     <button class="btn btn-sm btn-outline-primary listing-detail" data-id="{{this.listingId}}">Details</button>
                     <a class="btn btn-sm btn-outline-secondary" href="tel:{{this.ContactPhone}}">Call</a>
                     <a class="btn btn-sm btn-outline-secondary" href="mailto:{{this.ContactEmail}}">Email</a>
+                    <a class="btn btn-sm btn-outline-primary edit-listing" data-id="{{this.listingId}}" href="/forms/listing?editId={{this.listingId}}">Edit</a>
+                    <button class="btn btn-sm btn-outline-danger delete-listing" data-id="{{this.listingId}}">Delete</button>
                   </div>
                   <div class="d-flex align-items-center">
                     <div class="d-flex align-items-center">
@@ -93,11 +95,73 @@
       /* Ensure consistent card height and remove inner gutters */
       .listing-card .row.g-0 { height:100%; }
       .listing-card .col-5, .listing-card .col-7 { padding:0; }
-      .listing-card .card-body { padding:14px; }
-      @media (max-width:767px){
-        .card-img-left{ min-height:160px; }
-      }
+  .listing-card .card-body { padding:14px; }
+  @media (max-width:767px){
+    .card-img-left{ min-height:160px; }
+  }
     </style>
+
+    <!-- Edit Listing Modal -->
+    <div class="modal fade" id="editListingModal" tabindex="-1" aria-labelledby="editListingModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editListingModalLabel">Edit Listing</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="editListingForm" novalidate>
+              <input type="hidden" id="editListingId">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">Title</label>
+                  <input type="text" class="form-control" id="editTitle" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Asking Price</label>
+                  <input type="number" class="form-control" id="editAskingPrice" step="0.01">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Address</label>
+                  <input type="text" class="form-control" id="editAddress">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Bedrooms</label>
+                  <input type="number" class="form-control" id="editBedrooms" min="0">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Bathrooms</label>
+                  <input type="number" class="form-control" id="editBathrooms" min="0">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Square Footage</label>
+                  <input type="number" class="form-control" id="editSqft" min="0">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Photo URL</label>
+                  <input type="text" class="form-control" id="editPhotoURL" placeholder="https://...">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Upload New Photo</label>
+                  <input type="file" class="form-control" id="editPhotoFile" accept="image/*">
+                  <div id="editPhotoPreview" class="mt-2 d-flex gap-2 flex-wrap"></div>
+                </div>
+                <div class="col-md-4 d-flex align-items-center">
+                  <div class="form-check mt-3">
+                    <input class="form-check-input" type="checkbox" id="editAvailable">
+                    <label class="form-check-label" for="editAvailable">Available</label>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary" id="saveListingBtn">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
@@ -147,6 +211,194 @@
           });
         });
 
+        // Delete listing
+        document.querySelectorAll('.delete-listing').forEach(btn => {
+          btn.addEventListener('click', async function(){
+            const id = this.dataset.id;
+            const card = this.closest('.listing-card');
+            const confirmed = await Swal.fire({
+              icon:'warning',
+              title:'Delete listing?',
+              text:'This action cannot be undone.',
+              showCancelButton:true,
+              confirmButtonText:'Delete',
+              confirmButtonColor:'#d33'
+            });
+            if(!confirmed.isConfirmed) return;
+            try{
+              Swal.fire({ title:'Deleting...', didOpen: ()=>Swal.showLoading(), allowOutsideClick:false, showConfirmButton:false });
+              const res = await fetch(`/api/listing/${id}`, { method:'DELETE' });
+              const data = await res.json();
+              Swal.close();
+              if(data && data.success){
+                card?.remove();
+                Swal.fire({ icon:'success', title:'Deleted' });
+              } else {
+                Swal.fire({ icon:'error', title:'Error', text:(data && data.message) || 'Delete failed' });
+              }
+            }catch(err){
+              Swal.close();
+              console.error(err);
+              Swal.fire({ icon:'error', title:'Network error', text:'Could not delete listing' });
+            }
+          });
+        });
+
+        // Edit listing modal
+        const listings = {{{ json listings }}};
+        const editModalEl = document.getElementById('editListingModal');
+        const editModal = editModalEl ? new bootstrap.Modal(editModalEl) : null;
+        const editFields = {
+          id: document.getElementById('editListingId'),
+          title: document.getElementById('editTitle'),
+          price: document.getElementById('editAskingPrice'),
+          address: document.getElementById('editAddress'),
+          beds: document.getElementById('editBedrooms'),
+          baths: document.getElementById('editBathrooms'),
+          sqft: document.getElementById('editSqft'),
+          photoUrl: document.getElementById('editPhotoURL'),
+          photoFile: document.getElementById('editPhotoFile'),
+          available: document.getElementById('editAvailable'),
+          photoPreview: document.getElementById('editPhotoPreview')
+        };
+
+        document.querySelectorAll('.edit-listing').forEach(btn => {
+          btn.addEventListener('click', function(e){
+            e.preventDefault();
+            if(!editModal) return;
+          const id = this.dataset.id || this.href.split('editId=')[1];
+          const item = listings.find(x => String(x.listingId) === String(id));
+          if(!item){
+            Swal.fire({icon:'error', title:'Not found', text:'Listing data missing'});
+            return;
+          }
+          editFields.id.value = item.listingId;
+          editFields.title.value = decodeHtmlEntities(item.Title || '');
+          editFields.price.value = item.AskingPrice || '';
+          editFields.address.value = decodeHtmlEntities(item.PropertyAddress || '');
+          editFields.beds.value = item.Bedrooms || '';
+          editFields.baths.value = item.Bathrooms || '';
+          editFields.sqft.value = item.SquareFootage || item.FloorArea || '';
+          editFields.photoUrl.value = decodeHtmlEntities(item.PhotoURL || '');
+          editFields.available.checked = !!item.Available;
+            // reset preview and show current image
+            if(editFields.photoPreview){
+              editFields.photoPreview.innerHTML = '';
+              const currentImg = item.PhotoFile ? ('/' + item.PhotoFile) : (item.PhotoURL || '');
+              if(currentImg){
+                const img = document.createElement('img');
+                img.src = currentImg;
+                img.style.maxWidth = '160px';
+                img.style.maxHeight = '160px';
+                img.className = 'rounded border';
+                editFields.photoPreview.appendChild(img);
+                const meta = document.createElement('div');
+                meta.className = 'small text-muted mt-1';
+                meta.textContent = 'Current image';
+                editFields.photoPreview.appendChild(meta);
+              }
+            }
+            if(editFields.photoFile){
+              editFields.photoFile.value = '';
+              editFields.photoFile.onchange = function(){
+                if(!editFields.photoPreview) return;
+                editFields.photoPreview.innerHTML = '';
+                const file = (this.files || [])[0];
+                if(!file) return;
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                img.style.maxWidth = '160px';
+                img.style.maxHeight = '160px';
+                img.className = 'rounded border';
+                editFields.photoPreview.appendChild(img);
+                const meta = document.createElement('div');
+                meta.className = 'small text-muted mt-1';
+                meta.textContent = `${file.name} (${Math.round(file.size/1024)} KB)`;
+                editFields.photoPreview.appendChild(meta);
+              };
+            }
+          editModal.show();
+        });
+      });
+
+        document.getElementById('saveListingBtn')?.addEventListener('click', async function(){
+          const id = editFields.id.value;
+          if(!id) return Swal.fire({icon:'error', title:'Missing ID'});
+          const formData = new FormData();
+          formData.append('Title', editFields.title.value.trim());
+          formData.append('AskingPrice', editFields.price.value !== '' ? editFields.price.value : '');
+          formData.append('PropertyAddress', editFields.address.value.trim());
+          formData.append('Bedrooms', editFields.beds.value !== '' ? editFields.beds.value : '');
+          formData.append('Bathrooms', editFields.baths.value !== '' ? editFields.baths.value : '');
+          formData.append('SquareFootage', editFields.sqft.value !== '' ? editFields.sqft.value : '');
+          formData.append('PhotoURL', editFields.photoUrl.value.trim());
+          formData.append('Available', editFields.available.checked ? 1 : 0);
+          if (editFields.photoFile && editFields.photoFile.files && editFields.photoFile.files[0]) {
+            formData.append('PhotoFile', editFields.photoFile.files[0]);
+          }
+          try{
+            Swal.fire({ title:'Saving...', didOpen: ()=>Swal.showLoading(), allowOutsideClick:false, showConfirmButton:false });
+            const res = await fetch(`/api/listing/${id}`, {
+              method:'PUT',
+              body: formData
+            });
+            const data = await res.json();
+            Swal.close();
+            if(data && data.success){
+              const item = listings.find(x => String(x.listingId) === String(id));
+              if(item){
+                Object.assign(item, data.listing || {});
+              }
+              const card = document.querySelector(`.listing-card[data-id="${id}"]`);
+              if(card){
+                const listingData = data.listing || {};
+                const titleEl = card.querySelector('.listing-title');
+                if(titleEl) titleEl.textContent = listingData.Title || '(No title)';
+                const priceEl = card.querySelector('.listing-price');
+                if(priceEl) priceEl.textContent = listingData.AskingPrice !== null && listingData.AskingPrice !== undefined && listingData.AskingPrice !== '' ? `$${listingData.AskingPrice}` : '$0';
+                const addrEl = card.querySelector('.listing-address');
+                if(addrEl) addrEl.textContent = listingData.PropertyAddress || '';
+                const bedEl = card.querySelector('.listing-bedrooms');
+                if(bedEl) bedEl.innerHTML = `<i class="flaticon-bed"></i> ${listingData.Bedrooms ?? ''}`;
+                const bathEl = card.querySelector('.listing-bathrooms');
+                if(bathEl) bathEl.innerHTML = `<i class="flaticon-bathtub"></i> ${listingData.Bathrooms ?? ''}`;
+                const sqftEl = card.querySelector('.listing-sqft');
+                if(sqftEl) sqftEl.textContent = (listingData.SquareFootage ? `${listingData.SquareFootage} sqft` : 'N/A');
+                const imgEl = card.querySelector('.card-img-element');
+                const placeholder = card.querySelector('.card-img-placeholder');
+                const newImg = listingData.PhotoFile ? ('/' + listingData.PhotoFile) : (listingData.PhotoURL || '');
+                if(imgEl && newImg){
+                  imgEl.src = newImg;
+                  imgEl.style.display = 'block';
+                  if(placeholder) placeholder.style.display = 'none';
+                }
+                const availBtn = card.querySelector('.availability-btn');
+                if(availBtn){
+                  const newAvail = listingData.Available ? '1' : '0';
+                  availBtn.dataset.available = newAvail;
+                  if(listingData.Available){
+                    availBtn.classList.remove('btn-outline-secondary');
+                    availBtn.classList.add('btn-success');
+                    availBtn.textContent = 'Available';
+                  } else {
+                    availBtn.classList.remove('btn-success');
+                    availBtn.classList.add('btn-outline-secondary');
+                    availBtn.textContent = 'Unavailable';
+                  }
+                }
+              }
+              editModal?.hide();
+              Swal.fire({ icon:'success', title:'Saved', timer:1200, showConfirmButton:false });
+            } else {
+              Swal.fire({ icon:'error', title:'Error', text:(data && data.message) || 'Update failed' });
+            }
+          }catch(err){
+            Swal.close();
+            console.error(err);
+            Swal.fire({ icon:'error', title:'Network error', text:'Could not save changes' });
+          }
+        });
+
         // Availability buttons -> call API to toggle and update UI in-place
         document.querySelectorAll('.availability-btn').forEach(btn => {
           btn.addEventListener('click', async function(){
@@ -179,7 +431,6 @@
         });
 
         // Listing detail modal
-        const listings = {{{ json listings }}};
         document.querySelectorAll('.listing-detail').forEach(btn => {
           btn.addEventListener('click', function(){
             const id = this.dataset.id;

@@ -40,8 +40,11 @@
                 <span class="visually-hidden">Next</span>
               </button>
             </div>
-            <div class="p-3">
-              <div id="thumbnailStrip" class="d-flex gap-2 overflow-auto" style="-webkit-overflow-scrolling: touch;" aria-label="Gallery thumbnails"></div>
+            <div class="p-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+              <div id="thumbnailStrip" class="d-flex gap-2 overflow-auto flex-grow-1" style="-webkit-overflow-scrolling: touch;" aria-label="Gallery thumbnails"></div>
+              {{#if listPost.PhotoURL}}
+              <a id="externalMediaBtn" class="btn btn-outline-primary btn-sm" href="{{sanitize listPost.PhotoURL}}" target="_blank" rel="noopener">Open external media</a>
+              {{/if}}
             </div>
           </div>
         </div>
@@ -92,7 +95,7 @@
               <li><strong>Status:</strong> {{#if listPost.Available}}<span class="badge bg-success">Available</span>{{else}}<span class="badge bg-secondary">Unavailable</span>{{/if}}</li>
               <li><strong>Garage:</strong> {{listPost.Garage}}</li>
               <li><strong>Stories:</strong> {{listPost.Stories}}</li>
-              <li><strong>Contact:</strong> {{listPost.FullName}} &bull; {{listPost.Phone}}</li>
+              <li><strong>Contact:</strong> {{listPost.FullName}}</li>
             </ul>
           </div>
         </div>
@@ -147,13 +150,6 @@
         if(post.PhotoFile){
           var parts = String(post.PhotoFile).split(',').map(function(s){ return s.trim(); }).filter(Boolean);
           parts.forEach(function(p){ images.push({ type:'image', src:p }); });
-        }
-        if(post.PhotoURL){
-          var url = String(post.PhotoURL).trim();
-          if(url){
-            var isImg = /\.(jpe?g|png|gif|webp|bmp)(\?|$)/i.test(url);
-            images.push({ type: isImg ? 'image' : 'iframe', src: url });
-          }
         }
         if(images.length === 0) images.push({ type:'placeholder', src:'/public/images/placeholder.png' });
 

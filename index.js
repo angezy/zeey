@@ -88,9 +88,10 @@ app.get('/sitemap.xml', async (req, res) => {
 // Middleware to handle cookies
 app.use(cookieParser());
 
-// Middleware to parse JSON and URL-encoded requests
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+// Middleware to parse JSON and URL-encoded requests (raise limits for uploads with metadata)
+const bodyLimit = process.env.BODY_LIMIT || '20mb';
+app.use(bodyParser.urlencoded({ extended: true, limit: bodyLimit }));
+app.use(bodyParser.json({ limit: bodyLimit }));
 
 // Configure session middleware
 app.use(session({
@@ -101,8 +102,8 @@ app.use(session({
   cookie: { secure: (process.env.NODE_ENV === 'production') }
 }));
 
-// Middleware to parse JSON requests
-app.use(express.json());
+// Middleware to parse JSON requests (keep limit in sync)
+app.use(express.json({ limit: bodyLimit }));
 
 // Set up Handlebars
 app.engine('handlebars', engine({

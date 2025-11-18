@@ -4,29 +4,67 @@ const sql = require('mssql');
 const { body, validationResult } = require('express-validator');
 const validator = require('validator');
 const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 const router = express.Router();
 require('dotenv').config();
 const dbConfig = require('../config/db');
 
 // Configure multer for multiple file uploads
+const uploadDir = path.join(__dirname, '..', 'public', 'images', 'uploads');
+// Ensure upload directory exists even when PM2 runs the app from a different CWD
+fs.mkdirSync(uploadDir, { recursive: true });
+
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'public/images/uploads'); // Specify the folder for image uploads
+        cb(null, uploadDir); // Use absolute path so PM2/daemonized runs work reliably
     },
     filename: (req, file, cb) => {
         cb(null, `${Date.now()}-${file.originalname}`);
     },
 });
-const upload = multer({ storage }).array('PhotoFiles', 10); // Allow up to 10 photos
+// Increase limits to avoid 413 rejections for larger photos
+const uploadLimits = {
+    files: 10,
+    fileSize: 50 * 1024 * 1024 // 50 MB per file
+};
+const upload = multer({ storage, limits: uploadLimits }).array('PhotoFiles', 10); // Allow up to 10 photos
+const uploadSingle = multer({ storage, limits: uploadLimits }).single('PhotoFile'); // For edit/update
+
+// Multer wrapper to capture upload errors and attach requestId early
+const handleListingUpload = (req, res, next) => {
+    req.requestId = req.requestId || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    upload(req, res, (err) => {
+        if (err) {
+            console.error(`[listing][${req.requestId}] Multer/upload error:`, err);
+            const wantsJson = !(req.headers.accept || '').includes('text/html') || (req.headers.accept || '').includes('application/json');
+            const message = err.message || 'Upload error';
+            if (wantsJson) return res.status(400).json({ success: false, error: message, requestId: req.requestId });
+            const errorMessage = encodeURIComponent(message);
+            return res.redirect(`${req.get('Referer') || '/'}?errors=${errorMessage}&requestId=${encodeURIComponent(req.requestId)}`);
+        }
+        next();
+    });
+};
 
 // POST route for listing form submission
-router.post('/listing', upload, async (req, res) => {
+router.post('/listing', handleListingUpload, async (req, res) => {
+    const requestId = req.requestId || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
     const formData = (req.session && req.session.formData) || req.body;
-    const referrer = req.get('Referer');
+    const referrer = req.get('Referer') || '/';
     const userIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
     
     // Handle multiple files
     const imageFiles = req.files ? req.files.map(file => `public/images/uploads/${file.filename}`).join(',') : null;
+    console.log(`[listing][${requestId}] Incoming submission from IP ${userIP}`);
+    console.log(`[listing][${requestId}] Body keys:`, Object.keys(formData || {}));
+    console.log(`[listing][${requestId}] Uploaded files:`, (req.files || []).map(f => ({
+        fieldname: f.fieldname,
+        originalname: f.originalname,
+        mimetype: f.mimetype,
+        size: f.size,
+        path: f.path
+    })));
 
     // helper: detect whether client prefers JSON (AJAX/fetch) or HTML (legacy form)
     const accept = (req.headers.accept || '');
@@ -88,6 +126,8 @@ router.post('/listing', upload, async (req, res) => {
 
         // ensure uploaded imagePaths are decoded as well
         var decodedImageFiles = imageFiles ? decodeHtmlEntities(imageFiles) : imageFiles;
+        console.log(`[listing][${requestId}] normalizedPhotoUrl=`, normalizedPhotoUrl);
+        console.log(`[listing][${requestId}] decodedImageFiles=`, decodedImageFiles);
 
         // Store raw/trimmed values for fields that must preserve slashes and punctuation
         // We'll rely on template-side escaping when rendering to avoid XSS while keeping original input intact.
@@ -121,17 +161,25 @@ router.post('/listing', upload, async (req, res) => {
             Comps2: validator.trim(formData.Comps2 || ''),
             Comps3: validator.trim(formData.Comps3 || '')
         };
+        console.log(`[listing][${requestId}] sanitizedFormData preview:`, {
+            Title: sanitizedFormData.Title,
+            FullName: sanitizedFormData.FullName,
+            Email: sanitizedFormData.Email,
+            PhotoFile: sanitizedFormData.PhotoFile,
+            PhotoURL: sanitizedFormData.PhotoURL,
+            LotArea: sanitizedFormData.LotArea,
+            FloorArea: sanitizedFormData.FloorArea
+        });
 
-        // Require either uploaded image or a valid external URL
-        if (!sanitizedFormData.PhotoFile && !(sanitizedFormData.PhotoURL && validator.isURL(sanitizedFormData.PhotoURL, { require_protocol: true }))) {
-            const msg = 'Please upload a photo or provide a valid Photo URL (example: https://drive.google.com/...).';
-            if (wantsJson) return res.status(400).json({ success: false, error: msg });
-            const errorMessage = encodeURIComponent(msg);
-            return res.redirect(`${referrer}?errors=${errorMessage}`);
+        // Optional photos: warn if missing but do not block submission
+        if (!sanitizedFormData.PhotoFile && !sanitizedFormData.PhotoURL) {
+            console.warn(`[listing][${requestId}] No photo file or URL provided; continuing without images.`);
         }
 
     // Connect to MSSQL
+    console.log(`[listing][${requestId}] Connecting to SQL...`);
     const pool = await sql.connect(dbConfig);
+    console.log(`[listing][${requestId}] SQL connected.`);
 
         // Insert Data into Listings_tbl
         const query = `
@@ -163,7 +211,7 @@ router.post('/listing', upload, async (req, res) => {
             .input('ReasonForSelling', sql.NVarChar, sanitizedFormData.ReasonForSelling)
             .input('SubmitDate', sql.DateTime, sanitizedFormData.SubmitDate)
             .input('ListerIP', sql.VarChar, sanitizedFormData.ListerIP)
-            .input('PhotoFile', sql.NVarChar, imageFiles)
+            .input('PhotoFile', sql.NVarChar, sanitizedFormData.PhotoFile)
             .input('PhotoURL', sql.NVarChar, sanitizedFormData.PhotoURL)
             .input('LotArea', sql.Int, sanitizedFormData.LotArea)
             .input('FloorArea', sql.Int, sanitizedFormData.FloorArea)
@@ -176,6 +224,7 @@ router.post('/listing', upload, async (req, res) => {
             .input('Comps2', sql.NVarChar, sanitizedFormData.Comps2)
             .input('Comps3', sql.NVarChar, sanitizedFormData.Comps3)
             .query(query);
+        console.log(`[listing][${requestId}] Insert OK, new record id (if available):`, result.recordset && result.recordset[0]);
 
         const { sendEmail, sendEmailWithTemplate } = require('../models/mailer');
 
@@ -205,12 +254,17 @@ router.post('/listing', upload, async (req, res) => {
             return res.redirect(`${referrer}?success=${successMessage}`);
         }
     } catch (err) {
-        console.error(err);
+        console.error(`[listing][${requestId}] Error during submission:`, err && err.stack ? err.stack : err);
+        // Surface a bit more detail to clients for debugging (still generic for HTML flow)
         if (wantsJson) {
-            return res.status(500).json({ success: false, error: 'Error saving data to database' });
+            return res.status(500).json({
+                success: false,
+                error: err && err.message ? err.message : 'Error saving data to database',
+                requestId
+            });
         }
         const errorMessage = encodeURIComponent("Error saving data to database");
-        return res.redirect(`${referrer}?errors=${errorMessage}`);
+        return res.redirect(`${referrer}?errors=${errorMessage}&requestId=${encodeURIComponent(requestId)}`);
     } finally {
         try { sql.close(); } catch(e) { console.error('Error closing connection:', e.message); }
     }
@@ -238,6 +292,106 @@ router.post("/update-availability", async (req, res) => {
     } finally {
         try { sql.close(); } catch(e) { console.error('Error closing connection:', e.message); }
     }
+});
+
+// DELETE a listing by id (dashboard use)
+router.delete("/listing/:id", async (req, res) => {
+    const id = parseInt(req.params.id, 10);
+    if (!id) {
+        return res.status(400).json({ success: false, message: "Invalid listing ID" });
+    }
+    try {
+        const pool = await sql.connect(dbConfig);
+        const result = await pool
+            .request()
+            .input("listingId", sql.Int, id)
+            .query("DELETE FROM listings_tbl WHERE listingId = @listingId");
+
+        const rows = result.rowsAffected && result.rowsAffected[0] ? result.rowsAffected[0] : 0;
+        if (rows === 0) {
+            return res.status(404).json({ success: false, message: "Listing not found" });
+        }
+        return res.json({ success: true, message: "Listing deleted" });
+    } catch (error) {
+        console.error("Delete listing error:", error);
+        return res.status(500).json({ success: false, message: "Database error" });
+    } finally {
+        try { sql.close(); } catch(e) { console.error('Error closing connection:', e.message); }
+    }
+});
+
+// PUT update a listing (dashboard edit)
+router.put("/listing/:id", async (req, res) => {
+    const id = parseInt(req.params.id, 10);
+    if (!id) return res.status(400).json({ success: false, message: "Invalid listing ID" });
+
+    // allow multipart with optional file
+    uploadSingle(req, res, async (err) => {
+        if (err) {
+            console.error("Update listing upload error:", err);
+            return res.status(400).json({ success: false, message: err.message || "Upload error" });
+        }
+
+        const body = req.body || {};
+        const newPhotoFile = req.file ? path.join('public', 'images', 'uploads', req.file.filename).replace(/\\\\/g, '/') : null;
+
+        try {
+            const pool = await sql.connect(dbConfig);
+            // fetch existing to preserve missing fields
+            const existingResult = await pool.request()
+                .input("listingId", sql.Int, id)
+                .query("SELECT * FROM listings_tbl WHERE listingId = @listingId");
+            const existing = (existingResult.recordset || [])[0];
+            if (!existing) return res.status(404).json({ success: false, message: "Listing not found" });
+
+            const upd = {
+                Title: body.Title !== undefined ? body.Title : existing.Title,
+                PropertyAddress: body.PropertyAddress !== undefined ? body.PropertyAddress : existing.PropertyAddress,
+                AskingPrice: body.AskingPrice !== undefined && body.AskingPrice !== '' ? Number(body.AskingPrice) : existing.AskingPrice,
+                Bedrooms: body.Bedrooms !== undefined && body.Bedrooms !== '' ? Number(body.Bedrooms) : existing.Bedrooms,
+                Bathrooms: body.Bathrooms !== undefined && body.Bathrooms !== '' ? Number(body.Bathrooms) : existing.Bathrooms,
+                SquareFootage: body.SquareFootage !== undefined && body.SquareFootage !== '' ? Number(body.SquareFootage) : existing.SquareFootage,
+                PhotoURL: body.PhotoURL !== undefined ? body.PhotoURL : existing.PhotoURL,
+                PhotoFile: newPhotoFile || body.PhotoFile || existing.PhotoFile,
+                Available: body.Available !== undefined ? Number(body.Available) : existing.Available
+            };
+
+            const result = await pool.request()
+                .input("listingId", sql.Int, id)
+                .input("Title", sql.NVarChar, upd.Title)
+                .input("PropertyAddress", sql.NVarChar, upd.PropertyAddress)
+                .input("AskingPrice", sql.Money, upd.AskingPrice)
+                .input("Bedrooms", sql.Int, upd.Bedrooms)
+                .input("Bathrooms", sql.Int, upd.Bathrooms)
+                .input("SquareFootage", sql.Int, upd.SquareFootage)
+                .input("PhotoURL", sql.NVarChar, upd.PhotoURL)
+                .input("PhotoFile", sql.NVarChar, upd.PhotoFile)
+                .input("Available", sql.Bit, upd.Available)
+                .query(`
+                    UPDATE listings_tbl
+                    SET Title=@Title,
+                        PropertyAddress=@PropertyAddress,
+                        AskingPrice=@AskingPrice,
+                        Bedrooms=@Bedrooms,
+                        Bathrooms=@Bathrooms,
+                        SquareFootage=@SquareFootage,
+                        PhotoURL=@PhotoURL,
+                        PhotoFile=@PhotoFile,
+                        Available=@Available
+                    WHERE listingId=@listingId
+                `);
+
+            const rows = result.rowsAffected && result.rowsAffected[0] ? result.rowsAffected[0] : 0;
+            if (rows === 0) return res.status(404).json({ success: false, message: "Listing not found" });
+
+            return res.json({ success: true, message: "Listing updated", listing: { listingId: id, ...upd } });
+        } catch (error) {
+            console.error("Update listing error:", error);
+            return res.status(500).json({ success: false, message: "Database error" });
+        } finally {
+            try { sql.close(); } catch(e) { console.error('Error closing connection:', e.message); }
+        }
+    });
 });
 
 module.exports = router;
