@@ -1,0 +1,444 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+</head>
+
+<body class="property-finder-page bg-light">
+  <style>
+    .pf-hero .container {
+      max-width: 100%;
+      width: 100%;
+      padding-left: 5vw;
+      padding-right: 5vw;
+    }
+    .pf-hero h1 {
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      margin-bottom: 1rem;
+    }
+    .pf-hero p.lead {
+      font-size: clamp(1.1rem, 2vw, 1.6rem);
+      max-width: 1000px;
+      margin: 0 auto 1rem;
+    }
+    .pf-hero .text-uppercase {
+      letter-spacing: 0.2em;
+    }
+  </style>
+  {{> __newnav}}
+
+  <section class="hero-wrap hero-wrap-2 pf-hero" style="background: linear-gradient(135deg, #cc0000, #f44336); min-height: 300px; max-height: 400px;">
+    <div class="overlay" style="background: rgba(3, 11, 35, 0.55);max-height: 400px;"></div>
+    <div class="container position-relative py-3 text-white">
+      <div class="row justify-content-center">
+        <div class="col-12">
+          <div class="d-flex flex-column align-items-center text-center">
+            <p class="text-uppercase fw-bold letter-spacing-wide mb-2">Property Finder (Bird Dog) Team</p>
+            <h1 class="display-5 fw-bold mb-4">Turn your neighborhood intel into <span class="text-warning">$1,000 - $5,000+</span> rewards</h1>
+            <p class="lead mb-3">
+              We move fast on off-market deals. When you spot the opportunity and we close it, you get paid. It's that simple:
+              <strong>we win when you win</strong>.
+            </p>
+            <div class="d-flex flex-column flex-md-row justify-content-center gap-2">
+              <a class="btn btn-light text-primary fw-semibold px-4 py-2 mb-2 mb-md-0" href="#property-finder-root">Become a Bird Dog</a>
+              <a class="btn btn-outline-light fw-semibold px-4 py-2" target="_blank" rel="noopener" href="{{telegramLink}}">
+                Jump into Telegram HQ
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div id="property-finder-root" class="py-4"></div>
+
+  {{> __newfooter}}
+
+  <!-- React + MUI bundle -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@emotion/react@11.11.4/dist/emotion-react.umd.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@emotion/styled@11.11.0/dist/emotion-styled.umd.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@mui/material@5.15.15/umd/material-ui.development.js" crossorigin></script>
+
+  <script>
+    (function () {
+      const rootNode = document.getElementById('property-finder-root');
+      if (!rootNode || typeof React === 'undefined' || typeof MaterialUI === 'undefined') {
+        console.warn('Property finder shell missing required libraries.');
+        return;
+      }
+      const TELEGRAM_URL = {{{json telegramLink}}};
+      const {
+        createTheme,
+        ThemeProvider,
+        CssBaseline,
+        Container,
+        Box,
+        Grid,
+        Typography,
+        Chip,
+        Card,
+        CardContent,
+        CardActions,
+        Stack,
+        TextField,
+        Button,
+        Divider,
+        Alert,
+        Link,
+        MenuItem,
+        FormControlLabel,
+        Checkbox
+      } = MaterialUI;
+
+      const theme = createTheme({
+        palette: {
+          primary: { main: '#0d6efd' },
+          secondary: { main: '#6f42c1' },
+          background: { default: '#f4f6fb' }
+        },
+        shape: { borderRadius: 16 },
+        typography: {
+          fontFamily: 'Inter, "Segoe UI", sans-serif'
+        }
+      });
+
+      const benefits = [
+        {
+          title: 'Fast cash closings',
+          body: 'We are cash-ready buyers. When your lead fits our buy box, we can close in 7-10 days.'
+        },
+        {
+          title: 'Guide + mentorship',
+          body: 'Step-by-step bird dog playbook, live tips, and inspo inside the Telegram HQ to sharpen your hunt.'
+        },
+        {
+          title: 'Transparent payouts',
+          body: 'Earn $1,000 to $5,000+ per qualified deal. We summarize how rewards work before every assignment.'
+        }
+      ];
+
+      const resourceSections = [
+        {
+          title: 'New member guide & mission',
+          body: 'Start here to understand how we partner, the rhythm of the group, and how fast we expect to move.',
+          link: 'https://t.me/c/1888731494/1/9'
+        },
+        {
+          title: 'Cooperation terms & rewards',
+          body: 'Everything about contracts, payouts, and the exact way we track who brought which lead.',
+          link: 'https://t.me/c/1888731494/5/14'
+        },
+        {
+          title: 'Tutorials & tricks',
+          body: 'Ninja tactics to source off-market deals, how to talk to sellers, and what filters to run every morning.',
+          link: 'https://t.me/c/1888731494/6/24'
+        },
+        {
+          title: 'Buy criteria',
+          body: 'Location, condition, and pricing guardrails. Use this as your checklist before sending anything in.',
+          link: 'https://t.me/c/1888731494/2/67'
+        },
+        {
+          title: 'Monetization & bonuses',
+          body: 'See the bonus ladder plus creative ways the community makes side income along the way.',
+          link: 'https://t.me/c/1888731494/4/61'
+        },
+        {
+          title: 'Daily opportunities feed',
+          body: 'Fresh leads, motivation, and proof-of-progress posted in real time.',
+          link: 'https://t.me/c/1888731494/3/65'
+        }
+      ];
+
+      const experienceOptions = [
+        { value: 'starter', label: 'New to bird dogging' },
+        { value: 'hobbyist', label: 'Closed 1-3 leads' },
+        { value: 'pro', label: 'Experienced deal hunter' }
+      ];
+
+      const rewardOptions = [
+        { value: '1000', label: '$1,000 starter goal' },
+        { value: '1500', label: '$1,500 goal' },
+        { value: '2500', label: '$2,500+ goal' },
+        { value: '5000', label: '$5,000 elite bonus' }
+      ];
+
+      const initialForm = {
+        fullName: '',
+        email: '',
+        phone: '',
+        telegramHandle: '',
+        marketFocus: '',
+        experience: 'starter',
+        strategy: '',
+        motivation: '',
+        rewardGoal: '1500',
+        acceptedRules: false,
+        joinTelegram: true
+      };
+
+      function PropertyFinderApp() {
+        const [form, setForm] = React.useState(initialForm);
+        const [submitting, setSubmitting] = React.useState(false);
+        const [feedback, setFeedback] = React.useState(null);
+
+        const handleChange = (field) => (event) => {
+          const value = event?.target?.type === 'checkbox' ? event.target.checked : event.target.value;
+          setForm((prev) => ({ ...prev, [field]: value }));
+        };
+
+        const handleSubmit = async (event) => {
+          event.preventDefault();
+          setSubmitting(true);
+          setFeedback(null);
+          try {
+            const response = await fetch('/api/property-finder', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(form)
+            });
+            const result = await response.json().catch(() => ({}));
+            if (!response.ok) {
+              const message = result?.errors?.length
+                ? result.errors.map((e) => e.msg).join(', ')
+                : (result?.error || 'Unable to submit right now.');
+              throw new Error(message);
+            }
+            const nextUrl = result?.next || '/property-finder/agreement';
+            if (typeof window !== 'undefined' && nextUrl) {
+              window.location.assign(nextUrl);
+              return;
+            }
+            setFeedback({ type: 'success', message: result?.message || 'Welcome aboard! Check Telegram for the next step.' });
+            setForm({ ...initialForm, joinTelegram: true });
+          } catch (error) {
+            setFeedback({ type: 'error', message: error.message || 'Unexpected error. Please try again.' });
+          } finally {
+            setSubmitting(false);
+          }
+        };
+
+        return (
+          React.createElement(ThemeProvider, { theme },
+            React.createElement(React.Fragment, null,
+              React.createElement(CssBaseline, null),
+              React.createElement(Box, { sx: { py: { xs: 4, md: 6 }, backgroundColor: 'background.default' } },
+                React.createElement(Container, { maxWidth: 'lg' },
+                  React.createElement(Grid, { container: true, spacing: 3, sx: { mb: 4 } },
+                    benefits.map((item) =>
+                      React.createElement(Grid, { item: true, xs: 12, md: 4, key: item.title },
+                        React.createElement(Card, { elevation: 3, sx: { height: '100%' } },
+                          React.createElement(CardContent, null,
+                            React.createElement(Stack, { spacing: 2 },
+                              React.createElement(Chip, { label: 'Benefit', color: 'secondary', variant: 'outlined', size: 'small' }),
+                              React.createElement(Typography, { variant: 'h6', component: 'h3' }, item.title),
+                              React.createElement(Typography, { variant: 'body2', color: 'text.secondary' }, item.body)
+                            )
+                          )
+                        )
+                      )
+                    )
+                  ),
+                  React.createElement(Card, { variant: 'outlined', sx: { mb: 4 } },
+                    React.createElement(CardContent, null,
+                      React.createElement(Grid, { container: true, spacing: 3, alignItems: 'center' },
+                        React.createElement(Grid, { item: true, xs: 12, md: 7 },
+                          React.createElement(Typography, { variant: 'h5', className: 'fw-bold' },
+                            'How the Property Finder track works'
+                          ),
+                          React.createElement(Typography, { variant: 'body1', color: 'text.secondary', sx: { mt: 1 } },
+                            'Bring us qualified off-market deals that match the buy criteria. We jump on the conversation, handle contracts, inspect, and close for cash. You stay in the loop and collect your success bonus once the deal funds.'
+                          ),
+                          React.createElement(Stack, { direction: { xs: 'column', sm: 'row' }, spacing: 1, sx: { mt: 2 } },
+                            ['Find motivated sellers', 'Submit details fast', 'We close + pay you'].map(step =>
+                              React.createElement(Chip, { key: step, label: step, color: 'primary', variant: 'outlined' })
+                            )
+                          )
+                        ),
+                        React.createElement(Grid, { item: true, xs: 12, md: 5 },
+                          React.createElement(Card, { raised: true, sx: { background: 'linear-gradient(135deg, #0d6efd, #6f42c1)', color: '#fff' } },
+                            React.createElement(CardContent, null,
+                              React.createElement(Typography, { variant: 'overline', sx: { color: 'rgba(255,255,255,.8)' } }, 'Reward snapshot'),
+                              React.createElement(Typography, { variant: 'h4', sx: { fontWeight: 700 } }, '$1,000 – $5,000+'),
+                              React.createElement(Typography, { variant: 'body2', sx: { mb: 2 } }, 'Paid once our partners green-light the house and close. Bigger spreads = bigger win bonuses.'),
+                              React.createElement(Button, {
+                                variant: 'contained',
+                                color: 'secondary',
+                                href: TELEGRAM_URL,
+                                target: '_blank',
+                                rel: 'noopener',
+                                sx: { mt: 1 }
+                              }, 'See proof inside Telegram')
+                            )
+                          )
+                        )
+                      )
+                    )
+                  ),
+                  React.createElement(Grid, { container: true, spacing: 3 },
+                    React.createElement(Grid, { item: true, xs: 12, md: 7 },
+                      React.createElement(Card, { elevation: 4 },
+                        React.createElement(CardContent, null,
+                          React.createElement(Typography, { variant: 'h5', gutterBottom: true }, 'Apply to the Bird Dog roster'),
+                          React.createElement(Typography, { variant: 'body2', color: 'text.secondary', sx: { mb: 2 } },
+                            'Tell us who you are, where you hunt, and how we can help you lock in consistent bonuses.'
+                          ),
+                          feedback && React.createElement(Alert, { severity: feedback.type, sx: { mb: 2 } }, feedback.message),
+                          React.createElement('form', { onSubmit: handleSubmit },
+                            React.createElement(Stack, { spacing: 2 },
+                              React.createElement(TextField, {
+                                label: 'Full name',
+                                required: true,
+                                value: form.fullName,
+                                onChange: handleChange('fullName'),
+                                placeholder: 'Parmis the Deal Hunter'
+                              }),
+                              React.createElement(Grid, { container: true, spacing: 2 },
+                                React.createElement(Grid, { item: true, xs: 12, sm: 6 },
+                                  React.createElement(TextField, {
+                                    label: 'Email',
+                                    type: 'email',
+                                    value: form.email,
+                                    onChange: handleChange('email')
+                                  })
+                                ),
+                                React.createElement(Grid, { item: true, xs: 12, sm: 6 },
+                                  React.createElement(TextField, {
+                                    label: 'Phone / WhatsApp',
+                                    value: form.phone,
+                                    onChange: handleChange('phone')
+                                  })
+                                )
+                              ),
+                              React.createElement(TextField, {
+                                label: 'Preferred city / market',
+                                value: form.marketFocus,
+                                onChange: handleChange('marketFocus'),
+                                placeholder: 'Orlando, Tampa, Polk County...'
+                              }),
+                              React.createElement(TextField, {
+                                label: 'Experience level',
+                                select: true,
+                                value: form.experience,
+                                onChange: handleChange('experience')
+                              },
+                                experienceOptions.map((option) =>
+                                  React.createElement(MenuItem, { key: option.value, value: option.value }, option.label)
+                                )
+                              ),
+                              React.createElement(TextField, {
+                                label: 'How will you hunt deals?',
+                                value: form.strategy,
+                                onChange: handleChange('strategy'),
+                                placeholder: 'Driving for dollars, agent network, auctions...'
+                              }),
+                              React.createElement(TextField, {
+                                label: 'Why do you want to join?',
+                                value: form.motivation,
+                                onChange: handleChange('motivation'),
+                                multiline: true,
+                                minRows: 3
+                              }),
+                              React.createElement(TextField, {
+                                label: 'Reward target',
+                                select: true,
+                                value: form.rewardGoal,
+                                onChange: handleChange('rewardGoal')
+                              },
+                                rewardOptions.map((option) =>
+                                  React.createElement(MenuItem, { key: option.value, value: option.value }, option.label)
+                                )
+                              ),
+                              React.createElement(TextField, {
+                                label: 'Telegram @username (optional)',
+                                value: form.telegramHandle,
+                                onChange: handleChange('telegramHandle'),
+                                placeholder: '@yourhandle'
+                              }),
+                              React.createElement(FormControlLabel, {
+                                control: React.createElement(Checkbox, {
+                                  color: 'primary',
+                                  checked: form.joinTelegram,
+                                  onChange: handleChange('joinTelegram')
+                                }),
+                                label: 'I will join the Telegram HQ to stay synced.'
+                              }),
+                              React.createElement(FormControlLabel, {
+                                control: React.createElement(Checkbox, {
+                                  color: 'secondary',
+                                  required: true,
+                                  checked: form.acceptedRules,
+                                  onChange: handleChange('acceptedRules')
+                                }),
+                                label: 'I read the guide above and understand that we earn together.'
+                              }),
+                              React.createElement(Button, {
+                                type: 'submit',
+                                variant: 'contained',
+                                size: 'large',
+                                disabled: submitting
+                              }, submitting ? 'Sending...' : 'Lock in my spot')
+                            )
+                          )
+                        ),
+                        form.joinTelegram && feedback?.type === 'success' && React.createElement(CardActions, { sx: { justifyContent: 'flex-end' } },
+                          React.createElement(Button, {
+                            href: TELEGRAM_URL,
+                            target: '_blank',
+                            rel: 'noopener',
+                            color: 'secondary'
+                          }, 'Open Telegram group')
+                        )
+                      )
+                    ),
+                    React.createElement(Grid, { item: true, xs: 12, md: 5 },
+                      React.createElement(Stack, { spacing: 3 },
+                        React.createElement(Card, { elevation: 0, variant: 'outlined' },
+                          React.createElement(CardContent, null,
+                            React.createElement(Typography, { variant: 'subtitle2', color: 'text.secondary', textTransform: 'uppercase' }, 'Daily momentum'),
+                            resourceSections.map((resource) =>
+                              React.createElement(Box, { key: resource.title, sx: { mb: 2, pb: 2, borderBottom: '1px solid', borderColor: 'divider' } },
+                                React.createElement(Typography, { variant: 'h6', sx: { mb: 0.5 } }, resource.title),
+                                React.createElement(Typography, { variant: 'body2', color: 'text.secondary' }, resource.body),
+                                React.createElement(Link, { href: resource.link, target: '_blank', rel: 'noopener' }, 'Open on Telegram')
+                              )
+                            )
+                          )
+                        ),
+                        React.createElement(Card, { sx: { backgroundColor: '#fffbea' } },
+                          React.createElement(CardContent, null,
+                            React.createElement(Typography, { variant: 'h6' }, 'Parmis says:'),
+                            React.createElement(Typography, { variant: 'body2', color: 'text.secondary', sx: { mt: 1 } },
+                              '“Congratulations on discovering this opportunity! Prepare yourself for a potential career with no cap on income. We buy when your lead is solid, and then we both win.”'
+                            ),
+                            React.createElement(Divider, { sx: { my: 2 } }),
+                            React.createElement(Button, {
+                              variant: 'outlined',
+                              color: 'primary',
+                              href: TELEGRAM_URL,
+                              target: '_blank',
+                              rel: 'noopener'
+                            }, 'Read the full welcome message')
+                          )
+                        )
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          )
+        );
+      }
+
+      const appTree = React.createElement(PropertyFinderApp);
+      if (ReactDOM.createRoot) {
+        ReactDOM.createRoot(rootNode).render(appTree);
+      } else {
+        ReactDOM.render(appTree, rootNode);
+      }
+    })();
+  </script>
+</body>

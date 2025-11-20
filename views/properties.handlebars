@@ -3,255 +3,457 @@
 
 </head>
 
-<body class="">
-	{{> __newnav}}
+<body class="properties-page" style="background:#ffffff;color:#0f172a;">
+  {{> __newnav}}
 
+  <div id="properties-app" class="pt-2 pb-5"></div>
 
-	<!-- Hero -->
-	<section class="hero-wrap hero-wrap-2 ftco-degree-bg js-fullheight"
-		style="background-image: url('public/images/bg_1.jpg');">
-		<div class="overlay"></div>
-		<div class="container">
-			<div class="row no-gutters slider-text js-fullheight align-items-end justify-content-center">
-				<div class="col-md-9 ftco-animate pb-5 mb-5 text-center">
-					<h1 class="mb-3 bread">Available Properties</h1>
-					<p class="lead">Curated, premium listings with priority support and exclusive features.</p>
-					<p class="breadcrumbs"><span class="mr-2"><a href="/">Home <i
-									class="ion-ios-arrow-forward"></i></a></span>
-						<span class="mr-2"><a href="/Properties">Properties <i
-									class="ion-ios-arrow-forward"></i></a></span>
-					</p>
-				</div>
-			</div>
-		</div>
-	</section>
+  {{> __newfooter}}
 
-	<!-- Filters / Controls -->
-	<section class="ftco-section bg-light">
-		<div class="container">
-			<style>
-				/* Fix flaticon default margin and sizing inside property cards */
-				.property-card [class^="flaticon-"],
-				.property-card [class*=" flaticon-"] {
-					font-family: Flaticon !important;
-					font-size: 18px !important;
-					margin-left: 0 !important;
-					/* override flaticon global left margin */
-					margin-right: 8px !important;
-					display: inline-block;
-					vertical-align: middle;
-				}
-			</style>
-			<form class="mb-4" role="search" aria-label="Property filters">
-				<div class="row align-items-center">
-					<div class="col-md-4 mb-2">
-						<input type="search" name="q" class="form-control"
-							placeholder="Search by city, address, or keyword" aria-label="Search properties">
-					</div>
-					<div class="col-md-2 mb-2">
-						<select class="form-control" name="beds" aria-label="Bedrooms">
-							<option value="">Beds</option>
-							<option>1+</option>
-							<option>2+</option>
-							<option>3+</option>
-							<option>4+</option>
-						</select>
-					</div>
-					<div class="col-md-2 mb-2">
-						<select class="form-control" name="baths" aria-label="Bathrooms">
-							<option value="">Baths</option>
-							<option>1+</option>
-							<option>2+</option>
-							<option>3+</option>
-						</select>
-					</div>
-					<div class="col-md-2 mb-2">
-						<select class="form-control" name="priceRange" aria-label="Price range">
-							<option value="">Price</option>
-							<option>$0 - $100k</option>
-							<option>$100k - $300k</option>
-							<option>$300k+</option>
-						</select>
-					</div>
-					<div class="col-md-2 text-right mb-2">
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="checkbox" id="proOnly" name="proOnly">
-							<label class="form-check-label" for="proOnly">Pro only</label>
-						</div>
-						<button type="submit" class="btn btn-primary btn-sm ml-2">Filter</button>
-					</div>
-				</div>
-			</form>
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@emotion/react@11.11.4/dist/emotion-react.umd.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@emotion/styled@11.11.0/dist/emotion-styled.umd.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@mui/material@5.15.15/umd/material-ui.development.js" crossorigin></script>
 
-			<!-- Properties grid -->
-			<div class="row" id="properties-grid">
-				{{#each property}}
-				<div class="col-lg-4 col-md-6 mb-4">
-					<article class="card property-card h-100 shadow-sm" aria-labelledby="title-{{this.listingId}}">
-						<div class="card-img-top position-relative"
-							style="background-image:url({{this.PhotoFile}}); background-size:cover; background-position:center; height:220px;">
-							<!-- Pro badge (assumption: property has IsPro boolean) -->
-							{{#if this.IsPro}}
-							<span class="badge badge-warning position-absolute" style="top:12px; left:12px;">PRO</span>
-							{{/if}}
+  <script>
+    (function () {
+      const root = document.getElementById('properties-app');
+      const React = window.React;
+      const ReactDOM = window.ReactDOM;
+      if (!root || !React || !ReactDOM || !window.MaterialUI) return;
+      const { useState, useEffect, useMemo } = React;
 
-							<div class="card-actions position-absolute" style="right:12px; top:12px;">
-								<a href="/property/{{this.listingId}}" class="btn btn-sm btn-light"
-									aria-label="View details for {{this.Title}}">Details</a>
-							</div>
-						</div>
+      const listings = Array.isArray({{{json property}}}) ? {{{json property}}} : [];
 
-						<div class="card-body d-flex flex-column">
-							<div class="d-flex justify-content-between align-items-start mb-2">
-								<h3 id="title-{{this.listingId}}" class="h5 mb-0"><a
-										href="/property/{{this.listingId}}">{{this.Title}}</a></h3>
-								<div class="text-right text-primary font-weight-bold">${{this.AskingPrice}}</div>
-							</div>
+      const {
+        ThemeProvider,
+        createTheme,
+        CssBaseline,
+        Box,
+        Container,
+        Typography,
+        Stack,
+        TextField,
+        FormControl,
+        InputLabel,
+        Select,
+        MenuItem,
+        Switch,
+        Grid,
+        Card,
+        CardContent,
+        CardActions,
+        Chip,
+        Button,
+        Divider,
+        Alert,
+        IconButton
+      } = window.MaterialUI;
 
-							<p class="text-muted small mb-2"><i class="ion-ios-pin"></i> {{this.PropertyAddress}}</p>
+      const theme = createTheme({
+        palette: {
+          mode: 'light',
+          primary: { main: '#0f172a' },
+          secondary: { main: '#64748b' },
+          background: { default: '#ffffff', paper: '#ffffff' },
+          text: { primary: '#0f172a', secondary: '#64748b' }
+        },
+        shape: { borderRadius: 16 },
+        typography: {
+          fontFamily: 'Poppins, "Segoe UI", sans-serif'
+        }
+      });
 
-							<ul class="list-inline text-muted small mb-3">
-								<li class="list-inline-item" title="Bedrooms"><i class="flaticon-bed"></i>
-									{{this.Bedrooms}}</li>
-								<li class="list-inline-item" title="Bathrooms"><i class="flaticon-bathtub"></i>
-									{{this.Bathrooms}}</li>
-								<li class="list-inline-item" title="Square footage"><i class="flaticon-floor-plan"></i>
-									{{formatSqft this.SquareFootage this.FloorArea}}</li>
-							</ul>
+      const cardShadow = () => ({ boxShadow: '0 18px 32px rgba(15,23,42,0.06)' });
 
-							<div class="mt-auto d-flex justify-content-between align-items-center">
-								<div class="agent d-flex align-items-center">
-									<div class="agent-photo rounded-circle mr-2"
-										style="width:36px; height:36px; background-image:url(public/images/person_1.jpg); background-size:cover;">
-									</div>
-									<div class="small text-muted">Nick Farahmand</div>
-								</div>
-								<div class="btn-group">
-									<button class="btn btn-outline-secondary btn-sm"
-										data-listing-id="{{this.listingId}}"
-										onclick="openContactModal(this)">Contact</button>
-									<a href="/property/{{this.listingId}}" class="btn btn-primary btn-sm">Schedule
-										Tour</a>
-								</div>
-							</div>
-						</div>
-					</article>
-				</div>
-				{{/each}}
-			</div>
+      const formatNumber = (value) => {
+        if (value === null || value === undefined || value === '') return '';
+        const num = Number(value);
+        if (Number.isNaN(num)) return String(value);
+        return num.toLocaleString('en-US');
+      };
 
-			<!-- Pagination -->
-			<div class="row mt-4">
-				<div class="col text-center">
-					<nav aria-label="Pagination">
-						<ul class="pagination justify-content-center">
-							<li class="page-item"><a class="page-link" href="#" aria-label="Previous">&laquo;</a></li>
-							<li class="page-item active"><span class="page-link">1</span></li>
-							<li class="page-item"><a class="page-link" href="#">2</a></li>
-							<li class="page-item"><a class="page-link" href="#">3</a></li>
-							<li class="page-item"><a class="page-link" href="#" aria-label="Next">&raquo;</a></li>
-						</ul>
-					</nav>
-				</div>
-			</div>
-		</div>
-	</section>
+      const filterFieldSx = {
+        backgroundColor: '#eef3ff',
+        borderRadius: '999px',
+        '& .MuiOutlinedInput-root': {
+          borderRadius: '999px',
+          backgroundColor: '#ffffff',
+          transition: 'all .2s ease',
+          '& fieldset': { borderColor: 'transparent' },
+          '&:hover fieldset': { borderColor: 'transparent', boxShadow: '0 0 0 2px rgba(33,85,205,0.15)' },
+          '&.Mui-focused fieldset': {
+            borderColor: 'transparent',
+            boxShadow: '0 0 0 2px rgba(33,85,205,0.25)'
+          }
+        },
+        '& .MuiInputBase-input': { py: 1.15 }
+      };
 
-	<!-- Contact Modal (accessible) -->
-	<div class="modal fade" id="contactModal" tabindex="-1" role="dialog" aria-labelledby="contactModalLabel"
-		aria-hidden="true">
-		<div class="modal-dialog modal-dialog-centered" role="document">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="contactModalLabel">Contact Agent</h5>
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-						<span aria-hidden="true">&times;</span>
-					</button>
-				</div>
-				<form id="contactForm">
-					<div class="modal-body">
-						<input type="hidden" name="listingId" id="contactListingId">
-						<div class="form-group">
-							<label for="contactName">Your name</label>
-							<input id="contactName" name="name" class="form-control" required />
-						</div>
-						<div class="form-group">
-							<label for="contactEmail">Email</label>
-							<input id="contactEmail" name="email" type="email" class="form-control" required />
-						</div>
-						<div class="form-group">
-							<label for="contactMessage">Message</label>
-							<textarea id="contactMessage" name="message" class="form-control"
-								rows="3">I'm interested in this property. Please contact me.</textarea>
-						</div>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-						<button type="submit" class="btn btn-primary">Send</button>
-					</div>
-				</form>
-			</div>
-		</div>
-	</div>
+      const safeValue = (val) => {
+        if (val === null || val === undefined) return '';
+        const str = String(val).trim();
+        if (!str) return '';
+        const lower = str.toLowerCase();
+        if (lower === 'null' || lower === 'undefined') return '';
+        return str;
+      };
 
-	<script>
-		// Small helper: opens the contact modal and fills the listing id.
-		function openContactModal(btn) {
-			try {
-				var id = btn.getAttribute('data-listing-id') || btn.dataset.listingId;
-				var el = document.getElementById('contactListingId');
-				if (el) el.value = id || '';
-				// if bootstrap modal available
-				if (window.jQuery && jQuery('#contactModal').modal) {
-					jQuery('#contactModal').modal('show');
-				}
-			} catch (e) {
-				console.error(e);
-			}
-		}
+      const normalizePhotoPath = (raw) => {
+        const candidate = safeValue(raw);
+        if (!candidate) return '';
+        if (/^https?:\/\//i.test(candidate)) return candidate;
+        const cleaned = candidate.replace(/^\/+/, '').replace(/\\\\/g, '/');
+        return cleaned ? '/' + cleaned : '';
+      };
 
-		// Submit handler — posts to /contact (adjust endpoint as needed).
-		(function () {
-			if (!window.jQuery) return;
-			jQuery(function ($) {
-				$('#contactForm').on('submit', function (e) {
-					e.preventDefault();
-					var $btn = $(this).find('button[type=submit]');
-					$btn.prop('disabled', true).text('Sending...');
-					// Build payload matching /api/contactus expectations
-					var listingId = $('#contactListingId').val() || '(no-id)';
-					var payload = {
-						FullName: $('#contactName').val(),
-						Email: $('#contactEmail').val(),
-						subject: 'Inquiry about listing ' + listingId,
-						message: $('#contactMessage').val() + '\n\nListing ID: ' + listingId
-					};
+      const extractPhotos = (item) => {
+        const photos = [];
+        const seen = new Set();
+        const addPhoto = (raw) => {
+          const normalized = normalizePhotoPath(raw);
+          if (!normalized || seen.has(normalized)) return;
+          seen.add(normalized);
+          photos.push(normalized);
+        };
 
-					$.ajax({
-						url: '/api/contactus',
-						method: 'POST',
-						data: payload,
-						dataType: 'json'
-					})
-						.done(function () {
-							$('#contactModal').modal('hide');
-							// simple feedback — replace with nicer toast if available
-							alert('Message sent — an agent will contact you shortly.');
-						})
-						.fail(function (xhr) {
-							var msg = 'Failed to send message. Please try again later.';
-							try {
-								var json = xhr && xhr.responseJSON;
-								if (json && json.error) msg = json.error;
-							} catch (e) {}
-							alert(msg);
-						})
-						.always(function () {
-							$btn.prop('disabled', false).text('Send');
-						});
-				});
-			});
-		})();
-	</script>
+        const fileField = safeValue(item && item.PhotoFile);
+        if (fileField) {
+          fileField.split(',').map((p) => safeValue(p)).filter(Boolean).forEach(addPhoto);
+        }
 
-	{{> __newfooter}}
+        const urlField = safeValue(item && item.PhotoURL);
+        if (urlField) addPhoto(urlField);
+
+        if (!photos.length) photos.push('/public/images/bg_1.jpg');
+        return photos;
+      };
+
+      const PhotoCarousel = ({ photos, alt }) => {
+        const images = Array.isArray(photos) && photos.length ? photos : ['/public/images/bg_1.jpg'];
+        const [active, setActive] = useState(0);
+
+        useEffect(() => {
+          setActive(0);
+        }, [images]);
+
+        const go = (delta) => {
+          setActive((prev) => (prev + delta + images.length) % images.length);
+        };
+
+        const showNav = images.length > 1;
+
+        return React.createElement(
+          Box,
+          {
+            sx: {
+              position: 'relative',
+              borderTopLeftRadius: 16,
+              borderTopRightRadius: 16,
+              overflow: 'hidden',
+              background: '#f8fafc'
+            }
+          },
+          React.createElement('img', {
+            src: images[active],
+            alt: alt || 'Property image',
+            style: { width: '100%', height: 220, objectFit: 'cover', display: 'block' }
+          }),
+          showNav
+            ? React.createElement(
+                React.Fragment,
+                null,
+                React.createElement(
+                  IconButton,
+                  {
+                    size: 'small',
+                    onClick: (e) => {
+                      e.stopPropagation();
+                      go(-1);
+                    },
+                    sx: {
+                      position: 'absolute',
+                      top: '50%',
+                      left: 12,
+                      transform: 'translateY(-50%)',
+                      bgcolor: 'rgba(15,23,42,0.65)',
+                      color: '#fff',
+                      '&:hover': { bgcolor: 'rgba(15,23,42,0.85)' }
+                    }
+                  },
+                  '‹'
+                ),
+                React.createElement(
+                  IconButton,
+                  {
+                    size: 'small',
+                    onClick: (e) => {
+                      e.stopPropagation();
+                      go(1);
+                    },
+                    sx: {
+                      position: 'absolute',
+                      top: '50%',
+                      right: 12,
+                      transform: 'translateY(-50%)',
+                      bgcolor: 'rgba(15,23,42,0.65)',
+                      color: '#fff',
+                      '&:hover': { bgcolor: 'rgba(15,23,42,0.85)' }
+                    }
+                  },
+                  '›'
+                ),
+                React.createElement(
+                  Box,
+                  {
+                    sx: {
+                      position: 'absolute',
+                      bottom: 12,
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      bgcolor: 'rgba(15,23,42,0.75)',
+                      color: '#fff',
+                      px: 1.5,
+                      py: 0.25,
+                      borderRadius: 999,
+                      fontSize: 12,
+                      fontWeight: 600
+                    }
+                  },
+                  `${active + 1} / ${images.length}`
+                )
+              )
+            : null
+        );
+      };
+
+      const getPriceRange = (price) => {
+        if (price <= 100000) return '$0 - $100k';
+        if (price <= 300000) return '$100k - $300k';
+        return '$300k+';
+      };
+
+      const PropertyCard = ({ item }) => {
+        const photos = useMemo(() => extractPhotos(item), [item.PhotoFile, item.PhotoURL]);
+        return React.createElement(Card, {
+          sx: {
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            border: '1px solid rgba(148,163,184,0.25)',
+            background: '#fff',
+            ...cardShadow()
+          }
+        },
+          React.createElement(PhotoCarousel, { photos, alt: item.Title || 'Property image' }),
+          React.createElement(CardContent, { sx: { flexGrow: 1 } },
+            React.createElement(Typography, { variant: 'h6', sx: { fontWeight: 600, color: '#0f172a', mb: 0.5 } }, item.Title || 'Untitled'),
+            React.createElement(Typography, { variant: 'body2', sx: { color: 'text.secondary', mb: 1 } }, item.PropertyAddress || 'Address upon request'),
+            React.createElement(Typography, { variant: 'subtitle1', sx: { color: '#0f172a', fontWeight: 600, mb: 1 } }, item.AskingPrice ? `$${Number(item.AskingPrice).toLocaleString()}` : 'Contact'),
+            React.createElement(Stack, { direction: 'row', spacing: 1, sx: { mb: 1, flexWrap: 'wrap' } },
+              React.createElement(Chip, { label: `${item.Bedrooms || 0} bd`, size: 'small', variant: 'outlined', sx: { borderColor: 'rgba(15,23,42,0.1)' } }),
+              React.createElement(Chip, { label: `${item.Bathrooms || 0} ba`, size: 'small', variant: 'outlined', sx: { borderColor: 'rgba(15,23,42,0.1)' } }),
+              item.SquareFootage ? React.createElement(Chip, { label: `${formatNumber(item.SquareFootage)} sqft`, size: 'small', variant: 'outlined', sx: { borderColor: 'rgba(15,23,42,0.1)' } }) : null,
+              item.PropertyType ? React.createElement(Chip, { label: item.PropertyType, size: 'small', color: 'secondary', variant: 'outlined' }) : null
+            ),
+            item.Description ? React.createElement(Typography, { variant: 'body2', color: 'text.secondary' }, item.Description.slice(0, 120) + (item.Description.length > 120 ? '...' : '')) : null
+          ),
+          React.createElement(CardActions, { sx: { px: 3, pb: 3, justifyContent: 'space-between' } },
+            React.createElement(Button, { variant: 'outlined', color: 'primary', size: 'small', href: `/property/${item.listingId}` }, 'View'),
+            React.createElement(Button, { variant: 'contained', color: 'secondary', size: 'small', href: '/property/' + item.listingId }, 'Details')
+          )
+        );
+      };
+
+      const useQueryParams = () => {
+        const searchParams = new URLSearchParams(window.location.search);
+        return { q: searchParams.get('q') || '', beds: searchParams.get('beds') || '', baths: searchParams.get('baths') || '', priceRange: searchParams.get('priceRange') || '', proOnly: ['true', 'on', '1'].includes((searchParams.get('proOnly') || '').toLowerCase()) };
+      };
+
+      function PropertiesApp() {
+        const initialFilters = useQueryParams();
+        const [filters, setFilters] = React.useState(initialFilters);
+
+        const handleChange = (field) => (event) => {
+          const value = event?.target?.type === 'checkbox' ? event.target.checked : event.target.value;
+          setFilters((prev) => ({ ...prev, [field]: value }));
+        };
+
+        const filteredListings = React.useMemo(() => {
+          return listings.filter((item) => {
+            const price = Number(item.AskingPrice) || 0;
+            const haystack = [item.Title, item.PropertyAddress, item.Description].join(' ').toLowerCase();
+            if (filters.q && !haystack.includes(filters.q.toLowerCase())) return false;
+            if (filters.beds) {
+              const bedsMin = parseInt(filters.beds.replace(/\D/g, ''), 10);
+              if (!isNaN(bedsMin) && Number(item.Bedrooms || 0) < bedsMin) return false;
+            }
+            if (filters.baths) {
+              const bathsMin = parseInt(filters.baths.replace(/\D/g, ''), 10);
+              if (!isNaN(bathsMin) && Number(item.Bathrooms || 0) < bathsMin) return false;
+            }
+            if (filters.priceRange && filters.priceRange !== getPriceRange(price)) return false;
+            if (filters.proOnly && !item.IsPro) return false;
+            return true;
+          });
+        }, [filters]);
+
+        const handleSubmit = (event) => {
+          event.preventDefault();
+          const params = new URLSearchParams();
+          if (filters.q) params.set('q', filters.q);
+          if (filters.beds) params.set('beds', filters.beds);
+          if (filters.baths) params.set('baths', filters.baths);
+          if (filters.priceRange) params.set('priceRange', filters.priceRange);
+          if (filters.proOnly) params.set('proOnly', 'true');
+          const newUrl = `${window.location.pathname}?${params.toString()}`;
+          window.history.replaceState(null, '', newUrl);
+        };
+
+        return React.createElement(ThemeProvider, { theme },
+          React.createElement(React.Fragment, null,
+            React.createElement(CssBaseline, null),
+            React.createElement(Box, {
+              sx: {
+                backgroundImage: 'linear-gradient(135deg, #e3efff, #c9dbff)',
+                color: '#0b1f44',
+                py: 7,
+                pb: 12,
+                textAlign: 'center',
+                position: 'relative',
+                overflow: 'hidden'
+              }
+            },
+              React.createElement(Container, { maxWidth: 'lg' },
+                React.createElement(Stack, { spacing: 2, alignItems: 'center' },
+                  React.createElement(Typography, { variant: 'overline', sx: { letterSpacing: 6 } }, 'Nick House Buyer Vault'),
+                  React.createElement(Typography, { variant: 'h3', sx: { fontWeight: 800, color: '#0d47a1' } }, 'Blue-Chip Property Inventory'),
+                  React.createElement(Typography, { variant: 'body1', sx: { maxWidth: 820, color: 'rgba(11,31,68,0.75)' } }, 'Clean, trustworthy data for investors. Filter quickly, review the numbers, and lock in opportunities.')
+                )
+              )
+            ),
+            React.createElement(Container, {
+              maxWidth: 'lg',
+              sx: {
+                mt: { xs: 2, md: 3 },
+                mb: 4,
+                position: 'relative',
+                zIndex: 2
+              }
+            },
+              React.createElement(Box, {
+                sx: {
+                  borderRadius: '999px',
+                  px: { xs: 2, md: 3 },
+                  py: { xs: 2, md: 1.2 },
+                  background: '#dbe7ff',
+                  border: '1px solid rgba(34,69,146,0.18)',
+                  boxShadow: '0 35px 60px rgba(9,17,37,0.15)'
+                }
+              },
+                React.createElement('form', { onSubmit: handleSubmit },
+                  React.createElement(
+                    Box,
+                    {
+                      sx: {
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 1.1
+                      }
+                    },
+                    React.createElement(
+                      Box,
+                      {
+                        sx: {
+                          display: 'grid',
+                          gridTemplateColumns: {
+                            xs: '1fr',
+                            sm: 'repeat(2, minmax(0, 1fr))',
+                            md: 'repeat(5, minmax(0, 1fr))'
+                          },
+                          gap: 1
+                        }
+                      },
+                      React.createElement(TextField, {
+                        label: 'Search city, address, or keyword',
+                        fullWidth: true,
+                        value: filters.q,
+                        onChange: handleChange('q'),
+                        sx: filterFieldSx
+                      }),
+                      React.createElement(FormControl, { fullWidth: true, sx: filterFieldSx }, React.createElement(InputLabel, null, 'Bedrooms'),
+                        React.createElement(Select, { value: filters.beds, label: 'Bedrooms', onChange: handleChange('beds') },
+                          React.createElement(MenuItem, { value: '' }, 'Any'),
+                          React.createElement(MenuItem, { value: '1+' }, '1+'),
+                          React.createElement(MenuItem, { value: '2+' }, '2+'),
+                          React.createElement(MenuItem, { value: '3+' }, '3+'),
+                          React.createElement(MenuItem, { value: '4+' }, '4+')
+                        )
+                      ),
+                      React.createElement(FormControl, { fullWidth: true, sx: filterFieldSx }, React.createElement(InputLabel, null, 'Bathrooms'),
+                        React.createElement(Select, { value: filters.baths, label: 'Bathrooms', onChange: handleChange('baths') },
+                          React.createElement(MenuItem, { value: '' }, 'Any'),
+                          React.createElement(MenuItem, { value: '1+' }, '1+'),
+                          React.createElement(MenuItem, { value: '2+' }, '2+'),
+                          React.createElement(MenuItem, { value: '3+' }, '3+')
+                        )
+                      ),
+                      React.createElement(FormControl, { fullWidth: true, sx: filterFieldSx }, React.createElement(InputLabel, null, 'Price'),
+                        React.createElement(Select, { value: filters.priceRange, label: 'Price', onChange: handleChange('priceRange') },
+                          React.createElement(MenuItem, { value: '' }, 'Any'),
+                          React.createElement(MenuItem, { value: '$0 - $100k' }, '$0 - $100k'),
+                          React.createElement(MenuItem, { value: '$100k - $300k' }, '$100k - $300k'),
+                          React.createElement(MenuItem, { value: '$300k+' }, '$300k+')
+                        )
+                      ),
+                      React.createElement(Button, {
+                        type: 'submit',
+                        variant: 'contained',
+                        color: 'primary',
+                        disableElevation: true,
+                        sx: {
+                          height: '54px',
+                          mt: { xs: 1, md: 0 },
+                          borderRadius: '999px',
+                          fontWeight: 700,
+                          letterSpacing: 1,
+                          boxShadow: '0 16px 30px rgba(9,20,53,0.35)',
+                          background: 'linear-gradient(135deg,#010924,#092a74)',
+                          '&:hover': { background: 'linear-gradient(135deg,#04133d,#0b3286)' }
+                        }
+                      }, 'APPLY FILTERS')
+                    )
+                  )
+                )
+              )
+            ),
+            React.createElement(Container, { maxWidth: 'xl' },
+              filteredListings.length === 0
+                ? React.createElement(Alert, { severity: 'info', sx: { mt: 4, backgroundColor: '#fff' } }, 'No properties match your filters. Clear filters to view all listings.')
+                : React.createElement(Grid, { container: true, spacing: 3 },
+                  filteredListings.map((item) =>
+                    React.createElement(Grid, { item: true, xs: 12, sm: 6, lg: 4, key: item.listingId || item.Title },
+                      React.createElement(PropertyCard, { item })
+                    )
+                  )
+                )
+            ),
+            React.createElement(Container, { maxWidth: 'lg', sx: { mt: 5 } },
+              React.createElement(Divider, { sx: { mb: 3, borderColor: 'rgba(13,71,161,0.15)' } }),
+              React.createElement(Typography, { variant: 'body2', color: 'text.secondary', align: 'center' },
+                'Need a curated packet or walkthrough? Message us through the contact page—our team responds fast.')
+            )
+          )
+        );
+      }
+
+      const app = React.createElement(PropertiesApp);
+      if (ReactDOM.createRoot) {
+        ReactDOM.createRoot(root).render(app);
+      } else {
+        ReactDOM.render(app, root);
+      }
+    })();
+  </script>
+</body>

@@ -69,6 +69,27 @@ html {
   display: inline-block;
 }
 
+/* Trim hero sections across the site so they don't occupy the full viewport */
+.hero-wrap,
+.hero-wrap-2,
+.page-header,
+.js-fullheight {
+  min-height: 300px !important;
+  height: auto !important;
+}
+
+.hero-wrap.hero-wrap-2 .slider-text,
+.slider-text {
+  min-height: 300px !important;
+  height: auto !important;
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+}
+
+.min-vh-180 {
+  min-height: 300px !important;
+}
+
 article, aside, figcaption, figure, footer, header, hgroup, main, nav, section {
   display: block; }
 

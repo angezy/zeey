@@ -24,12 +24,21 @@ const storage = multer.diskStorage({
     },
 });
 // Increase limits to avoid 413 rejections for larger photos
+const MAX_PHOTOS = 30;
 const uploadLimits = {
-    files: 10,
+    files: MAX_PHOTOS,
     fileSize: 50 * 1024 * 1024 // 50 MB per file
 };
-const upload = multer({ storage, limits: uploadLimits }).array('PhotoFiles', 10); // Allow up to 10 photos
-const uploadSingle = multer({ storage, limits: uploadLimits }).single('PhotoFile'); // For edit/update
+const upload = multer({ storage, limits: uploadLimits }).array('PhotoFiles', MAX_PHOTOS); // Allow up to 30 photos
+const uploadEdit = multer({ storage, limits: uploadLimits }).array('PhotoFiles', MAX_PHOTOS); // For edit/update
+
+const normalizeStoredPhotoPath = (input) => {
+    if (!input && input !== 0) return '';
+    let str = String(input).trim().replace(/\\/g, '/');
+    if (!str) return '';
+    if (/^https?:\/\//i.test(str)) return str;
+    return str.replace(/^\/+/, '');
+};
 
 // Multer wrapper to capture upload errors and attach requestId early
 const handleListingUpload = (req, res, next) => {
@@ -326,14 +335,14 @@ router.put("/listing/:id", async (req, res) => {
     if (!id) return res.status(400).json({ success: false, message: "Invalid listing ID" });
 
     // allow multipart with optional file
-    uploadSingle(req, res, async (err) => {
+    uploadEdit(req, res, async (err) => {
         if (err) {
             console.error("Update listing upload error:", err);
             return res.status(400).json({ success: false, message: err.message || "Upload error" });
         }
 
         const body = req.body || {};
-        const newPhotoFile = req.file ? path.join('public', 'images', 'uploads', req.file.filename).replace(/\\\\/g, '/') : null;
+        const uploadedPhotos = (req.files || []).map(file => normalizeStoredPhotoPath(path.join('public', 'images', 'uploads', file.filename))).filter(Boolean);
 
         try {
             const pool = await sql.connect(dbConfig);
@@ -344,6 +353,25 @@ router.put("/listing/:id", async (req, res) => {
             const existing = (existingResult.recordset || [])[0];
             if (!existing) return res.status(404).json({ success: false, message: "Listing not found" });
 
+            const existingPhotos = existing.PhotoFile
+                ? existing.PhotoFile.split(',').map(normalizeStoredPhotoPath).filter(Boolean)
+                : [];
+            const submittedPhotos = body.PhotoFile !== undefined
+                ? String(body.PhotoFile).split(',').map(normalizeStoredPhotoPath).filter(Boolean)
+                : existingPhotos.slice();
+            const combinedPhotos = uploadedPhotos.length
+                ? submittedPhotos.concat(uploadedPhotos)
+                : submittedPhotos;
+            const uniquePhotos = [];
+            const seen = new Set();
+            combinedPhotos.forEach(photo => {
+                if (!photo) return;
+                if (seen.has(photo)) return;
+                seen.add(photo);
+                uniquePhotos.push(photo);
+            });
+            const photoFileValue = uniquePhotos.length ? uniquePhotos.join(',') : null;
+
             const upd = {
                 Title: body.Title !== undefined ? body.Title : existing.Title,
                 PropertyAddress: body.PropertyAddress !== undefined ? body.PropertyAddress : existing.PropertyAddress,
@@ -352,7 +380,7 @@ router.put("/listing/:id", async (req, res) => {
                 Bathrooms: body.Bathrooms !== undefined && body.Bathrooms !== '' ? Number(body.Bathrooms) : existing.Bathrooms,
                 SquareFootage: body.SquareFootage !== undefined && body.SquareFootage !== '' ? Number(body.SquareFootage) : existing.SquareFootage,
                 PhotoURL: body.PhotoURL !== undefined ? body.PhotoURL : existing.PhotoURL,
-                PhotoFile: newPhotoFile || body.PhotoFile || existing.PhotoFile,
+                PhotoFile: photoFileValue,
                 Available: body.Available !== undefined ? Number(body.Available) : existing.Available
             };
 

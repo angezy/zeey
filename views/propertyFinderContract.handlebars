@@ -1,0 +1,365 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+</head>
+
+<body class="property-finder-contract bg-light">
+  <style>
+    .pf-hero .container {
+      max-width: 100%;
+      width: 100%;
+      padding-left: 5vw;
+      padding-right: 5vw;
+    }
+    .pf-hero h1 {
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      margin-bottom: 1rem;
+    }
+    .pf-hero p.lead {
+      font-size: clamp(1.1rem, 2vw, 1.5rem);
+      max-width: 1000px;
+      margin: 0 auto 1rem;
+    }
+    .pf-hero .text-uppercase {
+      letter-spacing: 0.2em;
+    }
+  </style>
+  {{> __newnav}}
+
+  <section class="hero-wrap hero-wrap-2 pf-hero" style="background: linear-gradient(135deg, #cc0000, #f44336); min-height: 160px;">
+    <div class="overlay" style="background: rgba(3, 11, 35, 0.55);"></div>
+    <div class="container position-relative py-4 text-white">
+      <div class="row justify-content-center">
+        <div class="col-lg-9 text-center">
+          <img src="/public/images/241.png" alt="Nick House Buyer" style="height: 64px;" class="mb-3">
+          <p class="text-uppercase fw-bold letter-spacing-wide mb-2">Independent Contractor Agreement</p>
+          <h1 class="display-6 fw-bold mb-3">Lock in your partnership with Nick House Buyer</h1>
+          <p class="lead">Complete the agreement below so we can legally pay you on every bird dog deal you bring.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div id="contract-app-root" class="py-5"></div>
+
+  {{> __newfooter}}
+
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@emotion/react@11.11.4/dist/emotion-react.umd.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@emotion/styled@11.11.0/dist/emotion-styled.umd.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@mui/material@5.15.15/umd/material-ui.development.js" crossorigin></script>
+
+  <script>
+    (function () {
+      const node = document.getElementById('contract-app-root');
+      if (!node || typeof React === 'undefined' || typeof MaterialUI === 'undefined') return;
+
+      const TELEGRAM_URL = {{{json telegramLink}}};
+      const DEFAULT_DATE = {{{json defaultAgreementDate}}};
+      const {
+        ThemeProvider,
+        createTheme,
+        CssBaseline,
+        Container,
+        Box,
+        Grid,
+        Card,
+        CardContent,
+        Typography,
+        Stack,
+        Divider,
+        TextField,
+        Button,
+        Checkbox,
+        FormControlLabel,
+        Alert,
+        Link
+      } = MaterialUI;
+
+      const theme = createTheme({
+        palette: {
+          primary: { main: '#0d6efd' },
+          secondary: { main: '#563d7c' },
+          background: { default: '#f4f6fb' }
+        },
+        shape: { borderRadius: 16 },
+        typography: {
+          fontFamily: 'Inter, "Segoe UI", sans-serif'
+        }
+      });
+
+      const agreementSections = [
+        {
+          heading: 'Agreement Overview',
+          body: [
+            'This Independent Contractor Agreement (“Agreement”) is made this day between Nick House Buyer, organized and existing under the laws of the State of Florida (“Company”) and the Contractor (“Representative”).',
+            'Representative details (complete in the form below): Name, Phone, Email, Street, City, State, Zip.'
+          ]
+        },
+        {
+          heading: '1) Definitions',
+          body: ['Services: Any and all required tasks needed to facilitate real estate deals for Nick House Buyer.']
+        },
+        {
+          heading: '2) Appointment & Acceptance',
+          body: [
+            'The Company appoints the Representative as an independent marketing representative to locate contacts and potential deals. Representative must comply with all rules, laws, and regulations connected with these services.'
+          ]
+        },
+        {
+          heading: '3) Independent Contractor Status',
+          body: [
+            'This Agreement does not create an employment relationship, partnership, or agency.',
+            'Representative is solely responsible for payroll taxes and is not covered by Company insurance or benefits.'
+          ]
+        },
+        {
+          heading: '4) Compensation',
+          body: [
+            'Company pays a minimum of $1,000 per deal purchased, based on profit margins.',
+            'Representative is responsible for all taxes arising from such compensation and agrees to hold the Company harmless from related claims.'
+          ]
+        },
+        {
+          heading: '5) Assignment',
+          body: [
+            'This Agreement is personal to each party and may not be assigned, subcontracted, or transferred without prior written consent.'
+          ]
+        },
+        {
+          heading: '6) Entire Agreement',
+          body: [
+            'This document supersedes prior discussions and may only be amended via a written document signed by both parties.'
+          ]
+        },
+        {
+          heading: '7) Governing Law',
+          body: ['This Agreement is governed by the laws of the State of Florida.']
+        },
+        {
+          heading: '8) Authority to Contract',
+          body: [
+            'Each party warrants it is free to enter this Agreement and that doing so does not violate other commitments.'
+          ]
+        }
+      ];
+
+      const initialForm = {
+        fullName: '',
+        phone: '',
+        email: '',
+        street: '',
+        city: '',
+        state: '',
+        zip: '',
+        agreementDate: DEFAULT_DATE,
+        signatureName: '',
+        acceptTerms: false
+      };
+
+      function ContractApp() {
+        const [form, setForm] = React.useState(initialForm);
+        const [submitting, setSubmitting] = React.useState(false);
+        const [feedback, setFeedback] = React.useState(null);
+
+        const handleChange = (field) => (event) => {
+          const value = event?.target?.type === 'checkbox' ? event.target.checked : event.target.value;
+          setForm((prev) => ({ ...prev, [field]: value }));
+        };
+
+        const handleSubmit = async (event) => {
+          event.preventDefault();
+          setSubmitting(true);
+          setFeedback(null);
+          try {
+            const response = await fetch('/api/property-finder/contract', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(form)
+            });
+            const result = await response.json().catch(() => ({}));
+            if (!response.ok) {
+              const message = result?.errors?.length
+                ? result.errors.map((e) => e.msg).join(', ')
+                : (result?.error || 'Unable to submit right now.');
+              throw new Error(message);
+            }
+            setFeedback({ type: 'success', message: result?.message || 'Agreement submitted!' });
+            setForm({ ...initialForm });
+          } catch (error) {
+            setFeedback({ type: 'error', message: error.message || 'Unexpected error. Try again.' });
+          } finally {
+            setSubmitting(false);
+          }
+        };
+
+        return (
+          React.createElement(ThemeProvider, { theme },
+            React.createElement(React.Fragment, null,
+              React.createElement(CssBaseline, null),
+              React.createElement(Box, { sx: { py: { xs: 4, md: 6 } } },
+                React.createElement(Container, { maxWidth: 'lg' },
+                  React.createElement(Grid, { container: true, spacing: 3 },
+                    React.createElement(Grid, { item: true, xs: 12, md: 7 },
+                      React.createElement(Card, { elevation: 3, sx: { mb: 3 } },
+                        React.createElement(CardContent, null,
+                          React.createElement(Typography, { variant: 'h5', gutterBottom: true }, 'Read & Understand the Agreement'),
+                          agreementSections.map(section =>
+                            React.createElement(Box, { key: section.heading, sx: { mb: 2 } },
+                              React.createElement(Typography, { variant: 'subtitle1', sx: { fontWeight: 600 } }, section.heading),
+                              section.body.map((paragraph, idx) =>
+                                React.createElement(Typography, { key: idx, variant: 'body2', color: 'text.secondary', sx: { mb: 1 } }, paragraph)
+                              ),
+                              React.createElement(Divider, { sx: { my: 1.5 } })
+                            )
+                          ),
+                          React.createElement(Typography, { variant: 'body2', color: 'text.secondary' },
+                            'Date: _______________________'
+                          ),
+                          React.createElement(Typography, { variant: 'body2', color: 'text.secondary' },
+                            'Company: Nick House Buyer | Representative: (you)'
+                          ),
+                          React.createElement(Typography, { variant: 'body2', color: 'text.secondary' },
+                            'Nick Farahmand, President – Phone: 323-553-1922 – niickfarahmand@gmail.com'
+                          )
+                        )
+                      ),
+                      React.createElement(Card, { variant: 'outlined' },
+                        React.createElement(CardContent, null,
+                          React.createElement(Typography, { variant: 'h6', sx: { mb: 1 } }, 'Need help?'),
+                          React.createElement(Typography, { variant: 'body2', color: 'text.secondary' },
+                            'Drop questions in Telegram so we can make sure you fully understand how the bonuses work.'
+                          ),
+                          React.createElement(Button, {
+                            sx: { mt: 2 },
+                            variant: 'contained',
+                            color: 'secondary',
+                            href: TELEGRAM_URL,
+                            target: '_blank',
+                            rel: 'noopener'
+                          }, 'Message Nick on Telegram')
+                        )
+                      )
+                    ),
+                    React.createElement(Grid, { item: true, xs: 12, md: 5 },
+                      React.createElement(Card, { elevation: 4 },
+                        React.createElement(CardContent, null,
+                          React.createElement(Typography, { variant: 'h5', gutterBottom: true }, 'Sign the Agreement'),
+                          React.createElement(Typography, { variant: 'body2', color: 'text.secondary', sx: { mb: 2 } },
+                            'Complete the fields below to execute the Independent Contractor Agreement digitally.'
+                          ),
+                          feedback && React.createElement(Alert, { severity: feedback.type, sx: { mb: 2 } }, feedback.message),
+                          React.createElement('form', { onSubmit: handleSubmit },
+                            React.createElement(Stack, { spacing: 2 },
+                              React.createElement(TextField, {
+                                label: 'Full name',
+                                required: true,
+                                value: form.fullName,
+                                onChange: handleChange('fullName')
+                              }),
+                              React.createElement(TextField, {
+                                label: 'Phone',
+                                required: true,
+                                value: form.phone,
+                                onChange: handleChange('phone')
+                              }),
+                              React.createElement(TextField, {
+                                label: 'Email',
+                                required: true,
+                                type: 'email',
+                                value: form.email,
+                                onChange: handleChange('email')
+                              }),
+                              React.createElement(TextField, {
+                                label: 'Street',
+                                required: true,
+                                value: form.street,
+                                onChange: handleChange('street')
+                              }),
+                              React.createElement(Grid, { container: true, spacing: 2 },
+                                React.createElement(Grid, { item: true, xs: 12, sm: 6 },
+                                  React.createElement(TextField, {
+                                    label: 'City',
+                                    required: true,
+                                    value: form.city,
+                                    onChange: handleChange('city')
+                                  })
+                                ),
+                                React.createElement(Grid, { item: true, xs: 12, sm: 3 },
+                                  React.createElement(TextField, {
+                                    label: 'State',
+                                    required: true,
+                                    value: form.state,
+                                    onChange: handleChange('state')
+                                  })
+                                ),
+                                React.createElement(Grid, { item: true, xs: 12, sm: 3 },
+                                  React.createElement(TextField, {
+                                    label: 'ZIP',
+                                    required: true,
+                                    value: form.zip,
+                                    onChange: handleChange('zip')
+                                  })
+                                )
+                              ),
+                              React.createElement(TextField, {
+                                label: 'Agreement date',
+                                type: 'date',
+                                required: true,
+                                value: form.agreementDate,
+                                onChange: handleChange('agreementDate'),
+                                InputLabelProps: { shrink: true }
+                              }),
+                              React.createElement(TextField, {
+                                label: 'Signature (type your name)',
+                                required: true,
+                                value: form.signatureName,
+                                onChange: handleChange('signatureName')
+                              }),
+                              React.createElement(FormControlLabel, {
+                                control: React.createElement(Checkbox, {
+                                  checked: form.acceptTerms,
+                                  onChange: handleChange('acceptTerms'),
+                                  color: 'primary'
+                                }),
+                                label: 'I agree to the Independent Contractor Agreement and certify this signature is mine.'
+                              }),
+                              React.createElement(Button, {
+                                type: 'submit',
+                                variant: 'contained',
+                                size: 'large',
+                                disabled: submitting
+                              }, submitting ? 'Submitting...' : 'Sign & Submit')
+                            )
+                          )
+                        ),
+                        React.createElement(Box, { sx: { p: 3, borderTop: '1px solid', borderColor: 'divider' } },
+                          React.createElement(Typography, { variant: 'body2', color: 'text.secondary' },
+                            'After signing, stay active inside Telegram for assignments and pay updates.'
+                          ),
+                          React.createElement(Link, {
+                            href: TELEGRAM_URL,
+                            target: '_blank',
+                            rel: 'noopener'
+                          }, 'Go to Telegram HQ')
+                        )
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          )
+        );
+      }
+
+      const tree = React.createElement(ContractApp);
+      if (ReactDOM.createRoot) {
+        ReactDOM.createRoot(node).render(tree);
+      } else {
+        ReactDOM.render(tree, node);
+      }
+    })();
+  </script>
+</body>

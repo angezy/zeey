@@ -13,9 +13,13 @@
             <div class="col-5 col-md-4">
                     <div class="card-img-left">
                       {{#if this.PhotoFile}}
-                        <img src="/{{this.PhotoFile}}" alt="{{this.Title}}" class="card-img-element"/>
+                        <img src="{{firstImage this.PhotoFile}}" alt="{{this.Title}}" class="card-img-element"/>
                       {{else}}
-                        <div class="card-img-placeholder"></div>
+                        {{#if this.PhotoURL}}
+                          <img src="{{sanitize this.PhotoURL}}" alt="{{this.Title}}" class="card-img-element"/>
+                        {{else}}
+                          <div class="card-img-placeholder"></div>
+                        {{/if}}
                       {{/if}}
                     </div>
                   </div>
@@ -142,14 +146,21 @@
                   <input type="text" class="form-control" id="editPhotoURL" placeholder="https://...">
                 </div>
                 <div class="col-md-4">
-                  <label class="form-label">Upload New Photo</label>
-                  <input type="file" class="form-control" id="editPhotoFile" accept="image/*">
+                  <label class="form-label">Upload New Photos</label>
+                  <input type="file" class="form-control" id="editPhotoFiles" name="PhotoFiles" accept="image/*" multiple>
+                  <small class="text-muted d-block mt-1">Select up to 30 images to add to this listing.</small>
                   <div id="editPhotoPreview" class="mt-2 d-flex gap-2 flex-wrap"></div>
                 </div>
                 <div class="col-md-4 d-flex align-items-center">
                   <div class="form-check mt-3">
                     <input class="form-check-input" type="checkbox" id="editAvailable">
                     <label class="form-check-label" for="editAvailable">Available</label>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Current Photos</label>
+                  <div id="editCurrentPhotos" class="border rounded p-2 d-flex gap-2 flex-wrap bg-light" style="min-height:90px;">
+                    <span class="text-muted small">No photos uploaded yet.</span>
                   </div>
                 </div>
               </div>
@@ -200,6 +211,26 @@
           var s = decodeHtmlEntities(input);
           s = s.replace(/[\\\uFF0F]/g, '/');
           try{ return encodeURI(s); } catch(e){ return s; }
+        }
+
+        function parsePhotoList(raw){
+          if(raw === null || raw === undefined) return [];
+          return String(raw).split(',').map(function(item){ return item.trim(); }).filter(Boolean);
+        }
+
+        function normalizePhotoPath(value){
+          if(value === null || value === undefined) return '';
+          var str = decodeHtmlEntities(String(value)).trim().replace(/\\/g, '/');
+          if(!str) return '';
+          if(/^https?:\/\//i.test(str)) return str;
+          str = str.replace(/^\/+/, '');
+          return str ? '/' + str : '';
+        }
+
+        function getFirstPhotoPath(raw){
+          const list = parsePhotoList(raw);
+          if(!list.length) return '';
+          return normalizePhotoPath(list[0]);
         }
 
         // Copy link buttons (uses current origin so links work on any host)
@@ -257,10 +288,51 @@
           baths: document.getElementById('editBathrooms'),
           sqft: document.getElementById('editSqft'),
           photoUrl: document.getElementById('editPhotoURL'),
-          photoFile: document.getElementById('editPhotoFile'),
+          photoFiles: document.getElementById('editPhotoFiles'),
           available: document.getElementById('editAvailable'),
-          photoPreview: document.getElementById('editPhotoPreview')
+          photoPreview: document.getElementById('editPhotoPreview'),
+          currentPhotos: document.getElementById('editCurrentPhotos')
         };
+
+        function renderCurrentPhotos(item){
+          if(!editFields.currentPhotos) return;
+          const container = editFields.currentPhotos;
+          container.innerHTML = '';
+          const photos = parsePhotoList(item.PhotoFile);
+          const fallbackUrl = (item.PhotoURL || '').trim();
+          const list = photos.length ? photos : (fallbackUrl ? [fallbackUrl] : []);
+          if(!list.length){
+            container.innerHTML = '<span class="text-muted small">No photos uploaded yet.</span>';
+            return;
+          }
+          const maxThumbs = 8;
+          const frag = document.createDocumentFragment();
+          list.slice(0, maxThumbs).forEach(function(raw, idx){
+            const src = normalizePhotoPath(raw);
+            if(!src) return;
+            const wrapper = document.createElement('div');
+            wrapper.className = 'd-flex flex-column align-items-center';
+            const img = document.createElement('img');
+            img.src = src;
+            img.style.width = '74px';
+            img.style.height = '74px';
+            img.style.objectFit = 'cover';
+            img.className = 'rounded border shadow-sm';
+            wrapper.appendChild(img);
+            const caption = document.createElement('div');
+            caption.className = 'small text-muted mt-1';
+            caption.textContent = `Photo ${idx + 1}`;
+            wrapper.appendChild(caption);
+            frag.appendChild(wrapper);
+          });
+          container.appendChild(frag);
+          if(list.length > maxThumbs){
+            const more = document.createElement('div');
+            more.className = 'small text-muted align-self-center';
+            more.textContent = `+${list.length - maxThumbs} more saved photo${(list.length - maxThumbs) > 1 ? 's' : ''}`;
+            container.appendChild(more);
+          }
+        }
 
         document.querySelectorAll('.edit-listing').forEach(btn => {
           btn.addEventListener('click', function(e){
@@ -281,42 +353,45 @@
           editFields.sqft.value = item.SquareFootage || item.FloorArea || '';
           editFields.photoUrl.value = decodeHtmlEntities(item.PhotoURL || '');
           editFields.available.checked = !!item.Available;
-            // reset preview and show current image
-            if(editFields.photoPreview){
+          renderCurrentPhotos(item);
+          if(editFields.photoPreview){
+            editFields.photoPreview.innerHTML = '<span class="text-muted small">No new files selected yet.</span>';
+          }
+          if(editFields.photoFiles){
+            editFields.photoFiles.value = '';
+            editFields.photoFiles.onchange = function(){
+              if(!editFields.photoPreview) return;
+              const files = Array.from(this.files || []);
               editFields.photoPreview.innerHTML = '';
-              const currentImg = item.PhotoFile ? ('/' + item.PhotoFile) : (item.PhotoURL || '');
-              if(currentImg){
-                const img = document.createElement('img');
-                img.src = currentImg;
-                img.style.maxWidth = '160px';
-                img.style.maxHeight = '160px';
-                img.className = 'rounded border';
-                editFields.photoPreview.appendChild(img);
-                const meta = document.createElement('div');
-                meta.className = 'small text-muted mt-1';
-                meta.textContent = 'Current image';
-                editFields.photoPreview.appendChild(meta);
+              if(!files.length){
+                editFields.photoPreview.innerHTML = '<span class="text-muted small">No new files selected yet.</span>';
+                return;
               }
-            }
-            if(editFields.photoFile){
-              editFields.photoFile.value = '';
-              editFields.photoFile.onchange = function(){
-                if(!editFields.photoPreview) return;
-                editFields.photoPreview.innerHTML = '';
-                const file = (this.files || [])[0];
-                if(!file) return;
+              const maxPreview = 6;
+              files.slice(0, maxPreview).forEach(function(file, idx){
+                const wrapper = document.createElement('div');
+                wrapper.className = 'd-flex flex-column align-items-center';
                 const img = document.createElement('img');
                 img.src = URL.createObjectURL(file);
-                img.style.maxWidth = '160px';
-                img.style.maxHeight = '160px';
-                img.className = 'rounded border';
-                editFields.photoPreview.appendChild(img);
+                img.style.width = '74px';
+                img.style.height = '74px';
+                img.style.objectFit = 'cover';
+                img.className = 'rounded border shadow-sm';
+                wrapper.appendChild(img);
                 const meta = document.createElement('div');
                 meta.className = 'small text-muted mt-1';
-                meta.textContent = `${file.name} (${Math.round(file.size/1024)} KB)`;
-                editFields.photoPreview.appendChild(meta);
-              };
-            }
+                meta.textContent = file.name.length > 14 ? `${file.name.slice(0, 14)}…` : file.name;
+                wrapper.appendChild(meta);
+                editFields.photoPreview.appendChild(wrapper);
+              });
+              if(files.length > maxPreview){
+                const more = document.createElement('div');
+                more.className = 'small text-muted align-self-center';
+                more.textContent = `+${files.length - maxPreview} more selected`;
+                editFields.photoPreview.appendChild(more);
+              }
+            };
+          }
           editModal.show();
         });
       });
@@ -333,8 +408,8 @@
           formData.append('SquareFootage', editFields.sqft.value !== '' ? editFields.sqft.value : '');
           formData.append('PhotoURL', editFields.photoUrl.value.trim());
           formData.append('Available', editFields.available.checked ? 1 : 0);
-          if (editFields.photoFile && editFields.photoFile.files && editFields.photoFile.files[0]) {
-            formData.append('PhotoFile', editFields.photoFile.files[0]);
+          if (editFields.photoFiles && editFields.photoFiles.files && editFields.photoFiles.files.length) {
+            Array.from(editFields.photoFiles.files).forEach(file => formData.append('PhotoFiles', file));
           }
           try{
             Swal.fire({ title:'Saving...', didOpen: ()=>Swal.showLoading(), allowOutsideClick:false, showConfirmButton:false });
@@ -348,6 +423,7 @@
               const item = listings.find(x => String(x.listingId) === String(id));
               if(item){
                 Object.assign(item, data.listing || {});
+                renderCurrentPhotos(item);
               }
               const card = document.querySelector(`.listing-card[data-id="${id}"]`);
               if(card){
@@ -365,12 +441,23 @@
                 const sqftEl = card.querySelector('.listing-sqft');
                 if(sqftEl) sqftEl.textContent = (listingData.SquareFootage ? `${listingData.SquareFootage} sqft` : 'N/A');
                 const imgEl = card.querySelector('.card-img-element');
-                const placeholder = card.querySelector('.card-img-placeholder');
-                const newImg = listingData.PhotoFile ? ('/' + listingData.PhotoFile) : (listingData.PhotoURL || '');
-                if(imgEl && newImg){
-                  imgEl.src = newImg;
-                  imgEl.style.display = 'block';
-                  if(placeholder) placeholder.style.display = 'none';
+                const imgWrapper = card.querySelector('.card-img-left');
+                let placeholder = card.querySelector('.card-img-placeholder');
+                const newImg = getFirstPhotoPath(listingData.PhotoFile) || listingData.PhotoURL || '';
+                if(imgEl){
+                  if(newImg){
+                    imgEl.src = newImg;
+                    imgEl.style.display = 'block';
+                    if(placeholder) placeholder.style.display = 'none';
+                  } else {
+                    imgEl.style.display = 'none';
+                    if(!placeholder && imgWrapper){
+                      placeholder = document.createElement('div');
+                      placeholder.className = 'card-img-placeholder';
+                      imgWrapper.appendChild(placeholder);
+                    }
+                    if(placeholder) placeholder.style.display = 'block';
+                  }
                 }
                 const availBtn = card.querySelector('.availability-btn');
                 if(availBtn){
@@ -437,9 +524,9 @@
             const item = listings.find(x => String(x.listingId) === String(id));
             if(!item){ Swal.fire({icon:'error', title:'Not found', text:'Listing data missing'}); return; }
 
-            const photoPath = sanitizeAttribute(item.PhotoFile);
+            const firstPhoto = getFirstPhotoPath(item.PhotoFile);
             const photoUrl = sanitizeAttribute(item.PhotoURL);
-            const image = photoPath ? ('/' + photoPath) : (photoUrl || '');
+            const image = firstPhoto ? sanitizeAttribute(firstPhoto) : (photoUrl || '');
             let html = '';
             if(image) html += `<div style="text-align:center;margin-bottom:12px;"><img src="${image}" style="max-width:100%;max-height:260px;border-radius:8px;"/></div>`;
             const title = sanitizeDisplay(item.Title || item.PropertyAddress || '');

@@ -40,12 +40,14 @@
 
 
 	var fullHeight = function() {
+		var resizeHero = function(){
+			var viewportHeight = $(window).height();
+			var heroHeight = Math.max(300, Math.min(viewportHeight, 420));
+			$('.js-fullheight').css('height', heroHeight);
+		};
 
-		$('.js-fullheight').css('height', $(window).height());
-		$(window).resize(function(){
-			$('.js-fullheight').css('height', $(window).height());
-		});
-
+		resizeHero();
+		$(window).resize(resizeHero);
 	};
 	fullHeight();
 
@@ -313,4 +315,3 @@
 
 
 })(jQuery);
-
