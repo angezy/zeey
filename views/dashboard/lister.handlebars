@@ -258,7 +258,7 @@
             if(!confirmed.isConfirmed) return;
             try{
               Swal.fire({ title:'Deleting...', didOpen: ()=>Swal.showLoading(), allowOutsideClick:false, showConfirmButton:false });
-              const res = await fetch(`/api/listing/${id}`, { method:'DELETE' });
+              const res = await fetch(`/api/listing/${id}/delete`, { method:'POST', credentials:'same-origin' });
               const data = await res.json();
               Swal.close();
               if(data && data.success){
@@ -413,8 +413,9 @@
           }
           try{
             Swal.fire({ title:'Saving...', didOpen: ()=>Swal.showLoading(), allowOutsideClick:false, showConfirmButton:false });
-            const res = await fetch(`/api/listing/${id}`, {
-              method:'PUT',
+            const res = await fetch(`/api/listing/${id}/update`, {
+              method:'POST',
+              credentials:'same-origin',
               body: formData
             });
             const data = await res.json();

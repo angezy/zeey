@@ -303,8 +303,7 @@ router.post("/update-availability", async (req, res) => {
     }
 });
 
-// DELETE a listing by id (dashboard use)
-router.delete("/listing/:id", async (req, res) => {
+const handleListingDelete = async (req, res) => {
     const id = parseInt(req.params.id, 10);
     if (!id) {
         return res.status(400).json({ success: false, message: "Invalid listing ID" });
@@ -327,10 +326,13 @@ router.delete("/listing/:id", async (req, res) => {
     } finally {
         try { sql.close(); } catch(e) { console.error('Error closing connection:', e.message); }
     }
-});
+};
 
-// PUT update a listing (dashboard edit)
-router.put("/listing/:id", async (req, res) => {
+// DELETE endpoints (both DELETE verb and POST fallback for hosts that block DELETE)
+router.delete("/listing/:id", handleListingDelete);
+router.post("/listing/:id/delete", handleListingDelete);
+
+const handleListingUpdate = (req, res) => {
     const id = parseInt(req.params.id, 10);
     if (!id) return res.status(400).json({ success: false, message: "Invalid listing ID" });
 
@@ -420,6 +422,10 @@ router.put("/listing/:id", async (req, res) => {
             try { sql.close(); } catch(e) { console.error('Error closing connection:', e.message); }
         }
     });
-});
+};
+
+// PUT endpoint plus POST fallback for environments that block PUT
+router.put("/listing/:id", handleListingUpdate);
+router.post("/listing/:id/update", handleListingUpdate);
 
 module.exports = router;

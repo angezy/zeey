@@ -90,7 +90,7 @@ app.get('/sitemap.xml', async (req, res) => {
 app.use(cookieParser());
 
 // Middleware to parse JSON and URL-encoded requests (raise limits for uploads with metadata)
-const bodyLimit = process.env.BODY_LIMIT || '20mb';
+const bodyLimit = process.env.BODY_LIMIT || '200mb';
 app.use(bodyParser.urlencoded({ extended: true, limit: bodyLimit }));
 app.use(bodyParser.json({ limit: bodyLimit }));
 

@@ -44,7 +44,8 @@ const upload = multer({
     storage: storage,
     fileFilter: fileFilter,
     limits: {
-        fileSize: 5 * 1024 * 1024, // 5MB limit
+        // Increase per-file size to 50 MB; combined with 10 files this keeps total under nginx/app limits
+        fileSize: 50 * 1024 * 1024,
         files: 10 // Maximum 10 files
     }
 });

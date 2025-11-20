@@ -294,18 +294,26 @@ router.get('/autocomplete', async (req, res) => {
   const MAX_QUERY_BYTES = 127;
   const query = (req.query.query || '').trim(); // Trim whitespace and guard undefined
   const queryBytes = Buffer.byteLength(query, 'utf8'); // Measure byte size
+  const authId = process.env.SMARTY_AUTH_ID || process.env.authID;
+  const authToken = process.env.SMARTY_AUTH_TOKEN || process.env.authToken;
 
   if (!query || queryBytes < MIN_QUERY_BYTES || queryBytes > MAX_QUERY_BYTES) {
     return res.status(400).json({ error: `Query must be between ${MIN_QUERY_BYTES} and ${MAX_QUERY_BYTES} bytes.` });
+  }
+
+  // If credentials are missing, fail soft with an empty list to avoid frontend errors
+  if (!authId || !authToken) {
+    console.warn('Autocomplete disabled: missing SmartyStreets credentials');
+    return res.json([]);
   }
 
   try {
     const response = await axios.get('https://us-autocomplete-pro.api.smarty.com/lookup', {
       params: {
         // support multiple env var names just in case
-        'auth-id': process.env.SMARTY_AUTH_ID || process.env.authID,
+        'auth-id': authId,
         'search': query, // Use the input query
-        'auth-token': process.env.SMARTY_AUTH_TOKEN || process.env.authToken
+        'auth-token': authToken
       },
     });
 
@@ -323,11 +331,11 @@ router.get('/autocomplete', async (req, res) => {
       return res.json(suggestions);
     } else {
       console.error('Autocomplete: unexpected API response', response.data);
-      return res.status(500).json({ error: 'Unexpected API response structure.' });
+      return res.json([]);
     }
   } catch (error) {
     console.error('Autocomplete error:', error && error.message ? error.message : error);
-    return res.status(500).json({ error: 'Failed to fetch suggestions' });
+    return res.json([]);
   }
 });
 // Endpoint to return saved fastSell form values/errors (if any) and clear them from session.

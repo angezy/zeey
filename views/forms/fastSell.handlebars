@@ -19,7 +19,7 @@
   <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
   <!-- MDB -->
   <link rel="stylesheet" href="/public/css/mdb.min.css" />
-  <link rel="stylesheet" href="/assets/css/fastSell.css">
+  <link rel="stylesheet" href="/assets/css/fastsell.css">
 </head>
 
 <body>
@@ -239,7 +239,7 @@
                   </div>
                   <div class="text-center bg-transparent">
                     <button type="button" class="btn btn-secondary" onclick="navigateSection(4, 3)">Previous</button>
-                    <button type="submit" class="btn btn-primary" onclick="submitForm()">Submit</button>
+                    <button type="submit" class="btn btn-primary">Submit</button>
                   </div>
                 </div>
               </form>
@@ -261,16 +261,80 @@
   <script src="/assets/js/form.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
   <script>
-    // Image preview functionality
-    function previewImages(event) {
+    const MAX_DIMENSION = 1600;
+    const JPEG_QUALITY = 0.7;
+
+    async function compressImageFile(file){
+      if(!file || !file.type.startsWith('image/')) return file;
+      return new Promise(resolve => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let { width, height } = img;
+          const max = MAX_DIMENSION;
+          if(width > max || height > max){
+            if(width > height){
+              height = Math.round((height / width) * max);
+              width = max;
+            } else {
+              width = Math.round((width / height) * max);
+              height = max;
+            }
+          }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          canvas.toBlob(blob => {
+            if(blob){
+              const compressed = new File([blob], file.name.replace(/\.[^/.]+$/, '') + '.jpg', { type:'image/jpeg', lastModified: Date.now() });
+              resolve(compressed);
+            } else {
+              resolve(file);
+            }
+          }, 'image/jpeg', JPEG_QUALITY);
+        };
+        img.onerror = () => resolve(file);
+        img.src = URL.createObjectURL(file);
+      });
+    }
+
+    async function compressAndReplaceFiles(inputEl){
+      const rawFiles = Array.from(inputEl.files || []);
+      const maxTotalBytes = 180 * 1024 * 1024; // guard rail in browser
+      if(rawFiles.length > 10){
+        alert('Please select up to 10 images.');
+        inputEl.value = '';
+        document.getElementById('imagePreview').innerHTML = '';
+        return [];
+      }
+      const compressedList = [];
+      for(const f of rawFiles){
+        compressedList.push(await compressImageFile(f));
+      }
+      const total = compressedList.reduce((s,f)=>s+(f?.size||0),0);
+      if(total > maxTotalBytes){
+        alert('Total image size is too large after compression. Please reduce files.');
+        inputEl.value = '';
+        document.getElementById('imagePreview').innerHTML = '';
+        return [];
+      }
+      const dt = new DataTransfer();
+      compressedList.forEach(f => f && dt.items.add(f));
+      inputEl.files = dt.files;
+      return compressedList;
+    }
+
+    // Image preview functionality with compression before upload
+    async function previewImages(event) {
       const preview = document.getElementById('imagePreview');
       preview.innerHTML = '';
-      const files = event.target.files;
+      const inputEl = event.target;
+      const files = await compressAndReplaceFiles(inputEl);
+      if(!files.length) return;
 
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        if (!file.type.startsWith('image/')) continue;
-
+      files.forEach(file => {
+        if (!file.type.startsWith('image/')) return;
         const reader = new FileReader();
         reader.onload = function(e) {
           const div = document.createElement('div');
@@ -287,9 +351,9 @@
           
           div.appendChild(img);
           preview.appendChild(div);
-        }
+        };
         reader.readAsDataURL(file);
-      }
+      });
     }
 
     // Add autocomplete functionality
@@ -305,22 +369,28 @@
 
       console.log('Query being sent to backend:', query); // Debugging line
       console.log('Query length:', query.length); // Log the length of the query
-      const response = await fetch(`/api/autocomplete?query=${encodeURIComponent(query)}`);
-      const results = await response.json();
+      try{
+        const response = await fetch(`/api/autocomplete?query=${encodeURIComponent(query)}`);
+        const payload = await response.json();
+        const results = Array.isArray(payload) ? payload : [];
 
-      resultsContainer.innerHTML = '';
-      results.forEach(result => {
-        const item = document.createElement('a');
-        item.className = 'list-group-item list-group-item-action';
-        item.textContent = result.display_name;
-        item.onclick = () => {
-          addressInput.value = result.display_name; // Set the input value to the selected address
-          resultsContainer.style.display = 'none'; // Hide results
-        };
-        resultsContainer.appendChild(item);
-      });
+        resultsContainer.innerHTML = '';
+        results.forEach(result => {
+          const item = document.createElement('a');
+          item.className = 'list-group-item list-group-item-action';
+          item.textContent = result.display_name;
+          item.onclick = () => {
+            addressInput.value = result.display_name; // Set the input value to the selected address
+            resultsContainer.style.display = 'none'; // Hide results
+          };
+          resultsContainer.appendChild(item);
+        });
 
-      resultsContainer.style.display = results.length ? 'block' : 'none'; // Show or hide results
+        resultsContainer.style.display = results.length ? 'block' : 'none'; // Show or hide results
+      }catch(err){
+        console.error('Autocomplete fetch failed', err);
+        resultsContainer.style.display = 'none';
+      }
     });
   </script>
 </body>
