@@ -11,6 +11,7 @@ const cbform = require('./routes/cashbuyer-route');
 const fastSell = require('./routes/fastSell');
 const contacts = require('./routes/contacts');
 const listing = require('./routes/listing');
+const propertyFinderRoutes = require('./routes/propertyFinder');
 const blogsRoutes = require('./routes/blogsRoutes');
 const contactusRoute = require('./routes/contactus-route'); // New route for contact form
 const kanbanRoutes = require('./routes/kanban');
@@ -46,7 +47,7 @@ app.get('/sitemap.xml', async (req, res) => {
     let pool = await sql.connect(dbConfig);
 
     // Static pages
-    const staticPages = ['/', '/properties', '/blogs', '/contactus', '/privacy-policy', '/terms-of-service'];
+    const staticPages = ['/', '/properties', '/blogs', '/contactus', '/privacy-policy', '/terms-of-service', '/property-finder', '/property-finder/agreement'];
     const now = new Date().toISOString();
 
     // Fetch available properties
@@ -127,6 +128,7 @@ app.use('/api', listing);
 app.use('/api', contactusRoute);
 app.use('/api', blogsRoutes);
 app.use('/api', contacts);
+app.use('/api', propertyFinderRoutes);
 const listingsRouter = require('./routes/listing');
 app.use('/', listingsRouter);
 
@@ -154,6 +156,54 @@ Handlebars.registerHelper('sanitize', function (value) {
     });
     return s;
   } catch(e) { return String(value); }
+});
+Handlebars.registerHelper('split', function (value, delimiter) {
+  if(value === null || value === undefined) return [];
+  try {
+    var parts = String(value).split(delimiter || ',').map(function(item){ return item.trim(); }).filter(Boolean);
+    return parts;
+  } catch(e) {
+    return [];
+  }
+});
+Handlebars.registerHelper('set', function (key, value, options) {
+  if (!options || !options.data) return '';
+  options.data.root = options.data.root || {};
+  options.data.root[key] = value;
+  return '';
+});
+Handlebars.registerHelper('get', function (key, options) {
+  const data = (options && options.data && options.data.root) || {};
+  return data[key] || '';
+});
+Handlebars.registerHelper('formatCurrency', function (value) {
+  if (value === null || value === undefined || value === '') return '';
+  var num = Number(value);
+  if (isNaN(num)) return value;
+  return num.toLocaleString('en-US');
+});
+Handlebars.registerHelper('firstImage', function (value) {
+  if (!value) return '';
+  try {
+    var first = String(value).split(',')[0].trim();
+    if (!first) return '';
+    first = first.replace(/^\/+/, '/');
+    return first.startsWith('/') ? first : '/' + first;
+  } catch (e) {
+    return value;
+  }
+});
+Handlebars.registerHelper('photoUrl', function (value) {
+  if (!value && value !== 0) return '';
+  try {
+    var str = String(value).trim();
+    if (!str) return '';
+    if (/^https?:\/\//i.test(str)) return str;
+    str = str.replace(/^\/+/, '').replace(/\\/g, '/');
+    return str ? '/' + str : '';
+  } catch (e) {
+    return value;
+  }
 });
 
 // Format square-footage nicely. Accepts primary and fallback values (e.g. SquareFootage, FloorArea).
@@ -259,8 +309,25 @@ app.get('/', async (req, res) => {
   sql.close();
 }
 });
+app.get('/about', (req, res) => {
+  res.render('about', { title: 'About Nick House Buyer' });
+});
 app.get('/faq', (req, res) => {
   res.render('faq', { title: `Frequently Asked Questions` });
+});
+app.get('/property-finder', (req, res) => {
+  res.render('propertyFinder', {
+    title: 'Property Finder (Bird Dog) HQ',
+    telegramLink: process.env.TELEGRAM_GROUP_URL || 'https://t.me/c/1888731494/1/9'
+  });
+});
+app.get('/property-finder/agreement', (req, res) => {
+  const defaultDate = new Date().toISOString().split('T')[0];
+  res.render('propertyFinderContract', {
+    title: 'Independent Contractor Agreement',
+    telegramLink: process.env.TELEGRAM_GROUP_URL || 'https://t.me/c/1888731494/1/9',
+    defaultAgreementDate: defaultDate
+  });
 });
 app.get('/properties', async (req, res) => {
   // Support filter form query params: q, beds, baths, priceRange, proOnly

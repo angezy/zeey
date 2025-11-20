@@ -1,0 +1,223 @@
+{{> __newnav}}
+
+<style>
+  :root {
+    --about-primary: #1565c0;
+    --about-dark: #0b1a2c;
+    --about-surface: #0d2036;
+    --about-muted: #6c819e;
+    --about-border: rgba(255, 255, 255, 0.08);
+  }
+
+  .about-shell {
+    background: linear-gradient(145deg, #0a1524 0%, #0c1729 35%, #0d2036 100%);
+    color: #e7edf5;
+    min-height: 100vh;
+    padding-bottom: 64px;
+  }
+
+  .about-shell .mui-container {
+    max-width: 1100px;
+  }
+
+  .about-hero {
+    padding: 68px 0 38px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 28px;
+    align-items: center;
+  }
+
+  .about-card {
+    background: var(--about-surface);
+    border: 1px solid var(--about-border);
+    border-radius: 18px;
+    padding: 20px;
+    box-shadow: 0 12px 50px rgba(0, 0, 0, 0.35);
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: rgba(21, 101, 192, 0.12);
+    border-radius: 999px;
+    color: #d1e5ff;
+    font-weight: 700;
+  }
+
+  .headline {
+    font-size: clamp(30px, 4vw, 42px);
+    font-weight: 800;
+    line-height: 1.1;
+    margin: 12px 0;
+  }
+
+  .lede {
+    color: var(--about-muted);
+    font-size: 17px;
+  }
+
+  .values-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin: 32px 0 22px;
+  }
+
+  .value-card {
+    background: var(--about-surface);
+    border: 1px solid var(--about-border);
+    border-radius: 14px;
+    padding: 16px;
+  }
+
+  .value-card h4 {
+    margin: 10px 0 6px;
+  }
+
+  .stack {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 14px;
+  }
+
+  .list-item {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin: 10px 0;
+    color: var(--about-muted);
+  }
+
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .metric-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--about-border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    text-align: center;
+  }
+
+  .cta {
+    margin-top: 28px;
+    background: var(--about-surface);
+    border: 1px solid var(--about-border);
+    border-radius: 16px;
+    padding: 18px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 10px;
+    align-items: center;
+  }
+</style>
+
+<main class="about-shell">
+  <section class="mui-container about-hero">
+    <div>
+      <span class="pill"><span class="material-symbols-rounded">diversity_1</span> Meet the team</span>
+      <h1 class="headline">About Nick House Buyer</h1>
+      <p class="lede">We are a Tampa-based crew obsessed with clarity. Our MUI-inspired workflows keep selling your
+        home straightforward, respectful, and fast—whether you are relocating, restructuring finances, or ending a chapter.</p>
+      <div class="metrics">
+        <div class="metric-card">
+          <div class="mui--text-headline">24h</div>
+          <div class="mui--text-caption">Offer speed</div>
+        </div>
+        <div class="metric-card">
+          <div class="mui--text-headline">0 fees</div>
+          <div class="mui--text-caption">We pay closing</div>
+        </div>
+        <div class="metric-card">
+          <div class="mui--text-headline">Local</div>
+          <div class="mui--text-caption">Florida focus</div>
+        </div>
+      </div>
+    </div>
+    <div class="about-card mui-panel">
+      <div class="mui--text-title">Our promise</div>
+      <p class="mui--text-body2">You get a direct line to decision makers, transparent pricing, and scheduling that
+        revolves around you.</p>
+      <div class="list-item">
+        <span class="material-symbols-rounded">verified</span>
+        <div><strong>No repairs.</strong> Sell exactly as-is—no showings or staging.</div>
+      </div>
+      <div class="list-item">
+        <span class="material-symbols-rounded">schedule</span>
+        <div><strong>Your timeline.</strong> We close when you are ready, often in days—not months.</div>
+      </div>
+      <div class="list-item">
+        <span class="material-symbols-rounded">support_agent</span>
+        <div><strong>People-first.</strong> A dedicated guide keeps you updated at every step.</div>
+      </div>
+      <a class="mui-btn mui-btn--primary mui--text-white" href="/forms/fastSell">Start your offer</a>
+    </div>
+  </section>
+
+  <section class="mui-container">
+    <div class="mui--text-title mui--text-white">How we work</div>
+    <div class="stack">
+      <div class="value-card">
+        <span class="material-symbols-rounded">bolt</span>
+        <h4>Speed without the chaos</h4>
+        <p class="mui--text-body2">From first contact to closing, our modern toolkit keeps everything coordinated and documented.</p>
+      </div>
+      <div class="value-card">
+        <span class="material-symbols-rounded">visibility</span>
+        <h4>Radical transparency</h4>
+        <p class="mui--text-body2">Every estimate lists the math: comps, renovation assumptions, and credits—no opaque discounts.</p>
+      </div>
+      <div class="value-card">
+        <span class="material-symbols-rounded">favorite</span>
+        <h4>Respect for your situation</h4>
+        <p class="mui--text-body2">No pressure tactics. We present options and let you decide what fits.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="mui-container">
+    <div class="mui--text-title mui--text-white">A process built for Florida sellers</div>
+    <div class="values-grid">
+      <div class="value-card">
+        <span class="material-symbols-rounded">beach_access</span>
+        <h4>Coastal-aware valuations</h4>
+        <p class="mui--text-body2">We factor flood zones, hurricane codes, and local insurance realities into every offer.</p>
+      </div>
+      <div class="value-card">
+        <span class="material-symbols-rounded">eco</span>
+        <h4>Energy & roof considerations</h4>
+        <p class="mui--text-body2">Our estimates clearly call out roof age, HVAC health, and solar potential so you see the same numbers we do.</p>
+      </div>
+      <div class="value-card">
+        <span class="material-symbols-rounded">groups</span>
+        <h4>Neighborhood-first</h4>
+        <p class="mui--text-body2">We know Tampa Bay blocks street by street, helping us move faster and tailor timelines to your area.</p>
+      </div>
+      <div class="value-card">
+        <span class="material-symbols-rounded">contract</span>
+        <h4>Simple paperwork</h4>
+        <p class="mui--text-body2">Digital docs, mobile notaries, and clear milestones mean you can keep life moving.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="mui-container cta">
+    <div>
+      <div class="mui--text-title">Ready to see your options?</div>
+      <p class="mui--text-body2" style="color: var(--about-muted); margin: 4px 0;">Tell us about your home and we will deliver a clear cash offer with material-style transparency.</p>
+    </div>
+    <div class="mui--text-right">
+      <a class="mui-btn mui-btn--primary mui--text-white" href="/forms/fastSell">Get a cash offer</a>
+      <a class="mui-btn mui-btn--flat mui-btn--primary" href="/contactus">Talk with us</a>
+    </div>
+  </section>
+</main>
+
+{{> __newfooter}}
