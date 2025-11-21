@@ -1,27 +1,489 @@
-</head>
+{{> __newnav}}
 
-<body class="index-page bg-gray-300">
+<style>
+  :root {
+    --rpo-navy: #0b3556;
+    --rpo-gold: #f7a600;
+    --rpo-cream: #f8fbff;
+    --rpo-border: #d9e2ec;
+    --rpo-text: #1d2a32;
+  }
 
+  .rpo-page {
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    color: var(--rpo-text);
+    background: var(--rpo-cream);
+  }
 
+  .rpo-hero {
+    position: relative;
+    background: linear-gradient(120deg, rgba(11, 53, 86, 0.9), rgba(11, 53, 86, 0.65)), url('/assets/img/home-decor-2.jpg') center/cover no-repeat;
+    color: #fff;
+    padding: 120px 0 110px;
+    overflow: hidden;
+  }
 
-  {{> __newnav}}
+  .rpo-hero:after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0));
+    pointer-events: none;
+  }
 
-    {{> __header}}
+  .rpo-hero .lead {
+    max-width: 620px;
+    font-size: 1.05rem;
+    line-height: 1.6;
+  }
 
-    {{> __present}}
+  .rpo-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 999px;
+    font-weight: 600;
+  }
 
-    {{> __about}}
+  .rpo-cta .btn {
+    font-weight: 700;
+    padding: 12px 22px;
+    border-radius: 6px;
+    min-width: 180px;
+  }
 
-    {{> __counter}}
+  .rpo-cta .btn-primary {
+    background: var(--rpo-gold);
+    border: none;
+    color: #0b3556;
+  }
 
-    {{!-- {{> __divider}} --}}
+  .rpo-cta .btn-outline-light {
+    color: #fff;
+    border: 1.5px solid rgba(255, 255, 255, 0.8);
+    background: transparent;
+  }
 
-    {{> __aboutus}}
+  .rpo-section {
+    padding: 80px 0;
+  }
 
-    {{> __blogs}}
+  .rpo-section h2 {
+    color: var(--rpo-navy);
+    font-weight: 800;
+  }
 
-    {{> __intro}}
+  .rpo-feature-card {
+    background: #fff;
+    border: 1px solid var(--rpo-border);
+    box-shadow: 0 10px 30px rgba(11, 53, 86, 0.06);
+    border-radius: 14px;
+    padding: 26px 22px;
+    height: 100%;
+  }
 
-    {{> __faq}}
+  .rpo-feature-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: rgba(11, 53, 86, 0.08);
+    color: var(--rpo-navy);
+    display: grid;
+    place-items: center;
+    font-size: 22px;
+    margin-bottom: 14px;
+  }
 
-    {{> __newfooter}}
+  .rpo-comparison {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 16px 40px rgba(11, 53, 86, 0.08);
+    overflow: hidden;
+  }
+
+  .rpo-comparison th {
+    background: #e9f2fb;
+    color: var(--rpo-navy);
+    font-weight: 800;
+    text-align: center;
+    padding: 18px;
+  }
+
+  .rpo-comparison th.right-col {
+    background: var(--rpo-navy);
+    color: #fff;
+  }
+
+  .rpo-comparison td {
+    padding: 16px 18px;
+    border-top: 1px solid var(--rpo-border);
+    vertical-align: middle;
+  }
+
+  .rpo-check {
+    color: #1aa65a;
+    font-size: 18px;
+    margin-right: 8px;
+  }
+
+  .rpo-x {
+    color: #d7263d;
+    font-size: 18px;
+    margin-right: 8px;
+  }
+
+  .rpo-pill-grid {
+    background: #fff;
+    border: 1px dashed var(--rpo-border);
+    border-radius: 18px;
+    padding: 30px 26px;
+    box-shadow: 0 12px 32px rgba(11, 53, 86, 0.08);
+  }
+
+  .rpo-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: #f0f6fd;
+    border: 1px solid #d5e5f7;
+    border-radius: 999px;
+    color: var(--rpo-navy);
+    margin: 6px;
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  .rpo-testimonials .card {
+    border-radius: 14px;
+    border: 1px solid var(--rpo-border);
+    box-shadow: 0 12px 28px rgba(11, 53, 86, 0.06);
+  }
+
+  .rpo-form-box {
+    background: linear-gradient(160deg, var(--rpo-navy), #113f66);
+    color: #fff;
+    border-radius: 14px;
+    padding: 26px;
+    box-shadow: 0 16px 40px rgba(11, 53, 86, 0.1);
+  }
+
+  .rpo-form-box .form-control {
+    border-radius: 8px;
+    border: 1px solid rgba(11, 53, 86, 0.2);
+    background: #fff;
+    color: var(--rpo-navy);
+  }
+
+  .rpo-form-box .form-control::placeholder {
+    color: #5f7181;
+  }
+
+  .rpo-form-box .btn {
+    background: var(--rpo-gold);
+    border: none;
+    color: var(--rpo-navy);
+    font-weight: 800;
+    border-radius: 8px;
+  }
+
+  @media (max-width: 991px) {
+    .rpo-hero {
+      padding: 80px 0 70px;
+    }
+  }
+</style>
+
+<main class="rpo-page">
+  <section class="rpo-hero">
+    <div class="container position-relative">
+      <div class="row align-items-center">
+        <div class="col-lg-7">
+          <div class="rpo-badge mb-4">
+            <i class="fas fa-home"></i> Sell fast. No stress. Fair cash offer.
+          </div>
+          <h1 class="display-5 fw-bold mb-3">Sell Your House Without<br> The Stress Or Hassle</h1>
+          <p class="lead">House a headache? Get a fair cash offer today. We’ll buy it as-is, no questions asked. Keep every
+            dollar, pay nothing in fees. Your home, your timeline, your choice.</p>
+          <div class="d-flex gap-3 align-items-center flex-wrap rpo-cta mt-4">
+            <a href="/forms/fastSell" class="btn btn-primary">Get My Cash Offer</a>
+            <a href="tel:+13235531922" class="btn btn-outline-light"><i class="fas fa-phone-alt me-2"></i>(323) 553-1922</a>
+          </div>
+          <ul class="list-unstyled mt-4 d-flex flex-column gap-2">
+            <li><i class="fas fa-check-circle me-2 text-success"></i>We buy as-is. No repairs or clean-up needed.</li>
+            <li><i class="fas fa-check-circle me-2 text-success"></i>No commissions, no fees, no open houses.</li>
+            <li><i class="fas fa-check-circle me-2 text-success"></i>Pick the closing date that works for you.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="rpo-section">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h2 class="mb-3">Simplifying The Way You Sell</h2>
+        <p class="lead text-muted">Straightforward steps, fair offers, and a team that keeps things moving.</p>
+      </div>
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="rpo-feature-card">
+            <div class="rpo-feature-icon"><i class="fas fa-calendar-check"></i></div>
+            <h5 class="fw-bold">Move on Your Timeline</h5>
+            <p class="mb-0">Pick a closing day that fits your plan — we’ll make sure you’re never rushed.</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="rpo-feature-card">
+            <div class="rpo-feature-icon"><i class="fas fa-file-signature"></i></div>
+            <h5 class="fw-bold">No Legal Guesswork</h5>
+            <p class="mb-0">We handle the paperwork so you don’t have to worry about a thing.</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="rpo-feature-card">
+            <div class="rpo-feature-icon"><i class="fas fa-tools"></i></div>
+            <h5 class="fw-bold">As-Is Purchases</h5>
+            <p class="mb-0">We buy homes in any condition. No repairs or cleaning needed.</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="rpo-feature-card">
+            <div class="rpo-feature-icon"><i class="fas fa-home"></i></div>
+            <h5 class="fw-bold">We Take Any Property</h5>
+            <p class="mb-0">Old, damaged, messy, or vacant — we’ll take it off your hands.</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="rpo-feature-card">
+            <div class="rpo-feature-icon"><i class="fas fa-stopwatch-20"></i></div>
+            <h5 class="fw-bold">Instant Property Reviews</h5>
+            <p class="mb-0">Know your home’s worth fast with a no-pressure quote in 24 hours.</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="rpo-feature-card">
+            <div class="rpo-feature-icon"><i class="fas fa-receipt"></i></div>
+            <h5 class="fw-bold">Zero Extra Costs</h5>
+            <p class="mb-0">No middlemen, no fees. The price we offer is what you get.</p>
+          </div>
+        </div>
+      </div>
+      <div class="d-flex justify-content-center gap-3 align-items-center mt-5">
+        <a href="/forms/fastSell" class="btn btn-warning text-dark fw-bold px-4 py-2">Get My Cash Offer</a>
+        <a href="tel:+13235531922" class="btn btn-outline-dark fw-bold px-4 py-2"><i class="fas fa-phone me-2"></i>(323) 553-1922</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="rpo-section">
+    <div class="container">
+      <div class="text-center mb-4">
+        <h2>Traditional Sales Vs. Nick House Buyer</h2>
+      </div>
+      <div class="rpo-comparison table-responsive">
+        <table class="table mb-0">
+          <thead>
+            <tr>
+              <th class="text-uppercase">Traditional Sales</th>
+              <th class="text-uppercase right-col">Nick House Buyer</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><i class="rpo-x fas fa-times-circle"></i>High agent commissions</td>
+              <td><i class="rpo-check fas fa-check-circle"></i>Keep every dollar — no fees</td>
+            </tr>
+            <tr>
+              <td><i class="rpo-x fas fa-times-circle"></i>Slow, drawn-out process</td>
+              <td><i class="rpo-check fas fa-check-circle"></i>Close lightning fast in as little as 7 days</td>
+            </tr>
+            <tr>
+              <td><i class="rpo-x fas fa-times-circle"></i>Deals often collapse</td>
+              <td><i class="rpo-check fas fa-check-circle"></i>Solid, simple process</td>
+            </tr>
+            <tr>
+              <td><i class="rpo-x fas fa-times-circle"></i>Time-wasting showings</td>
+              <td><i class="rpo-check fas fa-check-circle"></i>Cash in your hands, no open houses</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="rpo-section" style="background: linear-gradient(180deg, #f6f9fc, #eaf2fb);">
+    <div class="container">
+      <div class="row gy-4 align-items-center">
+        <div class="col-lg-6">
+          <h2 class="mb-3">How We Keep It Simple</h2>
+          <p class="text-muted">Selling your house shouldn’t be a hassle — our process makes it fast, fair, and worry-free from start to finish.</p>
+          <ul class="list-unstyled d-flex flex-column gap-3">
+            <li><i class="rpo-check fas fa-check-circle"></i>Call us or submit the form — no delays, no waiting around.</li>
+            <li><i class="rpo-check fas fa-check-circle"></i>Schedule a meeting — we’ll review your property for a quick, clear offer.</li>
+            <li><i class="rpo-check fas fa-check-circle"></i>Choose your closing date — pick a date that works best, we’ll handle the rest.</li>
+          </ul>
+          <div class="d-flex gap-3 flex-wrap mt-4">
+            <a href="/forms/fastSell" class="btn btn-warning text-dark fw-bold">Get My Cash Offer</a>
+            <a href="tel:+13235531922" class="btn btn-outline-dark fw-bold"><i class="fas fa-phone me-2"></i>(323) 553-1922</a>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="card border-0 shadow-sm overflow-hidden">
+            <img src="/assets/img/home-decor-1.jpg" class="w-100" alt="Family in front of a home">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="rpo-section">
+    <div class="container">
+      <div class="text-center mb-4">
+        <h2>When Life Shifts, We Help You Move Forward</h2>
+        <p class="text-muted">Sometimes a fresh start means selling now — we’re here when selling becomes the next right step.</p>
+      </div>
+      <div class="rpo-pill-grid text-center">
+        <div class="d-flex flex-wrap justify-content-center">
+          <span class="rpo-pill"><i class="fas fa-check-circle text-success"></i>Inherited Homes</span>
+          <span class="rpo-pill"><i class="fas fa-check-circle text-success"></i>Downsizing Moves</span>
+          <span class="rpo-pill"><i class="fas fa-check-circle text-success"></i>Divorce</span>
+          <span class="rpo-pill"><i class="fas fa-check-circle text-success"></i>Out-of-State Moves</span>
+          <span class="rpo-pill"><i class="fas fa-check-circle text-success"></i>Foreclosure Risk</span>
+          <span class="rpo-pill"><i class="fas fa-check-circle text-success"></i>Rental Properties</span>
+          <span class="rpo-pill"><i class="fas fa-check-circle text-success"></i>Travel Problems</span>
+          <span class="rpo-pill"><i class="fas fa-check-circle text-success"></i>Empty Properties</span>
+          <span class="rpo-pill"><i class="fas fa-check-circle text-success"></i>Separation Situations</span>
+          <span class="rpo-pill"><i class="fas fa-check-circle text-success"></i>Water Damage Issues</span>
+          <span class="rpo-pill"><i class="fas fa-check-circle text-success"></i>Flood or Fire Damage</span>
+          <span class="rpo-pill"><i class="fas fa-check-circle text-success"></i>Behind on Mortgage</span>
+          <span class="rpo-pill"><i class="fas fa-check-circle text-success"></i>Code Violations</span>
+          <span class="rpo-pill"><i class="fas fa-check-circle text-success"></i>Unpaid Property Taxes</span>
+          <span class="rpo-pill"><i class="fas fa-check-circle text-success"></i>Bad Tenants</span>
+          <span class="rpo-pill"><i class="fas fa-check-circle text-success"></i>Old House Repairs</span>
+        </div>
+        <div class="d-flex justify-content-center gap-3 align-items-center mt-4">
+          <a href="/forms/fastSell" class="btn btn-warning text-dark fw-bold px-4 py-2">Get My Cash Offer</a>
+          <a href="tel:+13235531922" class="btn btn-outline-dark fw-bold px-4 py-2"><i class="fas fa-phone me-2"></i>(323) 553-1922</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="rpo-section rpo-testimonials" style="background: linear-gradient(180deg, #f6f9fc, #dfeaf8);">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h2>Real Stories, Real Satisfaction</h2>
+        <p class="text-muted">Homeowners who sold fast and moved forward with confidence.</p>
+      </div>
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="card p-4 h-100">
+            <div class="mb-3 text-warning">
+              <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+            </div>
+            <p class="mb-4">“My rental property needed a ton of work, I didn’t want to fix anything. Nick House Buyer bought it as-is and handled everything.”</p>
+            <small class="fw-bold text-muted">— Chris D.</small>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card p-4 h-100">
+            <div class="mb-3 text-warning">
+              <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+            </div>
+            <p class="mb-4">“I had a leaky roof and inherited the home. They were kind, patient, and made a very difficult time so much easier.”</p>
+            <small class="fw-bold text-muted">— Denise S.</small>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card p-4 h-100">
+            <div class="mb-3 text-warning">
+              <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+            </div>
+            <p class="mb-4">“They didn’t lowball me like other buyers. I got a cash offer and the keys in my new place on my closing date.”</p>
+            <small class="fw-bold text-muted">— Evan J.</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="rpo-section">
+    <div class="container">
+      <div class="row gy-4 align-items-center">
+        <div class="col-lg-6">
+          <h2>You’re Just Moments Away From A Simple, Home Sale</h2>
+          <p class="text-muted">No listings, no cleanup — just a real cash deal you control. Forget repairs, staging, or waiting weeks. We buy as-is, handle the details, and put cash in your hands. If you want a no-obligation offer, a closing date that fits your life, start here.</p>
+          <div class="d-flex gap-3 flex-wrap mt-4">
+            <a href="/forms/fastSell" class="btn btn-warning text-dark fw-bold px-4 py-2">Get My Offer Now</a>
+            <a href="tel:+13235531922" class="btn btn-outline-dark fw-bold px-4 py-2"><i class="fas fa-phone me-2"></i>(323) 553-1922</a>
+          </div>
+        </div>
+        <div class="col-lg-5 ms-auto">
+          <div class="rpo-form-box">
+            <h4 class="fw-bold mb-4">Start With Your Cash Offer Today</h4>
+            <form id="rpo-fastSell3" action="/api/fastSell3" method="POST" novalidate>
+              <div class="mb-3">
+                <input name="FullName" type="text" class="form-control" placeholder="Full Name (e.g., John Doe)" required>
+              </div>
+              <div class="mb-3">
+                <input name="PhoneNumber" type="tel" class="form-control" placeholder="Phone Number (e.g., 323-553-1922)" required>
+              </div>
+              <div class="mb-3">
+                <input name="PropertyAddress" type="text" class="form-control" placeholder="Property Address (e.g., 100 N Ashley Dr, Tampa)" required>
+              </div>
+              <div class="mb-4">
+                <textarea name="SpecificRequests" class="form-control" rows="3" placeholder="Any specific requests? (optional)"></textarea>
+              </div>
+              <div class="alert d-none" role="alert" id="rpo-fastSell3-status"></div>
+              <button type="submit" class="btn w-100 py-2">Get My Offer Now</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+  (function () {
+    const form = document.getElementById('rpo-fastSell3');
+    if (!form) return;
+    const status = document.getElementById('rpo-fastSell3-status');
+
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      if (status) {
+        status.className = 'alert d-none';
+        status.innerText = '';
+      }
+      const fd = new FormData(form);
+      try {
+        const res = await fetch(form.action, {
+          method: 'POST',
+          body: fd
+        });
+        const data = await res.json();
+        const ok = res.ok && data && data.success;
+        if (status) {
+          status.className = 'alert ' + (ok ? 'alert-success' : 'alert-danger');
+          status.innerText = ok ? (data.message || 'Submitted! We will contact you soon.') : (data.message || 'Please check your details and try again.');
+          status.classList.remove('d-none');
+        }
+        if (ok) form.reset();
+      } catch (err) {
+        if (status) {
+          status.className = 'alert alert-danger';
+          status.innerText = 'Network error. Please try again.';
+          status.classList.remove('d-none');
+        }
+        console.error('fastSell3 submit error', err);
+      }
+    });
+  })();
+</script>
+
+{{> __newfooter}}
