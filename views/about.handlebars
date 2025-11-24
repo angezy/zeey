@@ -1,13 +1,123 @@
-</head>
+{{> __newnav}}
 
-<body class="index-page bg-gray-300">
+<style>
+  :root {
+    --rpo-navy: #0b3556;
+    --rpo-gold: #f7a600;
+    --rpo-cream: #f8fbff;
+    --rpo-border: #d9e2ec;
+    --rpo-text: #1d2a32;
+  }
 
-  {{> __newnav}}
+  .about-page {
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    color: var(--rpo-text);
+    background: var(--rpo-cream);
+  }
 
-  {{> __about}}
+  .about-hero {
+    position: relative;
+    background: linear-gradient(120deg, rgba(11, 53, 86, 0.92), rgba(11, 53, 86, 0.72)), url('/assets/img/home-decor-1.jpg') center/cover no-repeat;
+    color: #fff;
+    padding: 110px 0 90px;
+    overflow: hidden;
+  }
 
-  {{> __aboutus}}
+  .about-hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0));
+    pointer-events: none;
+  }
 
-  {{> __faq}}
+  .about-hero h1 {
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
 
-  {{> __newfooter}}
+  .about-hero .lead {
+    max-width: 700px;
+    font-size: 1.08rem;
+    line-height: 1.6;
+  }
+
+  .about-cta .btn {
+    font-weight: 700;
+    padding: 12px 22px;
+    border-radius: 6px;
+    min-width: 170px;
+  }
+
+  .about-cta .btn-primary {
+    background: var(--rpo-gold);
+    border: none;
+    color: var(--rpo-navy);
+  }
+
+  .about-cta .btn-outline-light {
+    color: #fff;
+    border: 1.5px solid rgba(255, 255, 255, 0.85);
+    background: transparent;
+  }
+
+  .about-wrapper {
+    max-width: 1180px;
+    margin: -60px auto 0;
+    padding: 0 18px 70px;
+  }
+
+  .about-card {
+    background: #fff;
+    border: 1px solid var(--rpo-border);
+    border-radius: 16px;
+    box-shadow: 0 14px 36px rgba(11, 53, 86, 0.08);
+    padding: 32px 26px;
+    margin-bottom: 28px;
+  }
+
+  @media (max-width: 991px) {
+    .about-hero {
+      padding: 80px 0 70px;
+    }
+
+    .about-wrapper {
+      margin-top: -30px;
+    }
+  }
+</style>
+
+<main class="about-page">
+  <section class="about-hero">
+    <div class="container position-relative">
+      <div class="row">
+        <div class="col-lg-8">
+          <div class="rpo-badge mb-3 d-inline-flex align-items-center gap-2 px-3 py-2" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.18); border-radius: 999px;">
+            <i class="fas fa-home"></i>
+            About Nick House Buyer
+          </div>
+          <h1 class="display-5 mb-3">Local experts buying houses fast & fair.</h1>
+          <p class="lead">We combine technology, local market know-how, and a people-first process to give you a stress-free sale. No listings, no repairs, just a clear cash offer on your schedule.</p>
+          <div class="d-flex gap-3 align-items-center flex-wrap about-cta mt-4">
+            <a href="/forms/fastSell" class="btn btn-primary">Get My Cash Offer</a>
+            <a href="tel:+13235531922" class="btn btn-outline-light"><i class="fas fa-phone-alt me-2"></i>(323) 553-1922</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="about-wrapper">
+    <div class="about-card">
+      {{> __about}}
+    </div>
+    <div class="about-card">
+      {{> __aboutus}}
+    </div>
+    <div class="about-card">
+      {{> __faq}}
+    </div>
+  </div>
+</main>
+
+{{> __newfooter}}
