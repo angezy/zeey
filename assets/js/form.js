@@ -19,6 +19,7 @@ function navigateSection(currentSectionId, targetSectionId) {
   // Switch sections
   $currentSection.addClass('hidden-section');
   $targetSection.removeClass('hidden-section');
+  updateFastSellUI(targetSectionId);
 }
 
 function validateSection($section) {
@@ -111,8 +112,27 @@ function handlePageLoad() {
   // Clear the query string after processing so reloads don't re-trigger alerts
   try { const cleanUrl = window.location.pathname + (window.location.hash || ''); history.replaceState({}, '', cleanUrl); } catch (e) {}
 
+  updateFastSellUI(1);
 };
 window.onload = handlePageLoad;
+
+// Update progress + step badges for fastSell flow
+function updateFastSellUI(stepNumber) {
+  const steps = document.querySelectorAll('.fs-step');
+  if (steps && steps.length) {
+    steps.forEach(function (node) {
+      const step = Number(node.getAttribute('data-step'));
+      if (!isNaN(step)) {
+        node.classList.toggle('active', step === stepNumber);
+      }
+    });
+  }
+  const bar = document.getElementById('fs-progress');
+  if (bar && steps && steps.length) {
+    const pct = Math.min(Math.max(stepNumber, 1), steps.length) / steps.length * 100;
+    bar.style.width = pct + '%';
+  }
+}
 
 // Show inline validation errors next to fields for fastSell form
 function showInlineErrors(errors) {

@@ -1,21 +1,21 @@
 <div class="col-md-6 mx-auto">
-  <div class="border shadow-0 mb-3 glass-card rounded-4" style="min-height: 350px; width: 100%;">
-    <div class="card-body text-light p-4">
+  <div class="cash-card border-0 shadow-0 mb-3 rounded-4">
+    <div class="card-body text-light p-4 p-md-5">
       <form id="Preview-form" action="/api/fastSell3" method="POST" novalidate>
 
         <!-- Section 1 -->
         <div id="section-1" class="form-section active-section">
-          <h4 class="text-white mb-3">Basic Information</h4>
+          <h2 class="center text-white mb-3 cash-headline">100% Free & confidential!</h2>
           <div class="row mb-4">
             <div class="col">
               <div class="form-outline">
-                <input name="FullName" type="text" id="name" class="form-control text-dark" required />
+                <input name="FullName" type="text" id="name" class="form-control text-dark cash-input" placeholder="John Doe" required />
                 <label class="form-label" for="name">Full Name</label>
               </div>
             </div>
             <div class="col">
               <div class="form-outline">
-                <input name="PhoneNumber" type="tel" id="number" class="form-control text-dark" required />
+                <input name="PhoneNumber" type="tel" id="number" class="form-control text-dark cash-input" placeholder="(323) 553-1922" required />
                 <label class="form-label" for="number">Phone Number</label>
               </div>
             </div>
@@ -24,14 +24,14 @@
           <div class="row mb-4">
             <div class="col">
               <div class="form-outline">
-                <input name="PropertyAddress" type="text" id="PropertyAddress" class="form-control text-dark" required />
+                <input name="PropertyAddress" type="text" id="PropertyAddress" class="form-control text-dark cash-input" placeholder="123 Main St, Tampa, FL" required />
                 <label class="form-label" for="PropertyAddress">Property Address</label>
               </div>
             </div>
           </div>
 
           <div class="text-center">
-            <button type="button" class="btn btn-success" onclick="showNextSection(9)">Next</button>
+            <button type="button" class="btn btn-success cash-btn" onclick="showNextSection(9)">Get Fair Cash Offer!</button>
           </div>
         </div>
 
@@ -40,7 +40,7 @@
           <h4 class="text-white mb-3">Additional Information</h4>
           <div class="mb-4">
             <div class="form-outline">
-              <textarea class="form-control text-dark" id="additionalInfo" name="SpecificRequests" rows="4"></textarea>
+              <textarea class="form-control text-dark cash-input" id="additionalInfo" name="SpecificRequests" rows="4" placeholder="Any timing needs, repairs, or notes (optional)"></textarea>
               <label class="form-label" for="additionalInfo">Any specific requests or expectations?</label>
             </div>
           </div>
@@ -54,8 +54,8 @@
           </div>
 
           <div class="d-flex justify-content-between align-items-center">
-            <button type="button" class="btn btn-secondary" onclick="showPreviousSection(1)">Back</button>
-            <button type="submit" id="submitBtn" class="btn btn-success">
+            <button type="button" class="btn btn-secondary cash-btn-alt" onclick="showPreviousSection(1)">Back</button>
+            <button type="submit" id="submitBtn" class="btn btn-success cash-btn">
               <span id="submitText">Submit</span>
               <span id="submitSpinner" class="spinner-border spinner-border-sm d-none ms-2" role="status" aria-hidden="true"></span>
             </button>
@@ -84,6 +84,46 @@
 <style>
   .hidden-section { display: none; opacity: 0; transition: opacity 0.4s ease; }
   .active-section { display: block; opacity: 1; }
+
+  .cash-card {
+    background: linear-gradient(160deg, rgba(17, 24, 39, 0.75), rgba(28, 46, 68, 0.85));
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(14px);
+  }
+
+  .cash-headline {
+    font-size: 32px;
+    letter-spacing: -0.2px;
+  }
+
+  .cash-input {
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 12px;
+    border: 1px solid #d4deea;
+    padding: 12px 14px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .cash-input:focus {
+    border-color: #66c2ff;
+    box-shadow: 0 8px 24px rgba(102, 194, 255, 0.25);
+  }
+
+  .cash-btn {
+    min-width: 140px;
+    border-radius: 12px;
+    font-weight: 700;
+    background: linear-gradient(120deg, #2dd4bf, #22c55e);
+    border: none;
+  }
+
+  .cash-btn-alt {
+    border-radius: 12px;
+    font-weight: 700;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    color: #fff;
+  }
 
   /* Blue custom checkbox */
   .custom-checkbox {
@@ -223,4 +263,3 @@
     }
   });
 </script>
-

@@ -99,6 +99,28 @@
       margin-bottom: 1.2rem;
     }
 
+    .cta-card {
+      margin-top: 1.75rem;
+      padding: 1rem 1.25rem;
+      border-radius: 16px;
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      background: linear-gradient(135deg, #e8f1ff, #ffffff);
+      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.06);
+    }
+
+    .cta-card p {
+      margin: 0 0 0.75rem;
+      color: #0f172a;
+      font-weight: 600;
+    }
+
+    .cta-card .btn {
+      font-weight: 700;
+      border-radius: 999px;
+      padding-left: 1.25rem;
+      padding-right: 1.25rem;
+    }
+
     .feature-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -193,6 +215,13 @@
           {{#if listPost.PhotoURL}}
           <a class="btn btn-outline-dark mt-3" href="{{listPost.PhotoURL}}" target="_blank" rel="noopener">Open External Media</a>
           {{/if}}
+          <div class="cta-card">
+            <p>Want a walkthrough or numbers breakdown?</p>
+            <div class="d-flex flex-wrap gap-2">
+              <a class="btn btn-dark" href="mailto:info@nickhousebuyer.com?subject=Listing%20{{listPost.listingId}}%20Call">Book a Call</a>
+              <a class="btn btn-outline-primary" href="mailto:info@nickhousebuyer.com?subject=Listing%20{{listPost.listingId}}%20Packet">Request Deal Packet</a>
+            </div>
+          </div>
         </div>
       </div>
     </div>

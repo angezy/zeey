@@ -1,25 +1,183 @@
 
 .hidden-section {
-    display: none;
-  }
-  
-#bg {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  transition: all 2s ease-out;
-  background-image: url('../khoshame/jackki.jpg');
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  background-position: 50% 50%; 
-  min-height: 100vh;
-  overflow-y: auto;
+  display: none;
 }
-  
-  body, html {
-    height: 100%;
-    overflow-x: hidden;
+
+body, html {
+  height: 100%;
+  overflow-x: hidden;
+  background: #0d1a2a;
+}
+
+#bg {
+  position: relative;
+  min-height: 100vh;
+  background:
+    linear-gradient(135deg, rgba(12, 22, 38, 0.85), rgba(12, 22, 38, 0.75)),
+    url('../khoshame/jackki.jpg') center/cover no-repeat fixed;
+  padding: 48px 0 72px;
+  display: flex;
+  align-items: center;
+}
+
+.fs-shell {
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+.fs-card {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(12px);
+}
+
+.fs-card .card-body {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+  border-radius: 18px;
+}
+
+.fs-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: rgba(52, 199, 89, 0.12);
+  color: #b7f7ce;
+  border-radius: 999px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.fs-title {
+  color: #fff;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+}
+
+.fs-subtitle {
+  color: rgba(255, 255, 255, 0.78);
+  max-width: 680px;
+}
+
+.fs-progress {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.fs-progress-bar {
+  height: 100%;
+  width: 25%;
+  background: linear-gradient(90deg, #34c759, #2aa1ff);
+  transition: width 0.35s ease, transform 0.35s ease;
+}
+
+.fs-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 12px 0 24px;
+}
+
+.fs-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.75);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.fs-step .dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 0 0 0 rgba(52, 199, 89, 0.4);
+}
+
+.fs-step.active {
+  border-color: rgba(52, 199, 89, 0.8);
+  color: #fff;
+  background: rgba(52, 199, 89, 0.12);
+}
+
+.fs-step.active .dot {
+  background: #34c759;
+  box-shadow: 0 0 0 6px rgba(52, 199, 89, 0.14);
+}
+
+.form-outline .form-control {
+  background: rgba(255, 255, 255, 0.94);
+  border-radius: 12px;
+  border: 1px solid #d9e2ec;
+  padding: 12px 14px;
+}
+
+.form-outline .form-label {
+  color: #4c5667 !important;
+  font-weight: 600;
+}
+
+.fs-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.fs-actions .btn {
+  min-width: 120px;
+  border-radius: 10px;
+  font-weight: 700;
+}
+
+.fs-actions .btn-secondary {
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff;
+}
+
+.fs-actions .btn-primary {
+  background: linear-gradient(90deg, #34c759, #2aa1ff);
+  border: none;
+}
+
+#autocomplete-results {
+  max-height: 220px;
+  overflow-y: auto;
+  border-radius: 12px;
+  border: 1px solid #d9e2ec;
+}
+
+#imagePreview img {
+  border-radius: 10px;
+}
+
+@media (max-width: 767px) {
+  #bg {
+    padding: 32px 0 40px;
   }
-  
+  .fs-card {
+    border-radius: 14px;
+  }
+  .fs-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .fs-step {
+    font-size: 13px;
+  }
+  .fs-actions {
+    flex-direction: column;
+  }
+  .fs-actions .btn {
+    width: 100%;
+  }
+}

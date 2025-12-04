@@ -24,55 +24,70 @@
 
 <body>
   <section id="bg">
-    <div class="container py-5">
-      <div class="row d-flex align-items-center justify-content-center">
-        <h2 class="text-center text-dark-emphasis"></h2>
-        <p class="text-muted  text-center">.</p>
+    <div class="container fs-shell">
+      <div class="row justify-content-center">
+        <div class="col-12 text-center text-md-start mb-4">
+          <span class="fs-badge"><i class="fas fa-bolt"></i> Fast cash offer</span>
+          <h1 class="fs-title mt-3">Sell your home with a guided, 4-step intake</h1>
+          <p class="fs-subtitle mb-0">Complete the questions in minutes. We respond within 24 hours with a transparent cash offer.</p>
+        </div>
 
-        <div class="col-md-6">
-          <div class=" border  shadow-0 mb-3 glass-card" style="width: 100%;">
-            <div class="card-body rounded-4 text-light px-5 pt-4 pb-2">
+        <div class="col-12">
+          <div class="fs-card border-0 shadow-0">
+            <div class="card-body p-4 p-md-5 text-light">
 
-              <form id="Preview-form" action="/api/fastSell" method="POST" class="text-center" enctype="multipart/form-data" novalidate>
+              <div class="fs-progress mb-3">
+                <div id="fs-progress" class="fs-progress-bar"></div>
+              </div>
+              <div class="fs-steps">
+                <div class="fs-step active" data-step="1"><span class="dot"></span><span>Seller</span></div>
+                <div class="fs-step" data-step="2"><span class="dot"></span><span>Property</span></div>
+                <div class="fs-step" data-step="3"><span class="dot"></span><span>Condition</span></div>
+                <div class="fs-step" data-step="4"><span class="dot"></span><span>Extras</span></div>
+              </div>
+
+              <form id="Preview-form" action="/api/fastSell" method="POST" enctype="multipart/form-data" novalidate>
                 <!-- Section 1: Basic Information -->
                 <div id="section-1" class="form-section">
-                  <h4 class="text-white">Seller Information</h4>
-                  <br><br>
-                  <div class="row mb-4">
-                    <div class="col">
+                  <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h4 class="mb-0 text-white">Seller Information</h4>
+                    <small class="text-white-50">Step 1 of 4</small>
+                  </div>
+                  <div class="row g-3">
+                    <div class="col-md-6">
                       <div data-mdb-input-init class="form-outline">
-                        <input name="FullName" type="text" id="name" class=" text-dark form-control" required />
+                        <input name="FullName" type="text" id="name" class="text-dark form-control" required />
                         <label class="form-label" for="name">Full Name</label>
                       </div>
                     </div>
-                    <div class="col">
+                    <div class="col-md-6">
                       <div data-mdb-input-init class="form-outline">
-                        <input name="ContactEmail" type="email" id="contactEmail" class=" text-dark form-control"
+                        <input name="ContactEmail" type="email" id="contactEmail" class="text-dark form-control"
                           required />
                         <label class="form-label" for="contactEmail">Contact Email</label>
                       </div>
                     </div>
-                  </div>
-                  <div class="row mb-4">
-                    <div class="col">
+                    <div class="col-md-6">
                       <div data-mdb-input-init class="form-outline">
-                        <input name="ContactPhone" type="tel" id="number" class=" text-dark form-control" required />
+                        <input name="ContactPhone" type="tel" id="number" class="text-dark form-control" required />
                         <label class="form-label" for="number">Phone Number</label>
                       </div>
                     </div>
                   </div>
 
-                  <div class="text-center bg-transparent">
+                  <div class="fs-actions mt-4">
                     <button type="button" class="btn btn-primary" onclick="navigateSection(1, 2)">Next</button>
                   </div>
                 </div>
 
                 <!-- Section 2: Property Information -->
                 <div id="section-2" class="form-section hidden-section">
-                  <h4>Property Information</h4>
-                  <br>
-                  <div class="row mb-4">
-                    <div class="col">
+                  <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h4 class="mb-0 text-white">Property Information</h4>
+                    <small class="text-white-50">Step 2 of 4</small>
+                  </div>
+                  <div class="row g-3">
+                    <div class="col-12">
                       <div data-mdb-input-init class="form-outline">
                         <input name="PropertyAddress" type="text" id="propertyAddress" placeholder="123 Main St"
                           class="text-dark form-control" required autocomplete="off" />
@@ -80,25 +95,21 @@
                       </div>
                       <div id="autocomplete-results" class="list-group" style="display: none;"></div>
                     </div>
-                  </div>
 
-                  <div class="row mb-4">
-                    <div class="col">
+                    <div class="col-md-6">
                       <div data-mdb-input-init class="form-outline">
                         <input name="SquareFootage" type="number" id="squareFootage" placeholder="1500"
                           class="text-dark form-control" required />
                         <label class="form-label" for="squareFootage">Square Footage</label>
                       </div>
                     </div>
-                    <div class="col">
+                    <div class="col-md-6">
                       <div data-mdb-input-init class="form-outline">
                         <input name="LotSize" type="number" id="lotSize" class="text-dark form-control" required />
                         <label class="form-label" for="lotSize">Lot Size</label>
                       </div>
                     </div>
-                  </div>
-                  <div class="row mb-4">
-                    <div class="col">
+                    <div class="col-md-6">
                       <div data-mdb-input-init class="form-outline">
                         <input name="Bedrooms" type="number" id="bedrooms" placeholder="3"
                           class="text-dark form-control" required />
@@ -106,26 +117,22 @@
                       </div>
                     </div>
 
-                    <div class="col">
+                    <div class="col-md-6">
                       <div data-mdb-input-init class="form-outline">
                         <input name="Bathrooms" type="number" id="bathrooms" placeholder="2"
                           class="text-dark form-control" required />
                         <label class="form-label" for="bathrooms"><small>Number of Bathrooms</small></label>
                       </div>
                     </div>
-                  </div>
 
-                  <div class="row mb-4">
-                    <div class="col">
+                    <div class="col-md-6">
                       <div data-mdb-input-init class="form-outline">
                         <input name="YearBuilt" type="number" id="yearBuilt" class="text-dark rounded form-control" required />
                         <label class="form-label" for="yearBuilt">Year Built</label>
                       </div>
                     </div>
-                  </div>
-                  <div class="row mb-4">
-                    <div class="col">
-                      <div  class="form-outline">
+                    <div class="col-md-6">
+                      <div class="form-outline">
                         <select name="PropertyType" id="propertyType" class="text-dark form-control" required>
                           <option value=""> </option>
                           <option value="Single Family Home">Single Family Home</option>
@@ -140,58 +147,56 @@
                         <label class="form-label" for="propertyType">Property Type</label>
                       </div>
                     </div>
-                  </div>
 
-                  <div class="row mb-4">
-                    <div class="col">
+                    <div class="col-md-6">
                       <div data-mdb-input-init class="form-outline">
                         <input name="ReasonForSelling" type="text" id="reasonForSelling" class="text-dark form-control"
                           required />
                         <label class="form-label" for="reasonForSelling">Reason for Selling</label>
                       </div>
                     </div>
-                  </div>
-                  <div class="row mb-4">
-                    <div class="col">
+                    <div class="col-md-6">
                       <div data-mdb-input-init class="form-outline">
                         <input name="Timeframe" type="text" id="timeframe" class="text-dark form-control" required />
                         <label class="form-label" for="timeframe">Timeframe</label>
                       </div>
                     </div>
                   </div>
-                  <div class="text-center bg-transparent">
+                  <div class="fs-actions mt-4">
                     <button type="button" class="btn btn-secondary" onclick="navigateSection(2, 1)">Previous</button>
                     <button type="button" class="btn btn-primary" onclick="navigateSection(2, 3)">Next</button>
                   </div>
                 </div>
                 <!-- Section 3: Property Condition -->
                 <div id="section-3" class="form-section hidden-section">
-                  <h4>Property Condition</h4>
-                  <div class="row mb-4">
-                    <div class="col">
-                      <label class="text-dark form-label">What is the current condition of the property?</label>
-                      <br>
-                      <div class="form-check form-check-inline">
-                        <input name="PropertyCondition" class="form-check-input" type="radio" value="Excellent"
-                          id="Excellent" />
-                        <label class="form-check-label" for="Excellent">Excellent</label>
-                      </div>
-                      <div class="form-check form-check-inline">
-                        <input name="PropertyCondition" class="form-check-input" type="radio" value="Good" id="Good" />
-                        <label class="form-check-label" for="Good">Good</label>
-                      </div>
-                      <div class="form-check form-check-inline">
-                        <input name="PropertyCondition" class="form-check-input" type="radio" value="Fair" id="Fair" />
-                        <label class="form-check-label" for="Fair">Fair</label>
-                      </div>
-                      <div class="form-check form-check-inline">
-                        <input name="PropertyCondition" class="form-check-input" type="radio" value="Poor" id="Poor" />
-                        <label class="form-check-label" for="Poor">Poor</label>
+                  <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h4 class="mb-0 text-white">Property Condition</h4>
+                    <small class="text-white-50">Step 3 of 4</small>
+                  </div>
+                  <div class="row g-3">
+                    <div class="col-12">
+                      <label class="text-white-50 form-label">What is the current condition of the property?</label>
+                      <div class="mt-1">
+                        <div class="form-check form-check-inline text-white">
+                          <input name="PropertyCondition" class="form-check-input" type="radio" value="Excellent"
+                            id="Excellent" />
+                          <label class="form-check-label" for="Excellent">Excellent</label>
+                        </div>
+                        <div class="form-check form-check-inline text-white">
+                          <input name="PropertyCondition" class="form-check-input" type="radio" value="Good" id="Good" />
+                          <label class="form-check-label" for="Good">Good</label>
+                        </div>
+                        <div class="form-check form-check-inline text-white">
+                          <input name="PropertyCondition" class="form-check-input" type="radio" value="Fair" id="Fair" />
+                          <label class="form-check-label" for="Fair">Fair</label>
+                        </div>
+                        <div class="form-check form-check-inline text-white">
+                          <input name="PropertyCondition" class="form-check-input" type="radio" value="Poor" id="Poor" />
+                          <label class="form-check-label" for="Poor">Poor</label>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div class="row mb-4">
-                    <div class="col">
+                    <div class="col-12">
                       <div data-mdb-input-init class="form-outline">
                         <textarea name="AdditionalComments" id="additionalComments"
                           placeholder="Please describe the property" class="text-dark form-control" rows="3"></textarea>
@@ -199,36 +204,34 @@
                       </div>
                     </div>
                   </div>
-                  <div class="text-center bg-transparent">
+                  <div class="fs-actions mt-4">
                     <button type="button" class="btn btn-secondary" onclick="navigateSection(3, 2)">Previous</button>
                     <button type="button" class="btn btn-primary" onclick="navigateSection(3, 4)">Next</button>
                   </div>
                 </div>
                 <!-- Section 4: Additional Information -->
                 <div id="section-4" class="form-section hidden-section">
-                  <h4>Additional Information</h4>
-                  <br><br>
-                  <div class="row mb-4">
-                    <div class="col">
+                  <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h4 class="mb-0 text-white">Additional Information</h4>
+                    <small class="text-white-50">Step 4 of 4</small>
+                  </div>
+                  <div class="row g-3">
+                    <div class="col-md-6">
                       <div data-mdb-input-init class="form-outline">
                         <input name="AskingPrice" type="number" id="askingPrice" placeholder="500000"
                           class="text-dark form-control" required />
                         <label class="form-label" for="askingPrice">Asking Price</label>
                       </div>
                     </div>
-                  </div>
-                  <div class="row mb-4">
-                    <div class="col">
+                    <div class="col-12">
                       <div class="form-outline">
-                        <label class="form-label d-block text-start" for="propertyImages">Property Images (Max 10 images)</label>
+                        <label class="form-label d-block text-start text-white-50" for="propertyImages">Property Images (Max 10 images)</label>
                         <input type="file" name="propertyImages" id="propertyImages" class="form-control" accept="image/*" multiple 
                           onchange="previewImages(event)" />
                       </div>
                       <div id="imagePreview" class="mt-3 d-flex flex-wrap gap-2"></div>
                     </div>
-                  </div>
-                  <div class="row mb-4">
-                    <div class="col">
+                    <div class="col-12">
                       <div data-mdb-input-init class="form-outline">
                         <textarea name="AdditionalComments" id="additionalComments"
                           placeholder="Please provide any additional comments or questions"
@@ -237,7 +240,7 @@
                       </div>
                     </div>
                   </div>
-                  <div class="text-center bg-transparent">
+                  <div class="fs-actions mt-4">
                     <button type="button" class="btn btn-secondary" onclick="navigateSection(4, 3)">Previous</button>
                     <button type="submit" class="btn btn-primary">Submit</button>
                   </div>

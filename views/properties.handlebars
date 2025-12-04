@@ -236,6 +236,7 @@
 
       const PropertyCard = ({ item }) => {
         const photos = useMemo(() => extractPhotos(item), [item.PhotoFile, item.PhotoURL]);
+        const contactHref = 'mailto:info@nickhousebuyer.com?subject=' + encodeURIComponent(`Listing ${item.listingId || item.Title || 'Inquiry'}`);
         return React.createElement(Card, {
           sx: {
             height: '100%',
@@ -259,9 +260,30 @@
             ),
             item.Description ? React.createElement(Typography, { variant: 'body2', color: 'text.secondary' }, item.Description.slice(0, 120) + (item.Description.length > 120 ? '...' : '')) : null
           ),
-          React.createElement(CardActions, { sx: { px: 3, pb: 3, justifyContent: 'space-between' } },
-            React.createElement(Button, { variant: 'outlined', color: 'primary', size: 'small', href: `/property/${item.listingId}` }, 'View'),
-            React.createElement(Button, { variant: 'contained', color: 'secondary', size: 'small', href: '/property/' + item.listingId }, 'Details')
+          React.createElement(CardActions, {
+            sx: {
+              px: 3,
+              pb: 3,
+              justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: 1,
+            flexWrap: 'wrap'
+          }
+        },
+          React.createElement(Button, { variant: 'outlined', color: 'primary', size: 'small', href: `/property/${item.listingId}` }, 'View'),
+          React.createElement(Button, {
+            variant: 'contained',
+            color: 'primary',
+            size: 'small',
+            href: contactHref,
+            sx: {
+              background: 'linear-gradient(135deg,#0b1f44,#0f60ff)',
+              color: '#fff',
+              fontWeight: 700,
+              boxShadow: '0 10px 25px rgba(15,23,42,0.18)',
+              '&:hover': { background: 'linear-gradient(135deg,#0b1f44,#0c52d4)' }
+            }
+          }, 'Book a Call')
           )
         );
       };
