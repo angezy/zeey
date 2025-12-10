@@ -148,7 +148,7 @@
                 <div class="col-md-4">
                   <label class="form-label">Upload New Photos</label>
                   <input type="file" class="form-control" id="editPhotoFiles" name="PhotoFiles" accept="image/*" multiple>
-                  <small class="text-muted d-block mt-1">Select up to 30 images to add to this listing.</small>
+                  <small class="text-muted d-block mt-1">Select up to 60 images to add to this listing.</small>
                   <div id="editPhotoPreview" class="mt-2 d-flex gap-2 flex-wrap"></div>
                 </div>
                 <div class="col-md-4 d-flex align-items-center">
@@ -162,6 +162,10 @@
                   <div id="editCurrentPhotos" class="border rounded p-2 d-flex gap-2 flex-wrap bg-light" style="min-height:90px;">
                     <span class="text-muted small">No photos uploaded yet.</span>
                   </div>
+                </div>
+                <div class="col-12">
+                  <label class="form-label" for="editDescription">Description</label>
+                  <textarea class="form-control" id="editDescription" rows="3" placeholder="Add a short description"></textarea>
                 </div>
               </div>
             </form>
@@ -291,7 +295,8 @@
           photoFiles: document.getElementById('editPhotoFiles'),
           available: document.getElementById('editAvailable'),
           photoPreview: document.getElementById('editPhotoPreview'),
-          currentPhotos: document.getElementById('editCurrentPhotos')
+          currentPhotos: document.getElementById('editCurrentPhotos'),
+          description: document.getElementById('editDescription')
         };
 
         function renderCurrentPhotos(item){
@@ -353,6 +358,7 @@
           editFields.sqft.value = item.SquareFootage || item.FloorArea || '';
           editFields.photoUrl.value = decodeHtmlEntities(item.PhotoURL || '');
           editFields.available.checked = !!item.Available;
+          if(editFields.description) editFields.description.value = decodeHtmlEntities(item.Description || '');
           renderCurrentPhotos(item);
           if(editFields.photoPreview){
             editFields.photoPreview.innerHTML = '<span class="text-muted small">No new files selected yet.</span>';
@@ -408,6 +414,9 @@
           formData.append('SquareFootage', editFields.sqft.value !== '' ? editFields.sqft.value : '');
           formData.append('PhotoURL', editFields.photoUrl.value.trim());
           formData.append('Available', editFields.available.checked ? 1 : 0);
+          if (editFields.description) {
+            formData.append('Description', editFields.description.value.trim());
+          }
           if (editFields.photoFiles && editFields.photoFiles.files && editFields.photoFiles.files.length) {
             Array.from(editFields.photoFiles.files).forEach(file => formData.append('PhotoFiles', file));
           }

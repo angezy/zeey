@@ -21,7 +21,7 @@
 
         <div id="cashbuyer-list" class="row g-3">
             {{#each cashbuyer}}
-            <div class="col-md-4 p-2 cashbuyer-card" data-search="{{this.FullName}} {{this.PreferredAreas}} {{this.PropertyType}} {{this.CashBuyerIP}}">
+            <div class="col-md-4 p-2 cashbuyer-card" data-search="{{this.FullName}} {{this.PreferredAreas}} {{this.PropertyType}} {{this.CashBuyerIP}} {{this.CellPhone}} {{this.Email}}">
                 <div class="buyer-card card h-100 border-0 shadow-sm overflow-hidden">
                     <div class="buyer-card__stripe"></div>
                     <div class="card-body d-flex flex-column">
@@ -167,6 +167,7 @@
                                                         const email = buyerData.Email || '';
                                                         const phone = buyerData.CellPhone || '';
                                                         const priceRange = fmtPriceRange(buyerData.PriceRanges);
+                                                        const description = buyerData.AdditionalComments || buyerData.Description || '';
 
                                                         const proofImg = buyerData.ProofOfFundsFile ? `<img src="/${buyerData.ProofOfFundsFile}" class="img-fluid rounded w-100" style="max-height:220px;object-fit:cover;" alt="Proof of funds"/>` : '<div class="buyer-modal__proof-placeholder">No proof uploaded</div>';
 
@@ -195,7 +196,7 @@
 
                                                         const extraTable = Object.entries(buyerData).reduce(function (acc, [key, value]) {
                                                             if (!value && value !== 0) return acc;
-                                                            const exclude = ['ProofOfFundsFile','FullName','YearsInBusiness','Email','CellPhone','buyerID','PriceRanges','PreferredAreas','PropertyType','CashBuyerIP','FundingInPlace','ProofOfFunds','Quickly'];
+                                                            const exclude = ['ProofOfFundsFile','FullName','YearsInBusiness','Email','CellPhone','buyerID','PriceRanges','PreferredAreas','PropertyType','CashBuyerIP','FundingInPlace','ProofOfFunds','Quickly','AdditionalComments','Description'];
                                                             if (exclude.includes(key)) return acc;
                                                             acc += `<tr><th>${key}</th><td>${value}</td></tr>`;
                                                             return acc;
@@ -230,6 +231,7 @@
                                                                             ${metaGrid}
                                                                         </div>
                                                                     </div>
+                                                                    ${description ? `<div class="buyer-modal__panel"><div class="buyer-modal__panel-title">Description</div><p class="mb-0 text-muted">${description}</p></div>` : ''}
                                                                     ${extraTable ? `<div class="buyer-modal__panel"><div class="buyer-modal__panel-title">Additional Fields</div><div class="table-responsive"><table class="table table-sm mb-0"><tbody>${extraTable}</tbody></table></div></div>` : ''}
                                                                 </div>
                                                             </div>

@@ -24,7 +24,7 @@ const storage = multer.diskStorage({
     },
 });
 // Increase limits to avoid 413 rejections for larger photos
-const MAX_PHOTOS = 30;
+const MAX_PHOTOS = 60; // allow up to 60 photos (was 30)
 const uploadLimits = {
     files: MAX_PHOTOS,
     fileSize: 50 * 1024 * 1024 // 50 MB per file
@@ -383,7 +383,8 @@ const handleListingUpdate = (req, res) => {
                 SquareFootage: body.SquareFootage !== undefined && body.SquareFootage !== '' ? Number(body.SquareFootage) : existing.SquareFootage,
                 PhotoURL: body.PhotoURL !== undefined ? body.PhotoURL : existing.PhotoURL,
                 PhotoFile: photoFileValue,
-                Available: body.Available !== undefined ? Number(body.Available) : existing.Available
+                Available: body.Available !== undefined ? Number(body.Available) : existing.Available,
+                Description: body.Description !== undefined ? body.Description : existing.Description
             };
 
             const result = await pool.request()
@@ -397,6 +398,7 @@ const handleListingUpdate = (req, res) => {
                 .input("PhotoURL", sql.NVarChar, upd.PhotoURL)
                 .input("PhotoFile", sql.NVarChar, upd.PhotoFile)
                 .input("Available", sql.Bit, upd.Available)
+                .input("Description", sql.NVarChar, upd.Description)
                 .query(`
                     UPDATE listings_tbl
                     SET Title=@Title,
@@ -407,7 +409,8 @@ const handleListingUpdate = (req, res) => {
                         SquareFootage=@SquareFootage,
                         PhotoURL=@PhotoURL,
                         PhotoFile=@PhotoFile,
-                        Available=@Available
+                        Available=@Available,
+                        Description=@Description
                     WHERE listingId=@listingId
                 `);
 
