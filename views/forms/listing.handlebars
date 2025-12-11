@@ -195,8 +195,8 @@
       const photoFiles = document.getElementById('PhotoFiles');
       const preview = document.getElementById('photoPreview');
       const previewStatus = document.getElementById('photoPreviewStatus');
-      const MAX_DIMENSION = 900;
-      const JPEG_QUALITY = 0.55;
+      const MAX_DIMENSION = 1400;
+      const JPEG_QUALITY = 0.7;
       const MAX_FILES = 60;
 
       async function compressImageFile(file){
@@ -236,7 +236,7 @@
 
       async function compressAndReplaceFiles(inputEl){
         const files = Array.from(inputEl.files || []);
-        const maxTotalBytes = 40 * 1024 * 1024; // tighter guard rail to avoid 413s on the server/CDN
+        const maxTotalBytes = 200 * 1024 * 1024; // higher guard rail to match increased server limit
         if(files.length > MAX_FILES){
           alert(`Please select up to ${MAX_FILES} photos only`);
           inputEl.value = '';
