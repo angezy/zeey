@@ -27,7 +27,7 @@ const storage = multer.diskStorage({
 const MAX_PHOTOS = 60; // allow up to 60 photos (was 30)
 const uploadLimits = {
     files: MAX_PHOTOS,
-    fileSize: 50 * 1024 * 1024 // 50 MB per file
+    fileSize: 15 * 1024 * 1024 // 15 MB per file to stay within common proxy/CDN caps
 };
 const upload = multer({ storage, limits: uploadLimits }).array('PhotoFiles', MAX_PHOTOS); // Allow up to 30 photos
 const uploadEdit = multer({ storage, limits: uploadLimits }).array('PhotoFiles', MAX_PHOTOS); // For edit/update
