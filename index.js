@@ -387,7 +387,8 @@ app.get('/properties', async (req, res) => {
     }
 
     const whereSql = where.length ? ('WHERE ' + where.join(' AND ')) : '';
-    const finalQuery = `SELECT * FROM dbo.listings_tbl ${whereSql} ORDER BY CreatedAt DESC`;
+    // Show newest listings first (fallback to listingId for consistent ordering)
+    const finalQuery = `SELECT * FROM dbo.listings_tbl ${whereSql} ORDER BY CreatedAt DESC, listingId DESC`;
 
     const result = await request.query(finalQuery);
     const listers = result.recordset || [];
@@ -502,7 +503,7 @@ app.get('/dashboard/lister', authMiddleware, async (req, res) => {
   try {
     let pool = await sql.connect(dbConfig);
     let result = await pool.request()
-      .query('SELECT * FROM dbo.listings_tbl');
+      .query('SELECT * FROM dbo.listings_tbl ORDER BY CreatedAt DESC, listingId DESC');
     const listers = result.recordset;
     res.render('lister', { title: 'lister', layout: "__dashboard", listings: listers });
   } catch (err) {

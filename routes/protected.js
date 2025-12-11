@@ -110,8 +110,8 @@ router.get('/lister', async (req, res) => {
         // Connect to MSSQL
         const pool = await sql.connect(dbConfig);
 
-        // Query to fetch listings
-        const result = await pool.request().query('SELECT * FROM dbo.listings_tbl');
+        // Query to fetch listings (newest first)
+        const result = await pool.request().query('SELECT * FROM dbo.listings_tbl ORDER BY CreatedAt DESC, listingId DESC');
 
         // Render the lister view with the fetched listings
         res.render('dashboard/lister', { listings: result.recordset });
