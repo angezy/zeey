@@ -112,10 +112,10 @@
                     </div>
 
                     <div class="mb-3">
-                      <label class="form-label">Photos (upload up to 10)</label>
+                      <label class="form-label">Photos (upload up to 60)</label>
                       <input id="PhotoFiles" name="PhotoFiles" type="file" class="form-control mb-2" accept="image/*" multiple />
                       <input id="PhotoURL" name="PhotoURL" type="url" class="form-control" placeholder="https://drive.google.com/.... (optional)" />
-                      <div class="form-text">Upload up to 10 photos, or provide a Google Drive URL for additional images.</div>
+                      <div class="form-text">Upload up to 60 photos (we compress them before upload), or provide a Google Drive URL for additional images.</div>
                       <div id="preview" class="mt-2 d-flex flex-wrap gap-2"></div>
                     </div>
                   </div>
@@ -195,8 +195,9 @@
       const photoFiles = document.getElementById('PhotoFiles');
       const preview = document.getElementById('photoPreview');
       const previewStatus = document.getElementById('photoPreviewStatus');
-      const MAX_DIMENSION = 1600;
+      const MAX_DIMENSION = 1400;
       const JPEG_QUALITY = 0.7;
+      const MAX_FILES = 60;
 
       async function compressImageFile(file){
         if(!file || !file.type.startsWith('image/')) return file;
@@ -235,9 +236,9 @@
 
       async function compressAndReplaceFiles(inputEl){
         const files = Array.from(inputEl.files || []);
-        const maxTotalBytes = 180 * 1024 * 1024; // 180 MB client guard to stay below server limits
-        if(files.length > 10){
-          alert('Please select up to 10 photos only');
+        const maxTotalBytes = 220 * 1024 * 1024; // guard rail to keep uploads reasonable after compression
+        if(files.length > MAX_FILES){
+          alert(`Please select up to ${MAX_FILES} photos only`);
           inputEl.value = '';
           if(previewStatus) previewStatus.textContent = '0 files selected';
           return [];
