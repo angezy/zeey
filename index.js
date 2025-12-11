@@ -90,7 +90,8 @@ app.get('/sitemap.xml', async (req, res) => {
 app.use(cookieParser());
 
 // Middleware to parse JSON and URL-encoded requests (raise limits for uploads with metadata)
-const bodyLimit = process.env.BODY_LIMIT || '200mb';
+// Keep this in sync with IIS/web.config (maxAllowedContentLength) to avoid 413 errors.
+const bodyLimit = process.env.BODY_LIMIT || '500mb';
 app.use(bodyParser.urlencoded({ extended: true, limit: bodyLimit }));
 app.use(bodyParser.json({ limit: bodyLimit }));
 
