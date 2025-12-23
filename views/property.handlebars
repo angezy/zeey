@@ -212,6 +212,9 @@
           <h1>{{sanitize listPost.Title}}</h1>
           <p class="mb-2">{{sanitize listPost.PropertyAddress}}</p>
           <p class="fs-5 fw-semibold">${{formatCurrency listPost.AskingPrice}}</p>
+          {{#if listPost.ARV}}
+            <p class="text-muted mb-2">ARV: ${{formatCurrency listPost.ARV}}</p>
+          {{/if}}
           <div class="hero-pill-group">
             <span class="hero-pill">{{listPost.Bedrooms}} Beds</span>
             <span class="hero-pill">{{listPost.Bathrooms}} Baths</span>
@@ -248,6 +251,7 @@
           <table class="info-table">
             <tr><td>Listing ID</td><td>{{listPost.listingId}}</td></tr>
             <tr><td>Status</td><td>{{#if listPost.Available}}Available{{else}}Pending{{/if}}</td></tr>
+            {{#if listPost.ARV}}<tr><td>ARV</td><td>${{formatCurrency listPost.ARV}}</td></tr>{{/if}}
             <tr><td>Reason for selling</td><td>{{#if listPost.ReasonForSelling}}{{sanitize listPost.ReasonForSelling}}{{else}}Not provided{{/if}}</td></tr>
             <tr><td>Updated</td><td>{{formatDate listPost.UpdatedAt}}</td></tr>
           </table>

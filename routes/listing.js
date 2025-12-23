@@ -40,6 +40,21 @@ const normalizeStoredPhotoPath = (input) => {
     return str.replace(/^\/+/, '');
 };
 
+const columnExists = async (pool, { schema = 'dbo', table, column }) => {
+    const res = await pool.request()
+        .input('schema', sql.NVarChar, schema)
+        .input('table', sql.NVarChar, table)
+        .input('column', sql.NVarChar, column)
+        .query(`
+            SELECT 1 AS ok
+            FROM INFORMATION_SCHEMA.COLUMNS
+            WHERE LOWER(TABLE_SCHEMA) = LOWER(@schema)
+              AND LOWER(TABLE_NAME) = LOWER(@table)
+              AND LOWER(COLUMN_NAME) = LOWER(@column)
+        `);
+    return !!(res.recordset && res.recordset.length);
+};
+
 // Multer wrapper to capture upload errors and attach requestId early
 const handleListingUpload = (req, res, next) => {
     req.requestId = req.requestId || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -151,6 +166,7 @@ router.post('/listing', handleListingUpload, async (req, res) => {
             Bathrooms: validator.isInt(String(formData.Bathrooms || '')) ? formData.Bathrooms : null,
             SquareFootage: validator.isInt(String(formData.SquareFootage || '')) ? formData.SquareFootage : null,
             AskingPrice: validator.isFloat(String(formData.AskingPrice || '')) ? formData.AskingPrice : null,
+            ARV: validator.isFloat(String(formData.ARV || '')) ? formData.ARV : null,
             // Keep description raw (trimmed) so we don't mangle slashes; escape when rendering in templates
             Description: validator.trim(formData.Description || ''),
             ReasonForSelling: validator.trim(formData.ReasonForSelling || ''),
@@ -190,22 +206,32 @@ router.post('/listing', handleListingUpload, async (req, res) => {
     const pool = await sql.connect(dbConfig);
     console.log(`[listing][${requestId}] SQL connected.`);
 
-        // Insert Data into Listings_tbl
+        // Insert Data into Listings_tbl (ARV is optional; only used if the DB has an ARV column)
+        const hasArvColumn = await columnExists(pool, { schema: 'dbo', table: 'listings_tbl', column: 'ARV' });
+        const insertColumns = [
+            'Title', 'FullName', 'Email', 'Phone', 'PropertyAddress', 'PropertyType',
+            'Bedrooms', 'Bathrooms', 'SquareFootage', 'AskingPrice',
+            'Description', 'ReasonForSelling', 'SubmitDate', 'ListerIP', 'PhotoFile', 'PhotoURL',
+            'LotArea', 'FloorArea', 'YearBuilt', 'Garage', 'Stories', 'Roofing', 'Available',
+            'Comps1', 'Comps2', 'Comps3'
+        ];
+        const insertValues = [
+            '@Title', '@FullName', '@Email', '@Phone', '@PropertyAddress', '@PropertyType',
+            '@Bedrooms', '@Bathrooms', '@SquareFootage', '@AskingPrice',
+            '@Description', '@ReasonForSelling', '@SubmitDate', '@ListerIP', '@PhotoFile', '@PhotoURL',
+            '@LotArea', '@FloorArea', '@YearBuilt', '@Garage', '@Stories', '@Roofing', '@Available',
+            '@Comps1', '@Comps2', '@Comps3'
+        ];
+        if (hasArvColumn) {
+            insertColumns.splice(insertColumns.indexOf('AskingPrice') + 1, 0, 'ARV');
+            insertValues.splice(insertValues.indexOf('@AskingPrice') + 1, 0, '@ARV');
+        }
         const query = `
-            INSERT INTO dbo.listings_tbl (
-                Title, FullName, Email, Phone, PropertyAddress, PropertyType,
-                Bedrooms, Bathrooms, SquareFootage, AskingPrice,
-                Description, ReasonForSelling, SubmitDate, ListerIP, PhotoFile, PhotoURL,
-                LotArea, FloorArea, YearBuilt, Garage, Stories, Roofing, Available, Comps1, Comps2, Comps3
-            ) VALUES (
-                @Title, @FullName, @Email, @Phone, @PropertyAddress, @PropertyType,
-                @Bedrooms, @Bathrooms, @SquareFootage, @AskingPrice,
-                @Description, @ReasonForSelling, @SubmitDate, @ListerIP, @PhotoFile, @PhotoURL,
-                @LotArea, @FloorArea, @YearBuilt, @Garage, @Stories, @Roofing, @Available, @Comps1, @Comps2, @Comps3
-            )
+            INSERT INTO dbo.listings_tbl (${insertColumns.join(', ')})
+            VALUES (${insertValues.join(', ')})
         `;
 
-        const result = await pool.request()
+        const reqq = pool.request()
             .input('Title', sql.NVarChar, sanitizedFormData.Title)
             .input('FullName', sql.NVarChar, sanitizedFormData.FullName)
             .input('Email', sql.NVarChar, sanitizedFormData.Email)
@@ -231,8 +257,9 @@ router.post('/listing', handleListingUpload, async (req, res) => {
             .input('Available', sql.Bit, sanitizedFormData.Available)
             .input('Comps1', sql.NVarChar, sanitizedFormData.Comps1)
             .input('Comps2', sql.NVarChar, sanitizedFormData.Comps2)
-            .input('Comps3', sql.NVarChar, sanitizedFormData.Comps3)
-            .query(query);
+            .input('Comps3', sql.NVarChar, sanitizedFormData.Comps3);
+        if (hasArvColumn) reqq.input('ARV', sql.Money, sanitizedFormData.ARV);
+        const result = await reqq.query(query);
         console.log(`[listing][${requestId}] Insert OK, new record id (if available):`, result.recordset && result.recordset[0]);
 
         const { sendEmail, sendEmailWithTemplate } = require('../models/mailer');
@@ -378,6 +405,7 @@ const handleListingUpdate = (req, res) => {
                 Title: body.Title !== undefined ? body.Title : existing.Title,
                 PropertyAddress: body.PropertyAddress !== undefined ? body.PropertyAddress : existing.PropertyAddress,
                 AskingPrice: body.AskingPrice !== undefined && body.AskingPrice !== '' ? Number(body.AskingPrice) : existing.AskingPrice,
+                ARV: body.ARV !== undefined && body.ARV !== '' ? Number(body.ARV) : existing.ARV,
                 Bedrooms: body.Bedrooms !== undefined && body.Bedrooms !== '' ? Number(body.Bedrooms) : existing.Bedrooms,
                 Bathrooms: body.Bathrooms !== undefined && body.Bathrooms !== '' ? Number(body.Bathrooms) : existing.Bathrooms,
                 SquareFootage: body.SquareFootage !== undefined && body.SquareFootage !== '' ? Number(body.SquareFootage) : existing.SquareFootage,
@@ -387,7 +415,22 @@ const handleListingUpdate = (req, res) => {
                 Description: body.Description !== undefined ? body.Description : existing.Description
             };
 
-            const result = await pool.request()
+            const hasArvColumn = await columnExists(pool, { schema: 'dbo', table: 'listings_tbl', column: 'ARV' });
+            const updateParts = [
+                'Title=@Title',
+                'PropertyAddress=@PropertyAddress',
+                'AskingPrice=@AskingPrice',
+                'Bedrooms=@Bedrooms',
+                'Bathrooms=@Bathrooms',
+                'SquareFootage=@SquareFootage',
+                'PhotoURL=@PhotoURL',
+                'PhotoFile=@PhotoFile',
+                'Available=@Available',
+                'Description=@Description'
+            ];
+            if (hasArvColumn) updateParts.splice(updateParts.indexOf('AskingPrice=@AskingPrice') + 1, 0, 'ARV=@ARV');
+
+            const reqq = pool.request()
                 .input("listingId", sql.Int, id)
                 .input("Title", sql.NVarChar, upd.Title)
                 .input("PropertyAddress", sql.NVarChar, upd.PropertyAddress)
@@ -398,21 +441,14 @@ const handleListingUpdate = (req, res) => {
                 .input("PhotoURL", sql.NVarChar, upd.PhotoURL)
                 .input("PhotoFile", sql.NVarChar, upd.PhotoFile)
                 .input("Available", sql.Bit, upd.Available)
-                .input("Description", sql.NVarChar, upd.Description)
-                .query(`
-                    UPDATE listings_tbl
-                    SET Title=@Title,
-                        PropertyAddress=@PropertyAddress,
-                        AskingPrice=@AskingPrice,
-                        Bedrooms=@Bedrooms,
-                        Bathrooms=@Bathrooms,
-                        SquareFootage=@SquareFootage,
-                        PhotoURL=@PhotoURL,
-                        PhotoFile=@PhotoFile,
-                        Available=@Available,
-                        Description=@Description
-                    WHERE listingId=@listingId
-                `);
+                .input("Description", sql.NVarChar, upd.Description);
+            if (hasArvColumn) reqq.input("ARV", sql.Money, upd.ARV);
+
+            const result = await reqq.query(`
+                UPDATE listings_tbl
+                SET ${updateParts.join(',\n                    ')}
+                WHERE listingId=@listingId
+            `);
 
             const rows = result.rowsAffected && result.rowsAffected[0] ? result.rowsAffected[0] : 0;
             if (rows === 0) return res.status(404).json({ success: false, message: "Listing not found" });

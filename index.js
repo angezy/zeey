@@ -19,9 +19,23 @@ const sql = require('mssql');
 const dbConfig = require("./config/db");
 const Handlebars = require('handlebars');
 const session = require('express-session');
+const { ensureListingsArvColumn } = require('./utils/dbMigrations');
 
 const app = express();
 const port = process.env.PORT;
+
+// Lightweight DB migrations (best-effort, non-fatal)
+(async () => {
+  try {
+    const pool = await sql.connect(dbConfig);
+    const { changed } = await ensureListingsArvColumn(pool);
+    if (changed) console.log('[db] Added missing column dbo.listings_tbl.ARV');
+  } catch (err) {
+    console.error('[db] Migration error:', err && err.message ? err.message : err);
+  } finally {
+    try { sql.close(); } catch (e) {}
+  }
+})();
 
 // Expose site and geo metadata to views (can be overridden via environment variables)
 app.locals.geo = {

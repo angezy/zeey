@@ -100,6 +100,8 @@
         return str;
       };
 
+      const hasMeaningfulValue = (val) => safeValue(val) !== '';
+
       const normalizePhotoPath = (raw) => {
         const candidate = safeValue(raw);
         if (!candidate) return '';
@@ -251,7 +253,10 @@
           React.createElement(CardContent, { sx: { flexGrow: 1 } },
             React.createElement(Typography, { variant: 'h6', sx: { fontWeight: 600, color: '#0f172a', mb: 0.5 } }, item.Title || 'Untitled'),
             React.createElement(Typography, { variant: 'body2', sx: { color: 'text.secondary', mb: 1 } }, item.PropertyAddress || 'Address upon request'),
-            React.createElement(Typography, { variant: 'subtitle1', sx: { color: '#0f172a', fontWeight: 600, mb: 1 } }, item.AskingPrice ? `$${Number(item.AskingPrice).toLocaleString()}` : 'Contact'),
+            React.createElement(Stack, { direction: 'row', spacing: 1, sx: { mb: 1, alignItems: 'baseline', justifyContent: 'space-between', flexWrap: 'wrap', gap: 1 } },
+              React.createElement(Typography, { variant: 'subtitle1', sx: { color: '#0f172a', fontWeight: 600 } }, item.AskingPrice ? `$${Number(item.AskingPrice).toLocaleString()}` : 'Contact'),
+              hasMeaningfulValue(item.ARV) ? React.createElement(Typography, { variant: 'body2', sx: { color: 'text.secondary', fontWeight: 600 } }, `ARV: $${formatNumber(item.ARV)}`) : null
+            ),
             React.createElement(Stack, { direction: 'row', spacing: 1, sx: { mb: 1, flexWrap: 'wrap' } },
               React.createElement(Chip, { label: `${item.Bedrooms || 0} bd`, size: 'small', variant: 'outlined', sx: { borderColor: 'rgba(15,23,42,0.1)' } }),
               React.createElement(Chip, { label: `${item.Bathrooms || 0} ba`, size: 'small', variant: 'outlined', sx: { borderColor: 'rgba(15,23,42,0.1)' } }),

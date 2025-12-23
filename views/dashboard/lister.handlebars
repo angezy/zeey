@@ -29,6 +29,7 @@
                   <h6 class="mb-1 text-truncate listing-title" title="{{this.Title}}">{{this.Title}}</h6>
                   <div class="text-end">
                     <div class="text-primary fw-bold listing-price">${{this.AskingPrice}}</div>
+                    <div class="text-muted small listing-arv" {{#unless this.ARV}}style="display:none"{{/unless}}>ARV: ${{formatCurrency this.ARV}}</div>
                     <div class="text-muted small">{{formatDate this.SubmitDate}}</div>
                   </div>
                 </div>
@@ -128,6 +129,10 @@
                 <div class="col-md-6">
                   <label class="form-label">Address</label>
                   <input type="text" class="form-control" id="editAddress">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">After Repair Value (ARV)</label>
+                  <input type="number" class="form-control" id="editARV" step="0.01" min="0">
                 </div>
                 <div class="col-md-3">
                   <label class="form-label">Bedrooms</label>
@@ -287,6 +292,7 @@
           id: document.getElementById('editListingId'),
           title: document.getElementById('editTitle'),
           price: document.getElementById('editAskingPrice'),
+          arv: document.getElementById('editARV'),
           address: document.getElementById('editAddress'),
           beds: document.getElementById('editBedrooms'),
           baths: document.getElementById('editBathrooms'),
@@ -352,6 +358,7 @@
           editFields.id.value = item.listingId;
           editFields.title.value = decodeHtmlEntities(item.Title || '');
           editFields.price.value = item.AskingPrice || '';
+          if (editFields.arv) editFields.arv.value = item.ARV || '';
           editFields.address.value = decodeHtmlEntities(item.PropertyAddress || '');
           editFields.beds.value = item.Bedrooms || '';
           editFields.baths.value = item.Bathrooms || '';
@@ -408,6 +415,7 @@
           const formData = new FormData();
           formData.append('Title', editFields.title.value.trim());
           formData.append('AskingPrice', editFields.price.value !== '' ? editFields.price.value : '');
+          if (editFields.arv) formData.append('ARV', editFields.arv.value !== '' ? editFields.arv.value : '');
           formData.append('PropertyAddress', editFields.address.value.trim());
           formData.append('Bedrooms', editFields.beds.value !== '' ? editFields.beds.value : '');
           formData.append('Bathrooms', editFields.baths.value !== '' ? editFields.baths.value : '');
@@ -442,6 +450,25 @@
                 if(titleEl) titleEl.textContent = listingData.Title || '(No title)';
                 const priceEl = card.querySelector('.listing-price');
                 if(priceEl) priceEl.textContent = listingData.AskingPrice !== null && listingData.AskingPrice !== undefined && listingData.AskingPrice !== '' ? `$${listingData.AskingPrice}` : '$0';
+                const arvEl = card.querySelector('.listing-arv');
+                const arvRaw = listingData.ARV;
+                const arvNum = arvRaw !== null && arvRaw !== undefined && arvRaw !== '' ? Number(arvRaw) : NaN;
+                const arvText = (!Number.isNaN(arvNum)) ? `ARV: $${arvNum.toLocaleString('en-US')}` : '';
+                if(arvEl){
+                  if(arvText){
+                    arvEl.textContent = arvText;
+                    arvEl.style.display = '';
+                  } else {
+                    arvEl.textContent = '';
+                    arvEl.style.display = 'none';
+                  }
+                } else if(priceEl) {
+                  const holder = document.createElement('div');
+                  holder.className = 'text-muted small listing-arv';
+                  holder.textContent = arvText;
+                  if(!arvText) holder.style.display = 'none';
+                  priceEl.insertAdjacentElement('afterend', holder);
+                }
                 const addrEl = card.querySelector('.listing-address');
                 if(addrEl) addrEl.textContent = listingData.PropertyAddress || '';
                 const bedEl = card.querySelector('.listing-bedrooms');
@@ -543,7 +570,7 @@
             html += `<h5>${title}</h5>`;
             html += `<p class="text-muted small">${sanitizeDisplay(item.PropertyAddress || '')}</p>`;
             html += '<table class="table table-sm mt-2"><tbody>';
-            const fields = ['Bedrooms','Bathrooms','SquareFootage','AskingPrice','FullName','Email','Phone','Comps1','Comps2','Comps3'];
+            const fields = ['Bedrooms','Bathrooms','SquareFootage','AskingPrice','ARV','FullName','Email','Phone','Comps1','Comps2','Comps3'];
             fields.forEach(f=>{
               const raw = item[f];
               const val = sanitizeDisplay(raw);
