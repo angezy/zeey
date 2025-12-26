@@ -55,6 +55,24 @@ const columnExists = async (pool, { schema = 'dbo', table, column }) => {
     return !!(res.recordset && res.recordset.length);
 };
 
+const getTableColumnSet = async (pool, { schema = 'dbo', table }) => {
+    const res = await pool.request()
+        .input('schema', sql.NVarChar, schema)
+        .input('table', sql.NVarChar, table)
+        .query(`
+            SELECT COLUMN_NAME
+            FROM INFORMATION_SCHEMA.COLUMNS
+            WHERE LOWER(TABLE_SCHEMA) = LOWER(@schema)
+              AND LOWER(TABLE_NAME) = LOWER(@table)
+        `);
+    const set = new Set();
+    (res.recordset || []).forEach(r => {
+        if (!r || !r.COLUMN_NAME) return;
+        set.add(String(r.COLUMN_NAME).toLowerCase());
+    });
+    return set;
+};
+
 // Multer wrapper to capture upload errors and attach requestId early
 const handleListingUpload = (req, res, next) => {
     req.requestId = req.requestId || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -382,6 +400,53 @@ const handleListingUpdate = (req, res) => {
             const existing = (existingResult.recordset || [])[0];
             if (!existing) return res.status(404).json({ success: false, message: "Listing not found" });
 
+            const columnSet = await getTableColumnSet(pool, { schema: 'dbo', table: 'listings_tbl' });
+            const hasCol = (name) => columnSet.has(String(name).toLowerCase());
+
+            const trimToNull = (v) => {
+                if (v === undefined) return undefined;
+                const t = String(v).trim();
+                return t === '' ? null : t;
+            };
+            const escToNull = (v) => {
+                const t = trimToNull(v);
+                if (t === undefined) return undefined;
+                if (t === null) return null;
+                return validator.escape(t);
+            };
+            const emailToNull = (v) => {
+                const t = trimToNull(v);
+                if (t === undefined) return undefined;
+                if (t === null) return null;
+                const normalized = validator.normalizeEmail(t);
+                return normalized ? normalized : t;
+            };
+            const moneyOrExisting = (v, existingValue) => {
+                if (v === undefined) return existingValue;
+                const t = String(v).trim();
+                if (t === '') return null;
+                const cleaned = t.replace(/[$,\s]/g, '');
+                const n = Number(cleaned);
+                return Number.isFinite(n) ? n : existingValue;
+            };
+            const intOrExisting = (v, existingValue) => {
+                if (v === undefined) return existingValue;
+                const t = String(v).trim();
+                if (t === '') return null;
+                const n = Number(t);
+                if (!Number.isFinite(n)) return existingValue;
+                return parseInt(String(n), 10);
+            };
+            const bitOrExisting = (v, existingValue) => {
+                if (v === undefined) return existingValue;
+                const t = String(v).trim().toLowerCase();
+                if (t === '') return null;
+                if (t === '1' || t === 'true' || t === 'yes' || t === 'on') return 1;
+                if (t === '0' || t === 'false' || t === 'no' || t === 'off') return 0;
+                const n = Number(t);
+                return Number.isFinite(n) ? (n ? 1 : 0) : existingValue;
+            };
+
             const existingPhotos = existing.PhotoFile
                 ? existing.PhotoFile.split(',').map(normalizeStoredPhotoPath).filter(Boolean)
                 : [];
@@ -402,47 +467,65 @@ const handleListingUpdate = (req, res) => {
             const photoFileValue = uniquePhotos.length ? uniquePhotos.join(',') : null;
 
             const upd = {
-                Title: body.Title !== undefined ? body.Title : existing.Title,
-                PropertyAddress: body.PropertyAddress !== undefined ? body.PropertyAddress : existing.PropertyAddress,
-                AskingPrice: body.AskingPrice !== undefined && body.AskingPrice !== '' ? Number(body.AskingPrice) : existing.AskingPrice,
-                ARV: body.ARV !== undefined && body.ARV !== '' ? Number(body.ARV) : existing.ARV,
-                Bedrooms: body.Bedrooms !== undefined && body.Bedrooms !== '' ? Number(body.Bedrooms) : existing.Bedrooms,
-                Bathrooms: body.Bathrooms !== undefined && body.Bathrooms !== '' ? Number(body.Bathrooms) : existing.Bathrooms,
-                SquareFootage: body.SquareFootage !== undefined && body.SquareFootage !== '' ? Number(body.SquareFootage) : existing.SquareFootage,
-                PhotoURL: body.PhotoURL !== undefined ? body.PhotoURL : existing.PhotoURL,
+                Title: body.Title !== undefined ? escToNull(body.Title) : existing.Title,
+                FullName: body.FullName !== undefined ? escToNull(body.FullName) : existing.FullName,
+                Email: body.Email !== undefined ? emailToNull(body.Email) : existing.Email,
+                Phone: body.Phone !== undefined ? escToNull(body.Phone) : existing.Phone,
+                PropertyAddress: body.PropertyAddress !== undefined ? escToNull(body.PropertyAddress) : existing.PropertyAddress,
+                PropertyType: body.PropertyType !== undefined ? escToNull(body.PropertyType) : existing.PropertyType,
+                AskingPrice: moneyOrExisting(body.AskingPrice, existing.AskingPrice),
+                ARV: moneyOrExisting(body.ARV, existing.ARV),
+                Bedrooms: intOrExisting(body.Bedrooms, existing.Bedrooms),
+                Bathrooms: intOrExisting(body.Bathrooms, existing.Bathrooms),
+                SquareFootage: intOrExisting(body.SquareFootage, existing.SquareFootage),
+                LotArea: intOrExisting(body.LotArea, existing.LotArea),
+                FloorArea: intOrExisting(body.FloorArea, existing.FloorArea),
+                YearBuilt: intOrExisting(body.YearBuilt, existing.YearBuilt),
+                Garage: intOrExisting(body.Garage, existing.Garage),
+                Stories: intOrExisting(body.Stories, existing.Stories),
+                Roofing: body.Roofing !== undefined ? trimToNull(body.Roofing) : existing.Roofing,
+                Comps1: body.Comps1 !== undefined ? trimToNull(body.Comps1) : existing.Comps1,
+                Comps2: body.Comps2 !== undefined ? trimToNull(body.Comps2) : existing.Comps2,
+                Comps3: body.Comps3 !== undefined ? trimToNull(body.Comps3) : existing.Comps3,
+                ReasonForSelling: body.ReasonForSelling !== undefined ? escToNull(body.ReasonForSelling) : existing.ReasonForSelling,
+                PhotoURL: body.PhotoURL !== undefined ? trimToNull(body.PhotoURL) : existing.PhotoURL,
                 PhotoFile: photoFileValue,
-                Available: body.Available !== undefined ? Number(body.Available) : existing.Available,
-                Description: body.Description !== undefined ? body.Description : existing.Description
+                Available: bitOrExisting(body.Available, existing.Available),
+                Description: body.Description !== undefined ? escToNull(body.Description) : existing.Description
             };
 
-            const hasArvColumn = await columnExists(pool, { schema: 'dbo', table: 'listings_tbl', column: 'ARV' });
-            const updateParts = [
-                'Title=@Title',
-                'PropertyAddress=@PropertyAddress',
-                'AskingPrice=@AskingPrice',
-                'Bedrooms=@Bedrooms',
-                'Bathrooms=@Bathrooms',
-                'SquareFootage=@SquareFootage',
-                'PhotoURL=@PhotoURL',
-                'PhotoFile=@PhotoFile',
-                'Available=@Available',
-                'Description=@Description'
-            ];
-            if (hasArvColumn) updateParts.splice(updateParts.indexOf('AskingPrice=@AskingPrice') + 1, 0, 'ARV=@ARV');
+            const updateParts = [];
+            const reqq = pool.request().input("listingId", sql.Int, id);
 
-            const reqq = pool.request()
-                .input("listingId", sql.Int, id)
-                .input("Title", sql.NVarChar, upd.Title)
-                .input("PropertyAddress", sql.NVarChar, upd.PropertyAddress)
-                .input("AskingPrice", sql.Money, upd.AskingPrice)
-                .input("Bedrooms", sql.Int, upd.Bedrooms)
-                .input("Bathrooms", sql.Int, upd.Bathrooms)
-                .input("SquareFootage", sql.Int, upd.SquareFootage)
-                .input("PhotoURL", sql.NVarChar, upd.PhotoURL)
-                .input("PhotoFile", sql.NVarChar, upd.PhotoFile)
-                .input("Available", sql.Bit, upd.Available)
-                .input("Description", sql.NVarChar, upd.Description);
-            if (hasArvColumn) reqq.input("ARV", sql.Money, upd.ARV);
+            if (hasCol('Title')) { updateParts.push('Title=@Title'); reqq.input("Title", sql.NVarChar, upd.Title); }
+            if (hasCol('FullName')) { updateParts.push('FullName=@FullName'); reqq.input("FullName", sql.NVarChar, upd.FullName); }
+            if (hasCol('Email')) { updateParts.push('Email=@Email'); reqq.input("Email", sql.NVarChar, upd.Email); }
+            if (hasCol('Phone')) { updateParts.push('Phone=@Phone'); reqq.input("Phone", sql.NVarChar, upd.Phone); }
+            if (hasCol('PropertyAddress')) { updateParts.push('PropertyAddress=@PropertyAddress'); reqq.input("PropertyAddress", sql.NVarChar, upd.PropertyAddress); }
+            if (hasCol('PropertyType')) { updateParts.push('PropertyType=@PropertyType'); reqq.input("PropertyType", sql.NVarChar, upd.PropertyType); }
+            if (hasCol('AskingPrice')) { updateParts.push('AskingPrice=@AskingPrice'); reqq.input("AskingPrice", sql.Money, upd.AskingPrice); }
+            if (hasCol('ARV')) { updateParts.push('ARV=@ARV'); reqq.input("ARV", sql.Money, upd.ARV); }
+            if (hasCol('Bedrooms')) { updateParts.push('Bedrooms=@Bedrooms'); reqq.input("Bedrooms", sql.Int, upd.Bedrooms); }
+            if (hasCol('Bathrooms')) { updateParts.push('Bathrooms=@Bathrooms'); reqq.input("Bathrooms", sql.Int, upd.Bathrooms); }
+            if (hasCol('SquareFootage')) { updateParts.push('SquareFootage=@SquareFootage'); reqq.input("SquareFootage", sql.Int, upd.SquareFootage); }
+            if (hasCol('LotArea')) { updateParts.push('LotArea=@LotArea'); reqq.input("LotArea", sql.Int, upd.LotArea); }
+            if (hasCol('FloorArea')) { updateParts.push('FloorArea=@FloorArea'); reqq.input("FloorArea", sql.Int, upd.FloorArea); }
+            if (hasCol('YearBuilt')) { updateParts.push('YearBuilt=@YearBuilt'); reqq.input("YearBuilt", sql.Int, upd.YearBuilt); }
+            if (hasCol('Garage')) { updateParts.push('Garage=@Garage'); reqq.input("Garage", sql.Int, upd.Garage); }
+            if (hasCol('Stories')) { updateParts.push('Stories=@Stories'); reqq.input("Stories", sql.Int, upd.Stories); }
+            if (hasCol('Roofing')) { updateParts.push('Roofing=@Roofing'); reqq.input("Roofing", sql.NVarChar, upd.Roofing); }
+            if (hasCol('Comps1')) { updateParts.push('Comps1=@Comps1'); reqq.input("Comps1", sql.NVarChar, upd.Comps1); }
+            if (hasCol('Comps2')) { updateParts.push('Comps2=@Comps2'); reqq.input("Comps2", sql.NVarChar, upd.Comps2); }
+            if (hasCol('Comps3')) { updateParts.push('Comps3=@Comps3'); reqq.input("Comps3", sql.NVarChar, upd.Comps3); }
+            if (hasCol('ReasonForSelling')) { updateParts.push('ReasonForSelling=@ReasonForSelling'); reqq.input("ReasonForSelling", sql.NVarChar, upd.ReasonForSelling); }
+            if (hasCol('PhotoURL')) { updateParts.push('PhotoURL=@PhotoURL'); reqq.input("PhotoURL", sql.NVarChar, upd.PhotoURL); }
+            if (hasCol('PhotoFile')) { updateParts.push('PhotoFile=@PhotoFile'); reqq.input("PhotoFile", sql.NVarChar, upd.PhotoFile); }
+            if (hasCol('Available')) { updateParts.push('Available=@Available'); reqq.input("Available", sql.Bit, upd.Available); }
+            if (hasCol('Description')) { updateParts.push('Description=@Description'); reqq.input("Description", sql.NVarChar, upd.Description); }
+
+            if (!updateParts.length) {
+                return res.json({ success: true, message: "No editable columns found", listing: { listingId: id, ...upd } });
+            }
 
             const result = await reqq.query(`
                 UPDATE listings_tbl

@@ -45,8 +45,8 @@
                 <div class="d-flex justify-content-between align-items-center mt-2">
                   <div class="btn-group flex-wrap" role="group">
                     <button class="btn btn-sm btn-outline-primary listing-detail" data-id="{{this.listingId}}">Details</button>
-                    <a class="btn btn-sm btn-outline-secondary" href="tel:{{this.ContactPhone}}">Call</a>
-                    <a class="btn btn-sm btn-outline-secondary" href="mailto:{{this.ContactEmail}}">Email</a>
+                    <a class="btn btn-sm btn-outline-secondary" href="tel:{{this.Phone}}">Call</a>
+                    <a class="btn btn-sm btn-outline-secondary" href="mailto:{{this.Email}}">Email</a>
                     <a class="btn btn-sm btn-outline-primary edit-listing" data-id="{{this.listingId}}" href="/forms/listing?editId={{this.listingId}}">Edit</a>
                     <button class="btn btn-sm btn-outline-danger delete-listing" data-id="{{this.listingId}}">Delete</button>
                   </div>
@@ -122,17 +122,33 @@
                   <label class="form-label">Title</label>
                   <input type="text" class="form-control" id="editTitle" required>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-3">
                   <label class="form-label">Asking Price</label>
                   <input type="number" class="form-control" id="editAskingPrice" step="0.01">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">After Repair Value (ARV)</label>
+                  <input type="number" class="form-control" id="editARV" step="0.01" min="0">
                 </div>
                 <div class="col-md-6">
                   <label class="form-label">Address</label>
                   <input type="text" class="form-control" id="editAddress">
                 </div>
                 <div class="col-md-6">
-                  <label class="form-label">After Repair Value (ARV)</label>
-                  <input type="number" class="form-control" id="editARV" step="0.01" min="0">
+                  <label class="form-label">Property Type</label>
+                  <input type="text" class="form-control" id="editPropertyType" placeholder="Single Family, Condo, etc.">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Full Name</label>
+                  <input type="text" class="form-control" id="editFullName">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Email</label>
+                  <input type="email" class="form-control" id="editEmail">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Phone</label>
+                  <input type="text" class="form-control" id="editPhone">
                 </div>
                 <div class="col-md-3">
                   <label class="form-label">Bedrooms</label>
@@ -142,9 +158,49 @@
                   <label class="form-label">Bathrooms</label>
                   <input type="number" class="form-control" id="editBathrooms" min="0">
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                   <label class="form-label">Square Footage</label>
                   <input type="number" class="form-control" id="editSqft" min="0">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Lot Area</label>
+                  <input type="number" class="form-control" id="editLotArea" min="0">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Floor Area</label>
+                  <input type="number" class="form-control" id="editFloorArea" min="0">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Year Built</label>
+                  <input type="number" class="form-control" id="editYearBuilt" min="0">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Garage</label>
+                  <input type="number" class="form-control" id="editGarage" min="0">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Stories</label>
+                  <input type="number" class="form-control" id="editStories" min="0">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Roofing</label>
+                  <input type="text" class="form-control" id="editRoofing">
+                </div>
+                <div class="col-12">
+                  <label class="form-label" for="editReasonForSelling">Reason For Selling</label>
+                  <textarea class="form-control" id="editReasonForSelling" rows="2" placeholder="Add a short reason"></textarea>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Comps 1</label>
+                  <input type="text" class="form-control" id="editComps1" placeholder="Link or notes">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Comps 2</label>
+                  <input type="text" class="form-control" id="editComps2" placeholder="Link or notes">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Comps 3</label>
+                  <input type="text" class="form-control" id="editComps3" placeholder="Link or notes">
                 </div>
                 <div class="col-md-4">
                   <label class="form-label">Photo URL</label>
@@ -294,9 +350,23 @@
           price: document.getElementById('editAskingPrice'),
           arv: document.getElementById('editARV'),
           address: document.getElementById('editAddress'),
+          propertyType: document.getElementById('editPropertyType'),
+          fullName: document.getElementById('editFullName'),
+          email: document.getElementById('editEmail'),
+          phone: document.getElementById('editPhone'),
           beds: document.getElementById('editBedrooms'),
           baths: document.getElementById('editBathrooms'),
           sqft: document.getElementById('editSqft'),
+          lotArea: document.getElementById('editLotArea'),
+          floorArea: document.getElementById('editFloorArea'),
+          yearBuilt: document.getElementById('editYearBuilt'),
+          garage: document.getElementById('editGarage'),
+          stories: document.getElementById('editStories'),
+          roofing: document.getElementById('editRoofing'),
+          reasonForSelling: document.getElementById('editReasonForSelling'),
+          comps1: document.getElementById('editComps1'),
+          comps2: document.getElementById('editComps2'),
+          comps3: document.getElementById('editComps3'),
           photoUrl: document.getElementById('editPhotoURL'),
           photoFiles: document.getElementById('editPhotoFiles'),
           available: document.getElementById('editAvailable'),
@@ -360,9 +430,23 @@
           editFields.price.value = item.AskingPrice || '';
           if (editFields.arv) editFields.arv.value = item.ARV || '';
           editFields.address.value = decodeHtmlEntities(item.PropertyAddress || '');
+          if (editFields.propertyType) editFields.propertyType.value = decodeHtmlEntities(item.PropertyType || '');
+          if (editFields.fullName) editFields.fullName.value = decodeHtmlEntities(item.FullName || '');
+          if (editFields.email) editFields.email.value = decodeHtmlEntities(item.Email || '');
+          if (editFields.phone) editFields.phone.value = decodeHtmlEntities(item.Phone || '');
           editFields.beds.value = item.Bedrooms || '';
           editFields.baths.value = item.Bathrooms || '';
           editFields.sqft.value = item.SquareFootage || item.FloorArea || '';
+          if (editFields.lotArea) editFields.lotArea.value = item.LotArea || '';
+          if (editFields.floorArea) editFields.floorArea.value = item.FloorArea || '';
+          if (editFields.yearBuilt) editFields.yearBuilt.value = item.YearBuilt || '';
+          if (editFields.garage) editFields.garage.value = item.Garage || '';
+          if (editFields.stories) editFields.stories.value = item.Stories || '';
+          if (editFields.roofing) editFields.roofing.value = decodeHtmlEntities(item.Roofing || '');
+          if (editFields.reasonForSelling) editFields.reasonForSelling.value = decodeHtmlEntities(item.ReasonForSelling || '');
+          if (editFields.comps1) editFields.comps1.value = decodeHtmlEntities(item.Comps1 || '');
+          if (editFields.comps2) editFields.comps2.value = decodeHtmlEntities(item.Comps2 || '');
+          if (editFields.comps3) editFields.comps3.value = decodeHtmlEntities(item.Comps3 || '');
           editFields.photoUrl.value = decodeHtmlEntities(item.PhotoURL || '');
           editFields.available.checked = !!item.Available;
           if(editFields.description) editFields.description.value = decodeHtmlEntities(item.Description || '');
@@ -417,9 +501,23 @@
           formData.append('AskingPrice', editFields.price.value !== '' ? editFields.price.value : '');
           if (editFields.arv) formData.append('ARV', editFields.arv.value !== '' ? editFields.arv.value : '');
           formData.append('PropertyAddress', editFields.address.value.trim());
+          if (editFields.propertyType) formData.append('PropertyType', editFields.propertyType.value.trim());
+          if (editFields.fullName) formData.append('FullName', editFields.fullName.value.trim());
+          if (editFields.email) formData.append('Email', editFields.email.value.trim());
+          if (editFields.phone) formData.append('Phone', editFields.phone.value.trim());
           formData.append('Bedrooms', editFields.beds.value !== '' ? editFields.beds.value : '');
           formData.append('Bathrooms', editFields.baths.value !== '' ? editFields.baths.value : '');
           formData.append('SquareFootage', editFields.sqft.value !== '' ? editFields.sqft.value : '');
+          if (editFields.lotArea) formData.append('LotArea', editFields.lotArea.value !== '' ? editFields.lotArea.value : '');
+          if (editFields.floorArea) formData.append('FloorArea', editFields.floorArea.value !== '' ? editFields.floorArea.value : '');
+          if (editFields.yearBuilt) formData.append('YearBuilt', editFields.yearBuilt.value !== '' ? editFields.yearBuilt.value : '');
+          if (editFields.garage) formData.append('Garage', editFields.garage.value !== '' ? editFields.garage.value : '');
+          if (editFields.stories) formData.append('Stories', editFields.stories.value !== '' ? editFields.stories.value : '');
+          if (editFields.roofing) formData.append('Roofing', editFields.roofing.value.trim());
+          if (editFields.reasonForSelling) formData.append('ReasonForSelling', editFields.reasonForSelling.value.trim());
+          if (editFields.comps1) formData.append('Comps1', editFields.comps1.value.trim());
+          if (editFields.comps2) formData.append('Comps2', editFields.comps2.value.trim());
+          if (editFields.comps3) formData.append('Comps3', editFields.comps3.value.trim());
           formData.append('PhotoURL', editFields.photoUrl.value.trim());
           formData.append('Available', editFields.available.checked ? 1 : 0);
           if (editFields.description) {
