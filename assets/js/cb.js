@@ -1,673 +1,600 @@
+/* global Swal */
 
+(function () {
+  'use strict';
 
-function navigateSection(currentSectionId, targetSectionId) {
-  const $currentSection = $(`#section-${currentSectionId}`);
-  const $targetSection = $(`#section-${targetSectionId}`);
+  function qs(selector, root) {
+    return (root || document).querySelector(selector);
+  }
 
-  if (targetSectionId > currentSectionId) {
-    // Moving forward: validate required fields
-    if (!validateSection($currentSection)) {
-      Swal.fire({
-        title: "Please fill out all required fields before proceeding.",
-        icon: "error",
-        confirmButtonText: "OK",
-      });
-      return;
+  function qsa(selector, root) {
+    return Array.from((root || document).querySelectorAll(selector));
+  }
+
+  function getForm() {
+    return document.getElementById('cash-buyer-form');
+  }
+
+  function getSections(form) {
+    return qsa('.form-section', form);
+  }
+
+  function getCurrentSection(form) {
+    return getSections(form).find(s => !s.classList.contains('hidden-section')) || null;
+  }
+
+  function getSectionByStep(form, step) {
+    return qs(`#section-${step}`, form) || qs(`.form-section[data-step="${step}"]`, form) || null;
+  }
+
+  function setSectionVisible(section, visible) {
+    if (!section) return;
+    section.classList.toggle('hidden-section', !visible);
+    section.setAttribute('aria-hidden', visible ? 'false' : 'true');
+  }
+
+  function updateStepUI(form, currentStep) {
+    const sections = getSections(form);
+    const total = sections.length || 1;
+    const safeStep = Math.min(Math.max(Number(currentStep) || 1, 1), total);
+
+    const percent = Math.round((safeStep / total) * 100);
+    const bar = document.getElementById('form-progress');
+    if (bar) {
+      bar.style.width = `${percent}%`;
+      bar.setAttribute('aria-valuenow', String(percent));
     }
+
+    const steps = qsa('#cb-steps .cb-step');
+    steps.forEach(el => {
+      const step = Number(el.getAttribute('data-step')) || 0;
+      el.classList.toggle('active', step === safeStep);
+      el.classList.toggle('complete', step > 0 && step < safeStep);
+    });
   }
 
-  // Switch sections
-  $currentSection.addClass('hidden-section');
-  $targetSection.removeClass('hidden-section');
-
-  // Update progress bar based on data-step attributes or index
-  try {
-    const $steps = $('.form-section');
-    const total = $steps.length || 1;
-    // Try to derive the step index from data-step or from the id
-    const stepAttr = $targetSection.attr('data-step');
-    let stepIndex = stepAttr ? parseInt(stepAttr, 10) : null;
-    if (!stepIndex) {
-      // fallback: compute index based on position among visible sections
-      stepIndex = $steps.index($targetSection) + 1;
-    }
-    const percent = Math.round(((stepIndex) / total) * 100);
-    $('#form-progress').css('width', percent + '%').attr('aria-valuenow', percent);
-  } catch (e) {
-    console.warn('Could not update progress bar', e);
+  function showGroupFeedback(section, groupName, show) {
+    const fb = qs(`[data-required-group-feedback="${groupName}"]`, section);
+    if (!fb) return;
+    fb.classList.toggle('is-invalid', !!show);
   }
 
-  // Focus the first input inside the target for accessibility
-  const $firstInput = $targetSection.find('input, select, textarea').filter(':visible').first();
-  if ($firstInput && $firstInput.length) {
-    $firstInput.focus();
-  }
-}
+  function validateCheckboxGroups(section) {
+    let ok = true;
+    const groups = qsa('[data-required-group]', section)
+      .reduce((acc, el) => {
+        const group = el.getAttribute('data-required-group');
+        if (!group) return acc;
+        acc[group] = acc[group] || [];
+        acc[group].push(el);
+        return acc;
+      }, {});
 
-function validateSection($section) {
-  let isValid = true;
-  $section.find('input[required], select[required]').each(function () {
-    if (!$(this).val()) {
-      isValid = false;
-      $(this).addClass('is-invalid'); // Add a class for invalid fields (optional for styling)
-    } else {
-      $(this).removeClass('is-invalid'); // Remove invalid class if corrected
-    }
-  });
-  return isValid;
-};
+    Object.keys(groups).forEach(groupName => {
+      const inputs = groups[groupName];
+      const anyChecked = inputs.some(i => i.checked);
+      if (!anyChecked) ok = false;
 
-function toggleOtherInput() {
-  const otherCheckbox = document.getElementById('OtherFinancing');
-  const otherInputContainer = document.getElementById('otherInputContainer');
-  const otherInput = document.getElementById('otherInput');
+      inputs.forEach(i => i.classList.toggle('is-invalid', !anyChecked));
+      showGroupFeedback(section, groupName, !anyChecked);
+    });
 
-  if (otherCheckbox.checked) {
-    otherInputContainer.style.display = 'block';
-    otherInput.setAttribute('required', 'required'); // Make the input field required
-  } else {
-    otherInputContainer.style.display = 'none';
-    otherInput.removeAttribute('required'); // Remove the required attribute
-    otherInput.value = ''; // Optionally clear the input field
-  }
-};
-function toggleProofUpload(isVisible) {
-  const uploadContainer = document.getElementById('proofUploadContainer');
-  if (isVisible) {
-    uploadContainer.style.display = 'inline';
-  } else {
-    uploadContainer.style.display = 'none';
-  }
-};
-function toggleOtherQuicklyInput() {
-  const otherQuicklyRadio = document.getElementById('OtherQuickly');
-  const otherInputContainer = document.getElementById('otherQuicklyInputContainer');
-  const otherInput = document.getElementById('otherQuicklyInput');
-
-  if (otherQuicklyRadio.checked) {
-    otherInputContainer.style.display = 'block';
-    otherInput.setAttribute('required', 'required'); // Make the input field required
-  } else {
-    otherInputContainer.style.display = 'none';
-    otherInput.removeAttribute('required'); // Remove the required attribute
-    otherInput.value = ''; // Optionally clear the input field
-  }
-}
-
-// Attach event listeners to all radio buttons in the "Quickly" group
-document.querySelectorAll('input[name="Quickly"]').forEach((radio) => {
-  radio.addEventListener('change', toggleOtherQuicklyInput);
-});
-
-function toggleOtherPropertyInput() {
-  const checkbox = document.getElementById('PropertyOther');
-  const inputContainer = document.getElementById('propertyOtherInputContainer');
-
-  if (checkbox.checked) {
-    inputContainer.style.display = 'block';
-  } else {
-    inputContainer.style.display = 'none';
-  }
-}
-
-// Function to toggle the visibility of the "Other" work type input
-function toggleWorkTypeInput() {
-  const checkbox = document.getElementById('WorkTypeOther');
-  const inputContainer = document.getElementById('workTypeOtherInputContainer');
-
-  if (checkbox.checked) {
-    inputContainer.style.display = 'block';
-  } else {
-    inputContainer.style.display = 'none';
-  }
-};
-
-
-const readinessDescriptions = {
-  1: "Just browsing",
-  2: "Thinking about it",
-  3: "Researching options",
-  4: "Getting prepared",
-  5: "Somewhat ready",
-  6: "Fairly ready",
-  7: "Very ready",
-  8: "Extremely ready",
-  9: "Almost closing",
-  10: "Ready to close today"
-};
-
-function updateReadinessLabel(value) {
-  const label = readinessDescriptions[value];
-  document.getElementById("purchaseReadinessLabel").innerText = label;
-  document.getElementById("purchaseReadinessSlider").setAttribute("data-readiness-description", label);
-}
-
-// Price range dual-slider helpers
-function formatCurrency(num) {
-  if (num === '' || num === null || isNaN(Number(num))) return '$0';
-  return '$' + Number(num).toLocaleString();
-}
-
-function syncPriceRangeUI(source) {
-  const minInput = document.getElementById('PriceRangesMin');
-  const maxInput = document.getElementById('PriceRangesMax');
-  const minSlider = document.getElementById('priceRangeMinSlider');
-  const maxSlider = document.getElementById('priceRangeMaxSlider');
-  const summary = document.getElementById('priceRangeSummary');
-
-  if (!minInput || !maxInput || !minSlider || !maxSlider || !summary) {
-    console.debug('syncPriceRangeUI: one or more elements missing', { minInput: !!minInput, maxInput: !!maxInput, minSlider: !!minSlider, maxSlider: !!maxSlider, summary: !!summary });
-    return;
+    return ok;
   }
 
-  // Determine values depending on what triggered the sync.
-  // If a slider triggered the sync, prefer the slider's value for that side.
-  // If an input triggered the sync, prefer the input's value. If no source provided, use slider values by default.
-  let minVal, maxVal;
-  try {
-    if (source === 'minInput') {
-      minVal = parseInt(minInput.value, 10);
-    } else if (source === 'minSlider') {
-      minVal = parseInt(minSlider.value, 10);
-    }
-    if (source === 'maxInput') {
-      maxVal = parseInt(maxInput.value, 10);
-    } else if (source === 'maxSlider') {
-      maxVal = parseInt(maxSlider.value, 10);
-    }
-  } catch (e) {
-    // fall through
-  }
-  // If still undefined, prefer slider values, then input values
-  if (typeof minVal === 'undefined' || isNaN(minVal)) {
-    minVal = parseInt(minSlider.value || minInput.value, 10);
-  }
-  if (typeof maxVal === 'undefined' || isNaN(maxVal)) {
-    maxVal = parseInt(maxSlider.value || maxInput.value, 10);
+  function validateRequiredFields(section) {
+    let ok = true;
+
+    // Clear previous invalid markers inside this section.
+    qsa('.is-invalid', section).forEach(el => el.classList.remove('is-invalid'));
+    qsa('.cb-group-feedback', section).forEach(el => el.classList.remove('is-invalid'));
+
+    // Validate required radios by group.
+    const radioNames = new Set(
+      qsa('input[type="radio"][required]', section).map(r => r.name).filter(Boolean)
+    );
+    radioNames.forEach(name => {
+      const group = qsa(`input[type="radio"][name="${CSS.escape(name)}"]`, section);
+      const anyChecked = group.some(r => r.checked);
+      if (!anyChecked) {
+        ok = false;
+        group.forEach(r => r.classList.add('is-invalid'));
+      }
+    });
+
+    // Validate required inputs/textareas/selects (excluding radios handled above).
+    const requiredEls = qsa('input[required], textarea[required], select[required]', section)
+      .filter(el => el.type !== 'radio');
+
+    requiredEls.forEach(el => {
+      if (!el.checkValidity()) {
+        ok = false;
+        el.classList.add('is-invalid');
+      }
+    });
+
+    // Validate required checkbox groups via data-required-group.
+    if (!validateCheckboxGroups(section)) ok = false;
+
+    return ok;
   }
 
-  // Clamp
-  if (isNaN(minVal)) minVal = Number(minSlider.min) || 0;
-  if (isNaN(maxVal)) maxVal = Number(maxSlider.max) || 0;
-  if (minVal < Number(minSlider.min)) minVal = Number(minSlider.min);
-  if (maxVal > Number(maxSlider.max)) maxVal = Number(maxSlider.max);
-  if (minVal > maxVal) {
-    // swap to keep min <= max
-    const t = minVal; minVal = maxVal; maxVal = t;
+  function getStepFromSection(section) {
+    if (!section) return 1;
+    const attr = Number(section.getAttribute('data-step'));
+    if (attr) return attr;
+    const id = section.id || '';
+    const m = id.match(/section-(\d+)/);
+    return m ? Number(m[1]) : 1;
   }
 
-  // Reflect back to inputs and sliders
-  minInput.value = minVal;
-  maxInput.value = maxVal;
-  minSlider.value = minVal;
-  maxSlider.value = maxVal;
-  summary.innerText = formatCurrency(minVal) + ' - ' + formatCurrency(maxVal);
-  // update highlight track
-  try {
-    const highlight = document.getElementById('priceRangeHighlight');
-    if (highlight) {
-      const min = Number(minSlider.min) || 0;
-      const max = Number(minSlider.max) || 1;
-      const leftPct = ((minVal - min) / (max - min)) * 100;
-      const rightPct = 100 - ((maxVal - min) / (max - min)) * 100;
-      highlight.style.left = leftPct + '%';
-      highlight.style.right = rightPct + '%';
-    }
-  } catch (e) {
-    console.debug('could not update highlight', e);
+  function focusFirstField(section) {
+    if (!section) return;
+    const field = qs('input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled])', section);
+    if (field && field.focus) field.focus();
   }
-  console.debug('syncPriceRangeUI:', { minVal, maxVal, summary: summary.innerText });
 
-  // Update hidden PriceRanges so validations/submission see correct value
-  try {
-    const form = document.getElementById('cash-buyer-form');
+  window.navigateSection = function navigateSection(currentSectionId, targetSectionId) {
+    const form = getForm();
     if (!form) return;
-    let hidden = form.querySelector('input[name="PriceRanges"]');
-    if (!hidden) {
-      hidden = document.createElement('input');
-      hidden.type = 'hidden';
-      hidden.name = 'PriceRanges';
-      form.appendChild(hidden);
+
+    const current = getSectionByStep(form, currentSectionId);
+    const target = getSectionByStep(form, targetSectionId);
+    if (!current || !target) return;
+
+    if (Number(targetSectionId) > Number(currentSectionId)) {
+      if (!validateRequiredFields(current)) {
+        const firstInvalid = qs('.is-invalid', current);
+        if (firstInvalid && firstInvalid.focus) firstInvalid.focus();
+        if (window.Swal) {
+          Swal.fire({
+            title: 'Please complete required fields',
+            text: 'Some fields are missing or invalid in this step.',
+            icon: 'error',
+            confirmButtonText: 'OK',
+          });
+        }
+        return;
+      }
     }
-    hidden.value = `${minVal} - ${maxVal}`;
-  } catch (e) {
-    console.warn('syncPriceRangeUI error', e);
-  }
-}
 
-// Wire up events
-function initPriceRangeControls() {
-  console.debug('initPriceRangeControls: initializing');
-  const minInput = document.getElementById('PriceRangesMin');
-  const maxInput = document.getElementById('PriceRangesMax');
-  const minSlider = document.getElementById('priceRangeMinSlider');
-  const maxSlider = document.getElementById('priceRangeMaxSlider');
-
-  if (!minInput || !maxInput || !minSlider || !maxSlider) return;
-
-  // Keep sliders and inputs in sync
-  ['input', 'change'].forEach(evt => {
-    minInput.addEventListener(evt, () => { console.debug('minInput event', evt); syncPriceRangeUI('minInput'); });
-    maxInput.addEventListener(evt, () => { console.debug('maxInput event', evt); syncPriceRangeUI('maxInput'); });
-    minSlider.addEventListener(evt, () => {
-      console.debug('minSlider event', evt, { minSlider: minSlider.value, maxSlider: maxSlider.value });
-      // Prevent min slider surpassing max slider
-      if (Number(minSlider.value) > Number(maxSlider.value)) {
-        minSlider.value = maxSlider.value;
-      }
-      syncPriceRangeUI('minSlider');
-    });
-    maxSlider.addEventListener(evt, () => {
-      console.debug('maxSlider event', evt, { minSlider: minSlider.value, maxSlider: maxSlider.value });
-      if (Number(maxSlider.value) < Number(minSlider.value)) {
-        maxSlider.value = minSlider.value;
-      }
-      syncPriceRangeUI('maxSlider');
-    });
-  });
-
-  // Make overlapping sliders interactive: toggle z-index and pointer-events while dragging/touching
-  const clearActive = () => {
-    try {
-      minSlider.style.zIndex = '';
-      maxSlider.style.zIndex = '';
-      minSlider.style.pointerEvents = 'auto';
-      maxSlider.style.pointerEvents = 'auto';
-    } catch (e) {}
+    setSectionVisible(current, false);
+    setSectionVisible(target, true);
+    updateStepUI(form, getStepFromSection(target));
+    focusFirstField(target);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  minSlider.addEventListener('mousedown', () => {
-    minSlider.style.zIndex = 4;
-    maxSlider.style.zIndex = 3;
-    minSlider.style.pointerEvents = 'auto';
-    maxSlider.style.pointerEvents = 'auto';
-  });
-  maxSlider.addEventListener('mousedown', () => {
-    maxSlider.style.zIndex = 4;
-    minSlider.style.zIndex = 3;
-    minSlider.style.pointerEvents = 'auto';
-    maxSlider.style.pointerEvents = 'auto';
-  });
+  function setHiddenPriceRanges(form) {
+    const minEl = qs('input[name="PriceRangesMin"]', form);
+    const maxEl = qs('input[name="PriceRangesMax"]', form);
+    if (!minEl || !maxEl) return;
 
-  // Touch events for mobile
-  minSlider.addEventListener('touchstart', () => {
-    minSlider.style.zIndex = 4;
-    maxSlider.style.zIndex = 3;
-  }, { passive: true });
-  maxSlider.addEventListener('touchstart', () => {
-    maxSlider.style.zIndex = 4;
-    minSlider.style.zIndex = 3;
-  }, { passive: true });
-
-  // Clear active state on document up/end
-  document.addEventListener('mouseup', clearActive);
-  document.addEventListener('touchend', clearActive);
-
-  // Initialize once
-  syncPriceRangeUI();
-}
-
-function handlePageLoad() {
-  const params = new URLSearchParams(window.location.search);
-
-  // Try to restore any server-saved form values (one-time). This makes restoration work
-  // immediately after redirects no matter which page the form partial is embedded on.
-  try {
-    // Helper to apply restored values (server payload or inline window.__formValues)
-    function applyPayload(payload) {
-      if (!payload || !payload.values) return;
-      try {
-        const fv = payload.values;
-        Object.keys(fv).forEach(function (key) {
-          const val = fv[key];
-          if (typeof val === 'undefined' || val === null) return;
-          if (Array.isArray(val)) {
-            val.forEach(function (v) {
-              const els = document.querySelectorAll('[name="' + key + '"]');
-              els.forEach(function (el) {
-                if ((el.type === 'checkbox' || el.type === 'radio') && String(el.value) === String(v)) el.checked = true;
-              });
-            });
-            return;
-          }
-          const elements = document.querySelectorAll('[name="' + key + '"]');
-          if (!elements || !elements.length) return;
-          elements.forEach(function (el) {
-            const tag = el.tagName.toLowerCase();
-            const type = el.type ? el.type.toLowerCase() : '';
-            if (type === 'radio') {
-              if (String(el.value) === String(val)) el.checked = true;
-            } else if (type === 'checkbox') {
-              if (String(el.value) === String(val)) el.checked = true;
-            } else if (tag === 'input' || tag === 'textarea' || tag === 'select') {
-              el.value = val;
-            }
-          });
-        });
-
-        // After restoring raw values, ensure price-range UI syncs to reflect restored min/max
-        try {
-          if (typeof syncPriceRangeUI === 'function') syncPriceRangeUI();
-          if (typeof initPriceRangeControls === 'function') initPriceRangeControls();
-        } catch (e) { /* ignore */ }
-
-        // If server saved a previously uploaded proof file, show a small preview or link
-        try {
-          const proofPath = fv.ProofOfFundsFile || (payload && payload.values && payload.values.ProofOfFundsFile);
-          if (proofPath) {
-            const uploadInput = document.getElementById('proofUpload');
-            if (uploadInput) {
-              let preview = document.getElementById('proof-upload-preview');
-              if (!preview) {
-                preview = document.createElement('div');
-                preview.id = 'proof-upload-preview';
-                preview.className = 'mt-2 small text-muted';
-                uploadInput.parentNode.insertBefore(preview, uploadInput.nextSibling);
-              }
-              // proofPath is stored like 'public/uploaded/filename.ext' — serve via /public
-              const url = '/' + proofPath.replace(/^\/+/, '');
-              const ext = (proofPath.split('.').pop() || '').toLowerCase();
-              if (['jpg','jpeg','png','gif','webp'].includes(ext)) {
-                preview.innerHTML = `<div>Previously uploaded: <a href="${url}" target="_blank">view</a><br/><img src="${url}" style="max-width:200px;display:block;margin-top:6px;" alt="uploaded proof" /></div>`;
-              } else {
-                preview.innerHTML = `Previously uploaded: <a href="${url}" target="_blank">view file</a>`;
-              }
-            }
-          }
-        } catch (e) { console.error('proof preview error', e); }
-      } catch (e) {
-        console.error('Error restoring server-saved form values:', e);
-      }
-    }
-
-    // First try inline server-rendered values (set by server during GET render)
-    try {
-      if (window.__formValues && Object.keys(window.__formValues).length) {
-        applyPayload({ values: window.__formValues });
-      }
-    } catch (e) {}
-
-    // Then try the restore endpoint (if session still available)
-    fetch('/api/cbForm/restore', { credentials: 'same-origin' })
-      .then(r => r.json())
-      .then(payload => {
-        applyPayload(payload);
-        if (payload && payload.errors && payload.errors.length) {
-          try {
-            const qs = new URLSearchParams(window.location.search);
-            qs.set('errors', encodeURIComponent(JSON.stringify(payload.errors.map(e => e.msg || e))));
-            history.replaceState({}, '', window.location.pathname + '?' + qs.toString());
-          } catch (e) {}
-          try { showInlineErrors(payload.errors); } catch (e) {}
-        }
-      })
-      .catch(err => { /* ignore network errors */ })
-      .finally(() => {
-        // Clean the URL after restore processing so subsequent reloads don't re-trigger alerts
-        try {
-          const cleanUrl = window.location.pathname + (window.location.hash || '');
-          history.replaceState({}, '', cleanUrl);
-        } catch (e) { /* ignore */ }
-      });
-  } catch (e) { /* ignore */ }
-
-  // Handle validation errors
-  const errors = params.get('errors');
-  if (errors) {
-    try {
-      // Parse the JSON string to get error messages
-      const errorMessages = JSON.parse(decodeURIComponent(errors));
-
-      // Combine all errors into a single string with each error on a new line
-      const errorText = errorMessages.map(msg => `• ${msg}`).join("\n");
-
-      // Also show a persistent inline banner asking the user to re-check price and proof photo
-      try {
-        const form = document.getElementById('cash-buyer-form') || document.querySelector('form');
-        if (form) {
-          let banner = document.getElementById('recheck-alert');
-          if (!banner) {
-            banner = document.createElement('div');
-            banner.id = 'recheck-alert';
-            banner.className = 'alert alert-warning';
-            banner.style.marginBottom = '1rem';
-            // English message: ask user to verify price and proof photo
-            banner.innerText = 'Form submission failed — please re-check the price and proof-of-funds (photo) before resubmitting.';
-            form.insertBefore(banner, form.firstChild);
-          } else {
-            banner.style.display = '';
-          }
-        }
-      } catch (e) { /* ignore banner insertion errors */ }
-
-      // Display using SweetAlert2
-      Swal.fire({
-        title: "Please try again!",
-        text: errorText,
-        icon: "error",
-        confirmButtonText: "OK",
-      });
-    } catch (e) {
-      console.error('Error parsing validation errors:', e);
-    }
-  }
-  // Handle success message
-  const success = params.get('success');
-  if (success) {
-    Swal.fire({
-      title: "<h3 class='fw-bold text-secondary' style='font-size: 18px; margin: 0;'>Thank you for submitting the Cash Buyer Form. Our team will get back to you shortly!</h3>", // Smaller title
-      html: "<p class='fw-bold text-primary' style='font-size: 26px;'>Draw your dream with us</p>", // Larger text
-      icon: "success",
-      confirmButtonText: "OK",
-      confirmButtonColor: "#28a745", // Green color for the OK button
-      //  footer: `<a  href="/blogs">Refer to the blog page for guidance</a>`,
-
-    }).then((result) => {
-      if (result.isConfirmed) {
-        window.location.href = "/forms/Cash-Buyer"; // Redirect to blogs on confirmation
-      }
-    });
-  }
-
-  // Populate form fields with data from query parameters
-  const formElements = document.querySelectorAll("form#Preview-form [name]");
-  formElements.forEach(element => {
-    const value = params.get(element.name);
-    if (value) {
-      element.value = decodeURIComponent(value);
-    }
-  });
-
-  // Initialize form sections and progress
-  if (typeof initFormSections === 'function') {
-    initFormSections();
-  }
-
-  // Clear query string after we've processed errors/success and restored values so
-  // a subsequent reload won't re-trigger alerts or restore behavior.
-  try {
-    const cleanUrl = window.location.pathname + (window.location.hash || '');
-    history.replaceState({}, '', cleanUrl);
-  } catch (e) {
-    // ignore
-  }
-
-  // Hide the recheck banner when the user interacts with price inputs or the file input
-  try {
-    const hideBanner = () => {
-      const b = document.getElementById('recheck-alert'); if (b) b.style.display = 'none';
-    };
-    ['PriceRangesMin', 'PriceRangesMax', 'proofUpload'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.addEventListener('change', hideBanner);
-    });
-  } catch (e) {}
-}
-
-// Show inline validation errors next to fields.
-function showInlineErrors(errors) {
-  if (!errors || !errors.length) return;
-  try {
-    const form = document.getElementById('cash-buyer-form') || document.querySelector('form');
-    if (!form) return;
-
-    function findFeedback(el) {
-      let node = el;
-      for (let i = 0; i < 5 && node; i++) {
-        if (node.querySelector) {
-          const fb = node.querySelector('.invalid-feedback');
-          if (fb) return fb;
-        }
-        node = node.parentElement;
-      }
-      return null;
-    }
-
-    errors.forEach(function (err) {
-      const param = err && err.param ? err.param : null;
-      const msg = (err && (err.msg || err.message)) ? (err.msg || err.message) : (typeof err === 'string' ? err : String(err));
-
-      if (!param) {
-        // General form-level error: place an alert at top of form
-        let general = form.querySelector('.server-errors');
-        if (!general) {
-          general = document.createElement('div');
-          general.className = 'server-errors alert alert-danger';
-          form.insertBefore(general, form.firstChild);
-        }
-        general.innerText = msg;
-        return;
-      }
-
-      const els = form.querySelectorAll('[name="' + param + '"]');
-      if (!els || !els.length) {
-        // no matching field; add to general errors
-        let general = form.querySelector('.server-errors');
-        if (!general) {
-          general = document.createElement('div');
-          general.className = 'server-errors alert alert-danger';
-          form.insertBefore(general, form.firstChild);
-        }
-        general.innerText = (general.innerText ? general.innerText + '\n' : '') + msg;
-        return;
-      }
-
-      els.forEach(function (el) {
-        try {
-          el.classList.add('is-invalid');
-          let fb = findFeedback(el);
-          if (!fb) {
-            fb = document.createElement('div');
-            fb.className = 'invalid-feedback';
-            if (el.nextSibling) el.parentNode.insertBefore(fb, el.nextSibling); else el.parentNode.appendChild(fb);
-          }
-          fb.innerText = msg;
-        } catch (e) {
-          console.error('showInlineErrors per-field error', e);
-        }
-      });
-    });
-  } catch (e) {
-    console.error('showInlineErrors error', e);
-  }
-}
-
-// Run on page load
-window.onload = handlePageLoad;
-
-/**
- * Submit form helper used by inline onclick handlers.
- * Usage: submitForm() or submitForm('Preview-form')
- */
-function submitForm(formId) {
-  const form = formId ? document.getElementById(formId) : (document.getElementById('cash-buyer-form') || document.getElementById('Preview-form') || document.querySelector('form'));
-  if (!form) {
-    console.warn('submitForm: no form found to submit');
-    return false;
-  }
-
-  // Build a combined PriceRanges value from the two number inputs (if present)
-  try {
-    const minEl = form.querySelector('input[name="PriceRangesMin"]');
-    const maxEl = form.querySelector('input[name="PriceRangesMax"]');
-    let priceRangesValue = '';
-    if (minEl && minEl.value) priceRangesValue += minEl.value.trim();
-    if (maxEl && maxEl.value) priceRangesValue += (priceRangesValue ? ' - ' : '') + maxEl.value.trim();
-
-    let hidden = form.querySelector('input[name="PriceRanges"]');
+    const min = (minEl.value || '').trim();
+    const max = (maxEl.value || '').trim();
+    let hidden = qs('input[name="PriceRanges"]', form);
     if (!hidden) {
       hidden = document.createElement('input');
       hidden.type = 'hidden';
       hidden.name = 'PriceRanges';
       form.appendChild(hidden);
     }
-    hidden.value = priceRangesValue;
-  } catch (e) {
-    console.warn('Could not build PriceRanges hidden field', e);
+    hidden.value = (min && max) ? `${min} - ${max}` : '';
   }
 
-  // Use HTML5 validation
-  if (!form.checkValidity()) {
-    // Mark fields as touched so browser shows validation UI
-    form.classList.add('was-validated');
-    Swal.fire({
-      title: 'Please complete the required fields',
-      text: 'Some required fields are missing or invalid. Please check and try again.',
-      icon: 'error',
-      confirmButtonText: 'OK'
-    });
-    return false;
+  function appendDetailsToAdditionalComments(form) {
+    const details = [];
+
+    const otherFinancingChecked = !!qs('#SourceFinancingOther', form)?.checked;
+    const otherFinancing = (qs('#OtherFinancingDetails', form)?.value || '').trim();
+    if (otherFinancingChecked && otherFinancing) details.push(`Other financing: ${otherFinancing}`);
+
+    const quicklyOtherChecked = !!qs('#QuicklyOther', form)?.checked;
+    const quicklyOther = (qs('#QuicklyOtherTimeline', form)?.value || '').trim();
+    if (quicklyOtherChecked && quicklyOther) details.push(`Other closing timeline: ${quicklyOther}`);
+
+    const propertyOtherChecked = !!qs('#PropertyTypeOther', form)?.checked;
+    const propertyOther = (qs('#PropertyTypeOtherDetails', form)?.value || '').trim();
+    if (propertyOtherChecked && propertyOther) details.push(`Other property type: ${propertyOther}`);
+
+    const workOtherChecked = !!qs('#WorkTypeOther', form)?.checked;
+    const workOther = (qs('#WorkTypeOtherDetails', form)?.value || '').trim();
+    if (workOtherChecked && workOther) details.push(`Other work type: ${workOther}`);
+
+    if (!details.length) return;
+
+    const comments = qs('#AdditionalComments', form);
+    if (!comments) return;
+    const existing = (comments.value || '').trim();
+    const block = details.join('\n');
+
+    // Avoid duplicating if the user submits multiple times.
+    if (existing.includes(block)) return;
+
+    comments.value = existing ? `${existing}\n\n${block}` : block;
   }
 
-  // Disable submit buttons to prevent double submit
-  const submitButtons = form.querySelectorAll('button[type="submit"], input[type="submit"]');
-  submitButtons.forEach(btn => btn.disabled = true);
+  window.submitForm = function submitForm(formId) {
+    const form = formId ? document.getElementById(formId) : getForm();
+    if (!form) return false;
 
-  // Submit the form (will follow the form's action/method)
-  form.submit();
-  return true;
-}
+    setHiddenPriceRanges(form);
+    appendDetailsToAdditionalComments(form);
 
-// Initialize visibility of form sections and progress bar
-function initFormSections() {
-  try {
-    const $sections = $('.form-section');
-    if (!$sections.length) return;
-
-    // Hide all sections, then show first step (data-step=1)
-    $sections.addClass('hidden-section').attr('aria-hidden', 'true');
-    const $first = $sections.filter('[data-step="1"]').first() || $sections.first();
-    $first.removeClass('hidden-section').attr('aria-hidden', 'false');
-
-    // Set initial progress
-    const total = $sections.length;
-    const percent = Math.round((1 / total) * 100);
-    $('#form-progress').css('width', percent + '%').attr('aria-valuenow', percent);
-
-    // Remove invalid marker and clear server feedback when user fixes a field
-    $('form#cash-buyer-form').on('input change', 'input, select, textarea', function () {
-      try {
-        if (this.checkValidity && this.checkValidity()) {
-          $(this).removeClass('is-invalid');
-          // clear nearest .invalid-feedback text if it was added by server
-          let $fb = $(this).closest('.form-outline, .mb-3, .col-md-6, .form-group').find('.invalid-feedback').first();
-          if ($fb && $fb.length) $fb.text('');
-          // clear general server-errors alert if present and there are no remaining invalid fields
-          const $form = $(this).closest('form');
-          if ($form.find('.is-invalid').length === 0) {
-            $form.find('.server-errors').remove();
-          }
-        }
-      } catch (e) {
-        // ignore
+    // Validate step-by-step so we can navigate to the first failing section.
+    const sections = getSections(form);
+    const firstBad = sections.find(s => !validateRequiredFields(s));
+    if (firstBad) {
+      const badStep = getStepFromSection(firstBad);
+      const current = getCurrentSection(form);
+      const currentStep = getStepFromSection(current);
+      if (badStep !== currentStep) {
+        setSectionVisible(current, false);
+        setSectionVisible(firstBad, true);
+        updateStepUI(form, badStep);
       }
+
+      const firstInvalid = qs('.is-invalid', firstBad);
+      if (firstInvalid && firstInvalid.focus) firstInvalid.focus();
+
+      if (window.Swal) {
+        Swal.fire({
+          title: 'Please complete required fields',
+          text: 'Some required fields are missing or invalid. Please review the highlighted inputs.',
+          icon: 'error',
+          confirmButtonText: 'OK',
+        });
+      }
+      return false;
+    }
+
+    if (!form.checkValidity()) {
+      if (window.Swal) {
+        Swal.fire({
+          title: 'Please complete the form',
+          text: 'Some fields are missing or invalid.',
+          icon: 'error',
+          confirmButtonText: 'OK',
+        });
+      }
+      return false;
+    }
+
+    const submitButtons = qsa('button', form).filter(btn => (btn.textContent || '').toLowerCase().includes('submit'));
+    submitButtons.forEach(btn => { try { btn.disabled = true; } catch (e) {} });
+    form.submit();
+    return true;
+  };
+
+  function toggleOtherFinancing() {
+    const form = getForm();
+    if (!form) return;
+    const other = qs('#SourceFinancingOther', form);
+    const cont = qs('#otherInputContainer', form);
+    if (other && cont) cont.style.display = other.checked ? 'block' : 'none';
+  }
+
+  function toggleProofUpload() {
+    const form = getForm();
+    if (!form) return;
+    const yes = qs('#ProofOfFundsYes', form);
+    const cont = qs('#proofUploadContainer', form);
+    if (yes && cont) cont.style.display = yes.checked ? 'block' : 'none';
+  }
+
+  function toggleOtherQuickly() {
+    const form = getForm();
+    if (!form) return;
+    const other = qs('#QuicklyOther', form);
+    const cont = qs('#otherQuicklyInputContainer', form);
+    if (other && cont) cont.style.display = other.checked ? 'block' : 'none';
+  }
+
+  function toggleOtherPropertyType() {
+    const form = getForm();
+    if (!form) return;
+    const other = qs('#PropertyTypeOther', form);
+    const cont = qs('#propertyOtherInputContainer', form);
+    if (other && cont) cont.style.display = other.checked ? 'block' : 'none';
+  }
+
+  function toggleOtherWorkType() {
+    const form = getForm();
+    if (!form) return;
+    const other = qs('#WorkTypeOther', form);
+    const cont = qs('#workTypeOtherInputContainer', form);
+    if (other && cont) cont.style.display = other.checked ? 'block' : 'none';
+  }
+
+  function updateReadinessLabel(value) {
+    const label = qs('#purchaseReadinessLabel');
+    if (!label) return;
+
+    const readinessDescriptions = {
+      1: 'Just browsing',
+      2: 'Thinking about it',
+      3: 'Researching options',
+      4: 'Getting prepared',
+      5: 'Somewhat ready',
+      6: 'Fairly ready',
+      7: 'Very ready',
+      8: 'Extremely ready',
+      9: 'Almost closing',
+      10: 'Ready to close today'
+    };
+    label.textContent = readinessDescriptions[Number(value)] || String(value || '');
+  }
+
+  function syncPriceRangeUI(source) {
+    const form = getForm();
+    if (!form) return;
+
+    const minInput = qs('#PriceRangesMin', form);
+    const maxInput = qs('#PriceRangesMax', form);
+    const minSlider = qs('#priceMinSlider', form);
+    const maxSlider = qs('#priceMaxSlider', form);
+    const fill = qs('#priceRangeFill', form);
+
+    if (!minInput || !maxInput || !minSlider || !maxSlider) return;
+
+    let minVal = Number(minInput.value || minSlider.value || 0);
+    let maxVal = Number(maxInput.value || maxSlider.value || 0);
+
+    if (source === 'minSlider') minVal = Number(minSlider.value);
+    if (source === 'maxSlider') maxVal = Number(maxSlider.value);
+    if (source === 'minInput') minVal = Number(minInput.value);
+    if (source === 'maxInput') maxVal = Number(maxInput.value);
+
+    const sliderMin = Number(minSlider.min || 0);
+    const sliderMax = Number(minSlider.max || 1);
+
+    if (Number.isNaN(minVal)) minVal = sliderMin;
+    if (Number.isNaN(maxVal)) maxVal = sliderMax;
+
+    minVal = Math.max(sliderMin, Math.min(minVal, sliderMax));
+    maxVal = Math.max(sliderMin, Math.min(maxVal, sliderMax));
+
+    if (minVal > maxVal) {
+      if (source === 'minSlider' || source === 'minInput') maxVal = minVal;
+      else minVal = maxVal;
+    }
+
+    minInput.value = String(minVal);
+    maxInput.value = String(maxVal);
+    minSlider.value = String(minVal);
+    maxSlider.value = String(maxVal);
+
+    if (fill) {
+      const range = sliderMax - sliderMin;
+      const leftPct = ((minVal - sliderMin) / range) * 100;
+      const rightPct = ((maxVal - sliderMin) / range) * 100;
+      fill.style.left = `${leftPct}%`;
+      fill.style.width = `${Math.max(0, rightPct - leftPct)}%`;
+    }
+
+    setHiddenPriceRanges(form);
+  }
+
+  function initFormUI() {
+    const form = getForm();
+    if (!form) return;
+
+    const sections = getSections(form);
+    sections.forEach(s => setSectionVisible(s, false));
+    setSectionVisible(getSectionByStep(form, 1), true);
+    updateStepUI(form, 1);
+
+    // Wire up toggles
+    qsa('input[name="SourceFinancing"]', form).forEach(el => el.addEventListener('change', toggleOtherFinancing));
+    qsa('input[name="ProofOfFunds"]', form).forEach(el => el.addEventListener('change', toggleProofUpload));
+    qsa('input[name="Quickly"]', form).forEach(el => el.addEventListener('change', toggleOtherQuickly));
+    qsa('input[name="PropertyType"]', form).forEach(el => el.addEventListener('change', toggleOtherPropertyType));
+    qsa('input[name="WorkType"]', form).forEach(el => el.addEventListener('change', toggleOtherWorkType));
+
+    // Readiness label
+    const readiness = qs('#purchaseReadinessSlider', form);
+    if (readiness) {
+      readiness.addEventListener('input', e => updateReadinessLabel(e.target.value));
+      updateReadinessLabel(readiness.value);
+    }
+
+    // Price range
+    const minInput = qs('#PriceRangesMin', form);
+    const maxInput = qs('#PriceRangesMax', form);
+    const minSlider = qs('#priceMinSlider', form);
+    const maxSlider = qs('#priceMaxSlider', form);
+
+    if (minInput) minInput.addEventListener('input', () => syncPriceRangeUI('minInput'));
+    if (maxInput) maxInput.addEventListener('input', () => syncPriceRangeUI('maxInput'));
+    if (minSlider) minSlider.addEventListener('input', () => syncPriceRangeUI('minSlider'));
+    if (maxSlider) maxSlider.addEventListener('input', () => syncPriceRangeUI('maxSlider'));
+
+    // When sliders overlap, bring the active thumb to the front so it stays draggable.
+    if (minSlider && maxSlider) {
+      const bringMinFront = () => {
+        minSlider.style.zIndex = '5';
+        maxSlider.style.zIndex = '4';
+      };
+      const bringMaxFront = () => {
+        maxSlider.style.zIndex = '5';
+        minSlider.style.zIndex = '4';
+      };
+      ['pointerdown', 'mousedown', 'touchstart'].forEach(evt => {
+        minSlider.addEventListener(evt, bringMinFront, { passive: true });
+        maxSlider.addEventListener(evt, bringMaxFront, { passive: true });
+      });
+    }
+
+    // Clear per-field invalid state when edited
+    form.addEventListener('input', (e) => {
+      const el = e.target;
+      if (!el) return;
+      try {
+        if (el.classList && el.classList.contains('is-invalid') && el.checkValidity && el.checkValidity()) {
+          el.classList.remove('is-invalid');
+        }
+      } catch (err) { /* ignore */ }
     });
 
-    // initialize price range controls if present
-    if (typeof initPriceRangeControls === 'function') {
-      initPriceRangeControls();
-    }
-  } catch (e) {
-    console.warn('initFormSections failed', e);
+    // Initial toggle states
+    toggleOtherFinancing();
+    toggleProofUpload();
+    toggleOtherQuickly();
+    toggleOtherPropertyType();
+    toggleOtherWorkType();
+    syncPriceRangeUI();
   }
-}
+
+  function applyValues(values) {
+    const form = getForm();
+    if (!form || !values) return;
+
+    Object.keys(values).forEach(key => {
+      const val = values[key];
+      if (val === undefined || val === null) return;
+
+      const fields = qsa(`[name="${CSS.escape(key)}"]`, form);
+      if (!fields.length) return;
+
+      if (Array.isArray(val)) {
+        fields.forEach(el => {
+          if (el.type === 'checkbox' || el.type === 'radio') {
+            el.checked = val.some(v => String(v) === String(el.value));
+          }
+        });
+        return;
+      }
+
+      fields.forEach(el => {
+        const type = (el.type || '').toLowerCase();
+        if (type === 'checkbox' || type === 'radio') {
+          el.checked = String(el.value) === String(val);
+        } else {
+          el.value = String(val);
+        }
+      });
+    });
+
+    // Special: if server provided PriceRangesMin/Max, sync sliders and hidden field.
+    syncPriceRangeUI();
+    toggleOtherFinancing();
+    toggleProofUpload();
+    toggleOtherQuickly();
+    toggleOtherPropertyType();
+    toggleOtherWorkType();
+
+    const readiness = qs('#purchaseReadinessSlider', form);
+    if (readiness) updateReadinessLabel(readiness.value);
+  }
+
+  function showInlineErrors(errors) {
+    const form = getForm();
+    if (!form || !Array.isArray(errors) || !errors.length) return;
+
+    errors.forEach(err => {
+      const param = (err && err.param) ? String(err.param) : '';
+      const msg = (err && err.msg) ? String(err.msg) : 'Invalid value';
+      if (!param) return;
+
+      const fields = qsa(`[name="${CSS.escape(param)}"]`, form);
+      if (!fields.length) return;
+
+      fields.forEach(el => {
+        el.classList.add('is-invalid');
+        let fb = el.parentElement ? qs('.invalid-feedback', el.parentElement) : null;
+        if (!fb) {
+          fb = document.createElement('div');
+          fb.className = 'invalid-feedback';
+          el.insertAdjacentElement('afterend', fb);
+        }
+        fb.textContent = msg;
+      });
+    });
+
+    // Navigate to the first section that contains an invalid element.
+    const sections = getSections(form);
+    const firstBad = sections.find(s => qs('.is-invalid', s));
+    if (firstBad) {
+      const current = getCurrentSection(form);
+      setSectionVisible(current, false);
+      setSectionVisible(firstBad, true);
+      updateStepUI(form, getStepFromSection(firstBad));
+      const firstInvalid = qs('.is-invalid', firstBad);
+      if (firstInvalid && firstInvalid.focus) firstInvalid.focus();
+    }
+  }
+
+  async function handlePageLoad() {
+    initFormUI();
+
+    const params = new URLSearchParams(window.location.search);
+    const errorParam = params.get('errors');
+    const successParam = params.get('success');
+
+    // Restore session-saved payload (one-time)
+    try {
+      const resp = await fetch('/api/cbForm/restore', { credentials: 'same-origin' });
+      const payload = await resp.json();
+      if (payload && payload.values) applyValues(payload.values);
+      if (payload && Array.isArray(payload.errors) && payload.errors.length) {
+        showInlineErrors(payload.errors);
+        if (window.Swal) {
+          const messages = payload.errors.map(e => e.msg || e).filter(Boolean);
+          Swal.fire({
+            title: 'Please try again',
+            text: messages.join('\n'),
+            icon: 'error',
+            confirmButtonText: 'OK',
+          });
+        }
+      }
+    } catch (e) {
+      // ignore restore errors
+    }
+
+    // Also support inline-injected values (server render)
+    try {
+      if (window.__formValues) applyValues(window.__formValues);
+      if (window.__formErrors && Array.isArray(window.__formErrors) && window.__formErrors.length) {
+        showInlineErrors(window.__formErrors);
+      }
+    } catch (e) { /* ignore */ }
+
+    // Legacy errors query string
+    if (errorParam) {
+      try {
+        const list = JSON.parse(decodeURIComponent(errorParam));
+        if (Array.isArray(list) && list.length && window.Swal) {
+          Swal.fire({
+            title: 'Please try again',
+            text: list.join('\n'),
+            icon: 'error',
+            confirmButtonText: 'OK',
+          });
+        }
+      } catch (e) { /* ignore */ }
+    }
+
+    if (successParam && window.Swal) {
+      Swal.fire({
+        title: 'Thanks for submitting!',
+        text: 'We received your Cash Buyer Form. Our team will reach out shortly.',
+        icon: 'success',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#28a745',
+      }).then((result) => {
+        if (result.isConfirmed) window.location.href = '/forms/Cash-Buyer';
+      });
+    }
+
+    // Clear query string once processed (avoid re-alert on refresh)
+    try {
+      const cleanUrl = window.location.pathname + (window.location.hash || '');
+      history.replaceState({}, '', cleanUrl);
+    } catch (e) { /* ignore */ }
+  }
+
+  window.onload = function () {
+    handlePageLoad().catch((e) => console.error('cb.js load error', e));
+  };
+})();

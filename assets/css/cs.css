@@ -22,3 +22,135 @@ body, html {
   height: 100%;
   overflow-x: hidden;
 }
+
+/* Cash buyer form */
+.cb-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.cb-actions .btn {
+  min-width: 120px;
+}
+
+.cb-steps {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.5rem;
+  user-select: none;
+}
+
+.cb-step {
+  font-size: 12px;
+  text-align: center;
+  padding: 0.35rem 0.4rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(6px);
+}
+
+.cb-step.complete {
+  color: rgba(255, 255, 255, 0.9);
+  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.cb-step.active {
+  color: #ffffff;
+  background: rgba(13, 110, 253, 0.35);
+  border-color: rgba(13, 110, 253, 0.6);
+}
+
+.cb-field-title {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+  margin-bottom: 0.25rem;
+}
+
+.cb-checks .form-check-label {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Ensure checkboxes stay visible with MDB styles */
+.cb-checks .form-check-input {
+  appearance: auto !important;
+  -webkit-appearance: checkbox !important;
+  width: 1.05em !important;
+  height: 1.05em !important;
+  accent-color: #0d6efd !important;
+}
+
+.cb-group-feedback {
+  display: none;
+}
+
+.cb-group-feedback.is-invalid {
+  display: block;
+  color: #ffb3b3;
+}
+
+/* Dual-range slider */
+.dual-range {
+  position: relative;
+  height: 44px;
+  margin-top: 0.25rem;
+}
+
+.dual-range input[type=range] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  background: transparent;
+  position: absolute;
+  top: 18px;
+  left: 0;
+  margin: 0;
+  pointer-events: auto;
+  z-index: 3;
+  touch-action: none;
+}
+
+.dual-range input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid rgba(13, 110, 253, 0.9);
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.dual-range input[type=range]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid rgba(13, 110, 253, 0.9);
+  cursor: pointer;
+}
+
+.dual-range-track {
+  position: absolute;
+  top: 20px;
+  left: 0;
+  right: 0;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.25);
+  z-index: 1;
+}
+
+.dual-range-range {
+  position: absolute;
+  top: 20px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(13, 110, 253, 0.85);
+  z-index: 2;
+}

@@ -25,7 +25,7 @@
         <h2 class="text-center text-dark-emphasis">Nick's Cash Buyer Form</h2>
         <p class="text-dark  text-center">We ensure you receive high-quality properties tailored to your criteria.</p>
 
-        <div class="col-md-6">
+        <div class="col-12 col-lg-8">
           <div class=" border  shadow-0 mb-3 glass-card" style="width: 100%;">
             <div class="card-body rounded-4 text-light px-5 pt-4 pb-2">
 
@@ -37,61 +37,6 @@
               // formValues passed from server (may be empty)
               window.__formValues = {{{ json formValues }}} || {};
               window.__formErrors = {{{ json formErrors }}} || null;
-            </script>
-            <script>
-              (function restoreFormValues() {
-                if (!window.__formValues) return;
-                // Wait until DOM elements from the partial exist
-                document.addEventListener('DOMContentLoaded', function () {
-                  try {
-                    const fv = window.__formValues || {};
-                    Object.keys(fv).forEach(function (key) {
-                      const val = fv[key];
-                      if (typeof val === 'undefined' || val === null) return;
-
-                      // If the value is an array (checkbox groups) handle individually
-                      if (Array.isArray(val)) {
-                        val.forEach(function (v) {
-                          const els = document.querySelectorAll('[name="' + key + '"]');
-                          els.forEach(function (el) {
-                            if ((el.type === 'checkbox' || el.type === 'radio') && String(el.value) === String(v)) el.checked = true;
-                          });
-                        });
-                        return;
-                      }
-
-                      const elements = document.querySelectorAll('[name="' + key + '"]');
-                      if (!elements || !elements.length) return;
-                      elements.forEach(function (el) {
-                        const tag = el.tagName.toLowerCase();
-                        const type = el.type ? el.type.toLowerCase() : '';
-                        if (type === 'radio') {
-                          if (String(el.value) === String(val)) el.checked = true;
-                        } else if (type === 'checkbox') {
-                          // single checkbox with a value
-                          if (String(el.value) === String(val)) el.checked = true;
-                        } else if (tag === 'input' || tag === 'textarea' || tag === 'select') {
-                          el.value = val;
-                        }
-                      });
-                    });
-
-                    // If there are errors passed in, expose them to the query param behavior used by cb.js
-                    if (window.__formErrors && window.__formErrors.length) {
-                      try {
-                        const qs = new URLSearchParams(window.location.search);
-                        qs.set('errors', encodeURIComponent(JSON.stringify(window.__formErrors.map(e=> e.msg || e))));
-                        const base = window.location.pathname + '?' + qs.toString();
-                        history.replaceState({}, '', base);
-                      } catch (e) {
-                        // ignore
-                      }
-                    }
-                  } catch (e) {
-                    console.error('restoreFormValues error', e);
-                  }
-                });
-              })();
             </script>
             </div>
           </div>
@@ -109,7 +54,6 @@
   <!--   Core JS Files   -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="/assets/js/cb.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

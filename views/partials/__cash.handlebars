@@ -1,624 +1,459 @@
-<form id="cash-buyer-form" action="/api/cbForm" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate aria-label="Cash Buyer Registration Form">
-
-  <!-- Progress / Stepper -->
-  <div class="mb-3">
+<form id="cash-buyer-form" action="/api/cbForm" method="POST" enctype="multipart/form-data" novalidate aria-label="Cash Buyer Registration Form">
+  <div class="cb-progress mb-4">
     <div class="progress" style="height: 8px;">
-      <div id="form-progress" class="progress-bar bg-primary" role="progressbar" style="width: 0%" aria-valuemin="0" aria-valuemax="100"></div>
+      <div id="form-progress" class="progress-bar bg-primary" role="progressbar" style="width: 0%" aria-valuemin="0"
+        aria-valuemax="100" aria-valuenow="0"></div>
     </div>
-    <div class="d-flex justify-content-between mt-2 small text-muted">
-      <div>Basic</div>
-      <div>Experience</div>
-      <div>Financing</div>
-      <div>Criteria</div>
-      <div>Property</div>
+    <div id="cb-steps" class="cb-steps mt-3" aria-hidden="true">
+      <div class="cb-step active" data-step="1">Basics</div>
+      <div class="cb-step" data-step="2">Activity</div>
+      <div class="cb-step" data-step="3">Financing</div>
+      <div class="cb-step" data-step="4">Deal</div>
+      <div class="cb-step" data-step="5">Property</div>
+      <div class="cb-step" data-step="6">Finish</div>
     </div>
   </div>
 
-  <style>
-    /* Make checkboxes clearly visible and use brand blue when checked */
-    .form-check-input {
-      appearance: auto !important;
-      -webkit-appearance: checkbox !important;
-      width: 1.15em !important;
-      height: 1.15em !important;
-      display: inline-block !important;
-      vertical-align: middle !important;
-      accent-color: #0d6efd !important; /* modern browsers */
-    }
-    .form-check-input:checked {
-      background-color: #0d6efd !important;
-      border-color: #0d6efd !important;
-    }
-    /* Fallback for older WebKit browsers */
-    .form-check-input::-webkit-slider-thumb { }
-  </style>
-
-  <!-- Section 1: Basic Information -->
+  <!-- Step 1: Basic Information -->
   <section id="section-1" class="form-section" aria-labelledby="section-1-title" data-step="1">
-    <h4 id="section-1-title" class="mb-3">Basic Information</h4>
-    <p class="text-muted small">Tell us about yourself so we can match properties to your profile.</p>
-
-    <div class="row g-3 mb-3">
-      <div class="col-md-6">
-        <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
-        <input name="FullName" type="text" id="name" placeholder="John Doe" class="form-control form-control-sm" required aria-required="true" />
-        <div class="invalid-feedback">Please enter your full name.</div>
-      </div>
-      <div class="col-md-6">
-        <label for="company" class="form-label">Company Name</label>
-        <input name="CompanyName" type="text" id="company" placeholder="John's Real Estate" class="form-control form-control-sm" />
-      </div>
-    </div>
-    <div class="row g-3 mb-3">
-      <div class="col-md-6">
-        <label for="website" class="form-label">Website</label>
-        <input name="Website" type="url" id="website" placeholder="https://example.com" class="form-control form-control-sm" />
-        <div class="form-text">Optional — your company site or portfolio.</div>
-      </div>
-      <div class="col-md-6">
-        <label for="phone" class="form-label">Cell Phone <span class="text-danger">*</span></label>
-        <input name="CellPhone" type="tel" id="phone" placeholder="(123) 123-1234" class="form-control form-control-sm" required aria-required="true" pattern="[0-9\-\s\(\)]+" />
-        <div class="invalid-feedback">Please enter a valid phone number.</div>
-      </div>
-    </div>
-    <div class="row g-3 mb-3">
-      <div class="col-md-6">
-        <label for="email" class="form-label">Direct Email <span class="text-danger">*</span></label>
-        <input name="Email" type="email" id="email" placeholder="you@example.com" class="form-control form-control-sm" required aria-required="true" />
-        <div class="invalid-feedback">Please enter a valid email address.</div>
-      </div>
-      <div class="col-md-6">
-        <label for="address" class="form-label">Address (City / State) <span class="text-danger">*</span></label>
-        <input name="Address" type="text" id="address" placeholder="Tampa, FL" class="form-control form-control-sm" required aria-required="true" />
-        <div class="invalid-feedback">Please enter your city and state.</div>
-      </div>
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <h4 id="section-1-title" class="mb-0 text-white">Basic Information</h4>
+      <small class="text-white-50">Step 1 of 6</small>
     </div>
 
-    <div class="d-flex justify-content-end">
-      <button type="button" class="btn btn-primary" onclick="navigateSection(1,2)" id="btn-next-1">Next</button>
+    <div class="row g-3">
+      <div class="col-md-6">
+        <div data-mdb-input-init class="form-outline">
+          <input name="FullName" type="text" id="FullName" class="text-dark form-control" required />
+          <label class="form-label" for="FullName">Full name *</label>
+          <div class="invalid-feedback">Full name is required.</div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div data-mdb-input-init class="form-outline">
+          <input name="CompanyName" type="text" id="CompanyName" class="text-dark form-control" />
+          <label class="form-label" for="CompanyName">Company name (optional)</label>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div data-mdb-input-init class="form-outline">
+          <input name="Website" type="url" id="Website" class="text-dark form-control" placeholder="https://example.com" />
+          <label class="form-label" for="Website">Website (optional)</label>
+          <div class="form-text text-white-50">If you include a website, use the full URL (starts with https://).</div>
+          <div class="invalid-feedback">Please enter a valid website URL.</div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div data-mdb-input-init class="form-outline">
+          <input name="CellPhone" type="tel" id="CellPhone" class="text-dark form-control" required autocomplete="tel" />
+          <label class="form-label" for="CellPhone">Cell phone *</label>
+          <div class="invalid-feedback">A valid phone number is required.</div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div data-mdb-input-init class="form-outline">
+          <input name="Email" type="email" id="Email" class="text-dark form-control" required autocomplete="email" />
+          <label class="form-label" for="Email">Email *</label>
+          <div class="invalid-feedback">A valid email is required.</div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div data-mdb-input-init class="form-outline">
+          <input name="Address" type="text" id="Address" class="text-dark form-control" required autocomplete="address-level2" />
+          <label class="form-label" for="Address">City / State *</label>
+          <div class="invalid-feedback">City and state are required.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cb-actions mt-4">
+      <button type="button" class="btn btn-primary" onclick="navigateSection(1, 2)">Next</button>
     </div>
   </section>
-  <!-- Section 2: Experience & Activity -->
-  <section id="section-2" class="form-section hidden-section" aria-labelledby="section-2-title" data-step="2">
-    <h4 id="section-2-title" class="mb-3">Experience & Activity</h4>
-    <p class="text-muted small">Help us understand your experience and capacity.</p>
 
-    <div class="row g-3 mb-3">
-      <div class="col-md-6">
-        <label for="years" class="form-label">Years in Business <span class="text-danger">*</span></label>
-        <input name="YearsInBusiness" type="number" id="years" class="form-control form-control-sm" required min="0" />
-        <div class="invalid-feedback">Enter how long you've been operating.</div>
+  <!-- Step 2: Experience & Activity -->
+  <section id="section-2" class="form-section hidden-section" aria-labelledby="section-2-title" data-step="2" aria-hidden="true">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <h4 id="section-2-title" class="mb-0 text-white">Experience & Activity</h4>
+      <small class="text-white-50">Step 2 of 6</small>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-md-4">
+        <div data-mdb-input-init class="form-outline">
+          <input name="YearsInBusiness" type="number" id="YearsInBusiness" class="text-dark form-control" required min="0" inputmode="numeric" />
+          <label class="form-label" for="YearsInBusiness">Years in business *</label>
+          <div class="invalid-feedback">Required (0 or more).</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div data-mdb-input-init class="form-outline">
+          <input name="CompletedProjects" type="number" id="CompletedProjects" class="text-dark form-control" required min="0" inputmode="numeric" />
+          <label class="form-label" for="CompletedProjects">Completed projects *</label>
+          <div class="invalid-feedback">Required (0 or more).</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div data-mdb-input-init class="form-outline">
+          <input name="CurrentProjects" type="text" id="CurrentProjects" class="text-dark form-control" required />
+          <label class="form-label" for="CurrentProjects">Current projects *</label>
+          <div class="invalid-feedback">This field is required.</div>
+        </div>
       </div>
       <div class="col-md-6">
-        <label for="CompletedProjects" class="form-label">Completed Projects <span class="text-danger">*</span></label>
-        <input name="CompletedProjects" type="number" id="CompletedProjects" class="form-control form-control-sm" required min="0" />
+        <div data-mdb-input-init class="form-outline">
+          <input name="PropertiesNext6Months" type="number" id="PropertiesNext6Months" class="text-dark form-control" required min="0" inputmode="numeric" />
+          <label class="form-label" for="PropertiesNext6Months">Properties to buy in the next 6 months *</label>
+          <div class="invalid-feedback">Required (0 or more).</div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div data-mdb-input-init class="form-outline">
+          <input name="PropertiesPerYear" type="number" id="PropertiesPerYear" class="text-dark form-control" required min="0" inputmode="numeric" />
+          <label class="form-label" for="PropertiesPerYear">Properties per year *</label>
+          <div class="invalid-feedback">Required (0 or more).</div>
+        </div>
       </div>
     </div>
 
-    <div class="mb-3">
-      <label class="form-label">Current active projects</label>
+    <div class="cb-actions mt-4">
+      <button type="button" class="btn btn-outline-light" onclick="navigateSection(2, 1)">Back</button>
+      <button type="button" class="btn btn-primary" onclick="navigateSection(2, 3)">Next</button>
+    </div>
+  </section>
+
+  <!-- Step 3: Financing -->
+  <section id="section-3" class="form-section hidden-section" aria-labelledby="section-3-title" data-step="3" aria-hidden="true">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <h4 id="section-3-title" class="mb-0 text-white">Financing</h4>
+      <small class="text-white-50">Step 3 of 6</small>
+    </div>
+
+    <div class="mb-4">
+      <div class="cb-field-title">Source(s) of financing *</div>
+      <div class="text-white-50 small mb-2">Select all that apply.</div>
+      <div class="d-flex gap-3 flex-wrap cb-checks" data-required-group-container="SourceFinancing">
+        <div class="form-check">
+          <input name="SourceFinancing" class="form-check-input" type="checkbox" value="Cash on Hand" id="SourceFinancingCash" data-required-group="SourceFinancing" />
+          <label class="form-check-label" for="SourceFinancingCash">Cash on hand</label>
+        </div>
+        <div class="form-check">
+          <input name="SourceFinancing" class="form-check-input" type="checkbox" value="Hard Money" id="SourceFinancingHard" data-required-group="SourceFinancing" />
+          <label class="form-check-label" for="SourceFinancingHard">Hard money</label>
+        </div>
+        <div class="form-check">
+          <input name="SourceFinancing" class="form-check-input" type="checkbox" value="Private Money" id="SourceFinancingPrivate" data-required-group="SourceFinancing" />
+          <label class="form-check-label" for="SourceFinancingPrivate">Private money</label>
+        </div>
+        <div class="form-check">
+          <input name="SourceFinancing" class="form-check-input" type="checkbox" value="Traditional" id="SourceFinancingTraditional" data-required-group="SourceFinancing" />
+          <label class="form-check-label" for="SourceFinancingTraditional">Traditional (bank)</label>
+        </div>
+        <div class="form-check">
+          <input name="SourceFinancing" class="form-check-input" type="checkbox" value="JV Partner" id="SourceFinancingJv" data-required-group="SourceFinancing" />
+          <label class="form-check-label" for="SourceFinancingJv">JV partner(s)</label>
+        </div>
+        <div class="form-check">
+          <input name="SourceFinancing" class="form-check-input" type="checkbox" value="Seller Financing" id="SourceFinancingSeller" data-required-group="SourceFinancing" />
+          <label class="form-check-label" for="SourceFinancingSeller">Seller financing</label>
+        </div>
+        <div class="form-check">
+          <input name="SourceFinancing" class="form-check-input" type="checkbox" value="Subject To" id="SourceFinancingSubjectTo" data-required-group="SourceFinancing" />
+          <label class="form-check-label" for="SourceFinancingSubjectTo">Subject to</label>
+        </div>
+        <div class="form-check">
+          <input name="SourceFinancing" class="form-check-input" type="checkbox" value="Other" id="SourceFinancingOther" data-required-group="SourceFinancing" />
+          <label class="form-check-label" for="SourceFinancingOther">Other</label>
+        </div>
+      </div>
+      <div class="invalid-feedback cb-group-feedback" data-required-group-feedback="SourceFinancing">Please select at least one financing source.</div>
+
+      <div id="otherInputContainer" class="mt-3" style="display:none;">
+        <div data-mdb-input-init class="form-outline">
+          <input name="OtherFinancingDetails" type="text" id="OtherFinancingDetails" class="text-dark form-control" placeholder="Describe your financing source" />
+          <label class="form-label" for="OtherFinancingDetails">Other financing details (optional)</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+      <div class="col-md-6">
+        <div class="cb-field-title">Funding in place? *</div>
+        <div class="d-flex gap-4 flex-wrap">
+          <div class="form-check">
+            <input name="FundingInPlace" class="form-check-input" type="radio" value="Yes" id="FundingInPlaceYes" required />
+            <label class="form-check-label" for="FundingInPlaceYes">Yes</label>
+          </div>
+          <div class="form-check">
+            <input name="FundingInPlace" class="form-check-input" type="radio" value="No" id="FundingInPlaceNo" />
+            <label class="form-check-label" for="FundingInPlaceNo">No</label>
+          </div>
+        </div>
+        <div class="invalid-feedback">Required.</div>
+      </div>
+      <div class="col-md-6">
+        <div class="cb-field-title">Proof of funds available? *</div>
+        <div class="d-flex gap-4 flex-wrap">
+          <div class="form-check">
+            <input name="ProofOfFunds" class="form-check-input" type="radio" value="Yes" id="ProofOfFundsYes" required />
+            <label class="form-check-label" for="ProofOfFundsYes">Yes</label>
+          </div>
+          <div class="form-check">
+            <input name="ProofOfFunds" class="form-check-input" type="radio" value="No" id="ProofOfFundsNo" />
+            <label class="form-check-label" for="ProofOfFundsNo">No</label>
+          </div>
+        </div>
+        <div class="invalid-feedback">Required.</div>
+      </div>
+    </div>
+
+    <div id="proofUploadContainer" class="mb-4" style="display:none;">
+      <label for="proofUpload" class="form-label text-white">Upload proof of funds (optional)</label>
+      <input name="ProofOfFundsFile" type="file" id="proofUpload" class="form-control" />
+      <div class="form-text text-white-50">Supported: images or PDF.</div>
+    </div>
+
+    <div class="mb-4">
+      <div class="cb-field-title">If we bring 3 great deals next month, can you purchase them all? *</div>
+      <div class="d-flex gap-4 flex-wrap">
+        <div class="form-check">
+          <input name="TripleDeals" class="form-check-input" type="radio" value="Yes" id="TripleDealsYes" required />
+          <label class="form-check-label" for="TripleDealsYes">Yes</label>
+        </div>
+        <div class="form-check">
+          <input name="TripleDeals" class="form-check-input" type="radio" value="No" id="TripleDealsNo" />
+          <label class="form-check-label" for="TripleDealsNo">No</label>
+        </div>
+        <div class="form-check">
+          <input name="TripleDeals" class="form-check-input" type="radio" value="Maybe" id="TripleDealsMaybe" />
+          <label class="form-check-label" for="TripleDealsMaybe">Maybe</label>
+        </div>
+      </div>
+      <div class="invalid-feedback">Required.</div>
+    </div>
+
+    <div class="mb-4">
+      <div class="cb-field-title">How quickly can you close on a great deal? *</div>
       <div class="d-flex gap-3 flex-wrap">
-        <div class="form-check">
-          <input name="CurrentProjects" class="form-check-input" type="radio" value="None" id="current-none" required aria-required="true" />
-          <label class="form-check-label" for="current-none">None</label>
-        </div>
-        <div class="form-check">
-          <input name="CurrentProjects" class="form-check-input" type="radio" value="One" id="current-one" />
-          <label class="form-check-label" for="current-one">One</label>
-        </div>
-        <div class="form-check">
-          <input name="CurrentProjects" class="form-check-input" type="radio" value="Two" id="current-two" />
-          <label class="form-check-label" for="current-two">Two</label>
-        </div>
-        <div class="form-check">
-          <input name="CurrentProjects" class="form-check-input" type="radio" value="More" id="current-more" />
-          <label class="form-check-label" for="current-more">More than two</label>
+        <div class="form-check"><input name="Quickly" class="form-check-input" type="radio" value="One Day" id="QuicklyOneDay" required /><label class="form-check-label" for="QuicklyOneDay">One day</label></div>
+        <div class="form-check"><input name="Quickly" class="form-check-input" type="radio" value="Within a Week" id="QuicklyWeek" /><label class="form-check-label" for="QuicklyWeek">Within a week</label></div>
+        <div class="form-check"><input name="Quickly" class="form-check-input" type="radio" value="Within Two Weeks" id="QuicklyTwoWeeks" /><label class="form-check-label" for="QuicklyTwoWeeks">Within two weeks</label></div>
+        <div class="form-check"><input name="Quickly" class="form-check-input" type="radio" value="Within a Month" id="QuicklyMonth" /><label class="form-check-label" for="QuicklyMonth">Within a month</label></div>
+        <div class="form-check"><input name="Quickly" class="form-check-input" type="radio" value="Over a Month" id="QuicklyOverMonth" /><label class="form-check-label" for="QuicklyOverMonth">Over a month</label></div>
+        <div class="form-check"><input name="Quickly" class="form-check-input" type="radio" value="Other Timeline" id="QuicklyOther" /><label class="form-check-label" for="QuicklyOther">Other timeline</label></div>
+      </div>
+      <div class="invalid-feedback">Required.</div>
+
+      <div id="otherQuicklyInputContainer" class="mt-3" style="display:none;">
+        <div data-mdb-input-init class="form-outline">
+          <input name="QuicklyOtherTimeline" type="text" id="QuicklyOtherTimeline" class="text-dark form-control" placeholder="e.g., 45 days due to lender" />
+          <label class="form-label" for="QuicklyOtherTimeline">Other timeline details (optional)</label>
         </div>
       </div>
     </div>
 
-    <div class="row g-3 mb-3">
-      <div class="col-md-6">
-        <label for="PropertiesNext6Months" class="form-label small">Properties in next 6 months <span class="text-danger">*</span></label>
-        <input name="PropertiesNext6Months" type="number" id="PropertiesNext6Months" class="form-control form-control-sm" required min="0" />
-      </div>
-      <div class="col-md-6">
-        <label for="PropertiesPerYear" class="form-label small">Properties per year on average <span class="text-danger">*</span></label>
-        <input name="PropertiesPerYear" type="number" id="PropertiesPerYear" class="form-control form-control-sm" required min="0" />
-      </div>
-    </div>
-
-    <div class="d-flex justify-content-between">
-      <button type="button" class="btn btn-outline-secondary" onclick="navigateSection(2,1)">Previous</button>
-      <button type="button" class="btn btn-primary" onclick="navigateSection(2,3)">Next</button>
+    <div class="cb-actions mt-4">
+      <button type="button" class="btn btn-outline-light" onclick="navigateSection(3, 2)">Back</button>
+      <button type="button" class="btn btn-primary" onclick="navigateSection(3, 4)">Next</button>
     </div>
   </section>
-  <!-- Section 3: Financing Details -->
-  <section id="section-3" class="form-section hidden-section" aria-labelledby="section-3-title" data-step="3">
-    <h4 id="section-3-title" class="mb-3">Financing Details</h4>
-    <p class="text-muted small">Let us know how you fund purchases so we can send suitable opportunities.</p>
 
-    <div class="mb-3">
-      <label class="form-label">Source of Financing</label>
-      <div class="d-flex gap-2 flex-wrap">
-        <div class="form-check">
-          <input name="SourceFinancing" class="form-check-input" type="checkbox" value="Cash on Hand" id="CashonHand" />
-          <label class="form-check-label" for="CashonHand">Cash on Hand</label>
-        </div>
-        <div class="form-check">
-          <input name="SourceFinancing" class="form-check-input" type="checkbox" value="Hard Money" id="HardMoney" />
-          <label class="form-check-label" for="HardMoney">Hard Money</label>
-        </div>
-        <div class="form-check">
-          <input name="SourceFinancing" class="form-check-input" type="checkbox" value="Private Money" id="PrivateMoney" />
-          <label class="form-check-label" for="PrivateMoney">Private Money</label>
-        </div>
-        <div class="form-check">
-          <input name="SourceFinancing" class="form-check-input" type="checkbox" value="Traditional" id="Traditional" />
-          <label class="form-check-label" for="Traditional">Traditional (Bank)</label>
-        </div>
-        <div class="form-check">
-          <input name="SourceFinancing" class="form-check-input" type="checkbox" value="JV Partner" id="JVPartner" />
-          <label class="form-check-label" for="JVPartner">JV Partner(s)</label>
-        </div>
-        <div class="form-check">
-          <input name="SourceFinancing" class="form-check-input" type="checkbox" value="Seller Financing" id="SellerFinancing" />
-          <label class="form-check-label" for="SellerFinancing">Seller Financing</label>
-        </div>
-        <div class="form-check">
-          <input name="SourceFinancing" class="form-check-input" type="checkbox" value="Subject To" id="SubjectTo" />
-          <label class="form-check-label" for="SubjectTo">Subject To</label>
-        </div>
-        <div class="form-check">
-          <input name="OtherFinancing" class="form-check-input" type="checkbox" value="Other" id="OtherFinancing" onclick="toggleOtherInput()" />
-          <label class="form-check-label" for="OtherFinancing">Other</label>
-        </div>
-      </div>
-
-      <div id="otherInputContainer" class="mt-2" style="display:none;">
-        <input name="OtherFinancing" type="text" id="otherInput" class="form-control form-control-sm" placeholder="Please specify other financing" />
-      </div>
+  <!-- Step 4: Deal Criteria -->
+  <section id="section-4" class="form-section hidden-section" aria-labelledby="section-4-title" data-step="4" aria-hidden="true">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <h4 id="section-4-title" class="mb-0 text-white">Deal Criteria</h4>
+      <small class="text-white-50">Step 4 of 6</small>
     </div>
 
-    <div class="row g-3 mb-3">
+    <div class="row g-3 mb-4">
+      <div class="col-12">
+        <div class="cb-field-title">Price range *</div>
+        <div class="text-white-50 small mb-2">Enter your typical buy box. We’ll use this to filter deals.</div>
+      </div>
       <div class="col-md-6">
-        <label class="form-label">Funding in place?</label>
-        <div class="d-flex gap-3">
-          <div class="form-check">
-            <input name="FundingInPlace" class="form-check-input" type="radio" value="Yes" id="funding-yes" required aria-required="true" />
-              <label class="form-check-label" for="funding-yes">Yes</label>
-          </div>
-          <div class="form-check">
-            <input name="FundingInPlace" class="form-check-input" type="radio" value="No" id="funding-no" />
-            <label class="form-check-label" for="funding-no">No</label>
-          </div>
+        <div class="input-group">
+          <span class="input-group-text">$</span>
+          <input name="PriceRangesMin" type="number" id="PriceRangesMin" class="form-control" placeholder="Min" min="0" required inputmode="numeric" />
         </div>
       </div>
-
       <div class="col-md-6">
-        <label class="form-label">Proof of funds?</label>
-        <div class="d-flex gap-3">
-          <div class="form-check">
-            <input name="ProofOfFunds" class="form-check-input" type="radio" value="Yes" id="pf-yes" onclick="toggleProofUpload(true)" required aria-required="true" />
-            <label class="form-check-label" for="pf-yes">Yes</label>
-          </div>
-          <div class="form-check">
-            <input name="ProofOfFunds" class="form-check-input" type="radio" value="No" id="pf-no" onclick="toggleProofUpload(false)" />
-            <label class="form-check-label" for="pf-no">No</label>
-          </div>
+        <div class="input-group">
+          <span class="input-group-text">$</span>
+          <input name="PriceRangesMax" type="number" id="PriceRangesMax" class="form-control" placeholder="Max" min="0" required inputmode="numeric" />
+        </div>
+      </div>
+      <div class="col-12">
+        <div class="dual-range" aria-hidden="true">
+          <input id="priceMinSlider" type="range" min="0" max="2000000" step="5000" value="100000" />
+          <input id="priceMaxSlider" type="range" min="0" max="2000000" step="5000" value="750000" />
+          <div class="dual-range-track"></div>
+          <div class="dual-range-range" id="priceRangeFill"></div>
+        </div>
+        <div class="text-white-50 small mt-2">Tip: you can also drag the sliders.</div>
+      </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+      <div class="col-md-6">
+        <div data-mdb-input-init class="form-outline">
+          <input name="MinimumProfit" type="text" id="MinimumProfit" class="text-dark form-control" required placeholder="e.g., $25k or 15% ROI" />
+          <label class="form-label" for="MinimumProfit">Minimum profit requirement *</label>
+          <div class="invalid-feedback">Required.</div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div data-mdb-input-init class="form-outline">
+          <input name="GoodDealCriteria" type="text" id="GoodDealCriteria" class="text-dark form-control" required placeholder="e.g., 70% rule, 2% rule, etc." />
+          <label class="form-label" for="GoodDealCriteria">What makes a “good deal” to you? *</label>
+          <div class="invalid-feedback">Required.</div>
         </div>
       </div>
     </div>
 
-    <div id="proofUploadContainer" class="mb-3" style="display:none;">
-      <label for="proofUpload" class="form-label">Upload proof of funds</label>
-  <input name="ProofOfFundsFile" type="file" id="proofUpload" class="form-control form-control-sm" />
-    </div>
-
-    <div class="row g-3 mb-3">
-      <div class="col-md-12">
-        <label class="form-label">If we bring 3 great deals in the next month, can you purchase them all?</label>
-        <div class="d-flex gap-3">
-          <div class="form-check">
-            <input name="TripleDeals" class="form-check-input" type="radio" value="Yes" id="triple-yes" required aria-required="true" />
-            <label class="form-check-label" for="triple-yes">Yes</label>
-          </div>
-          <div class="form-check">
-            <input name="TripleDeals" class="form-check-input" type="radio" value="No" id="triple-no" />
-            <label class="form-check-label" for="triple-no">No</label>
-          </div>
-          <div class="form-check">
-            <input name="TripleDeals" class="form-check-input" type="radio" value="Maybe" id="triple-maybe" />
-            <label class="form-check-label" for="triple-maybe">Maybe</label>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="row g-3 mb-3">
-      <div class="col-md-12">
-        <label class="form-label">How quickly can you close on a great deal?</label>
-        <div class="d-flex gap-2 flex-wrap">
-          <div class="form-check"><input name="Quickly" class="form-check-input" type="radio" value="One Day" id="OneDay" required aria-required="true" /><label class="form-check-label" for="OneDay">One Day</label></div>
-          <div class="form-check"><input name="Quickly" class="form-check-input" type="radio" value="Within a Week" id="WithinWeek" /><label class="form-check-label" for="WithinWeek">Within a Week</label></div>
-          <div class="form-check"><input name="Quickly" class="form-check-input" type="radio" value="Within Two Weeks" id="WithinTwoWeeks" /><label class="form-check-label" for="WithinTwoWeeks">Within Two Weeks</label></div>
-          <div class="form-check"><input name="Quickly" class="form-check-input" type="radio" value="Within a Month" id="WithinMonth" /><label class="form-check-label" for="WithinMonth">Within a Month</label></div>
-          <div class="form-check"><input name="Quickly" class="form-check-input" type="radio" value="Over a Month" id="OverMonth" /><label class="form-check-label" for="OverMonth">Over a Month</label></div>
-          <div class="form-check"><input name="Quickly" class="form-check-input" type="radio" value="Other" id="OtherQuickly" /><label class="form-check-label" for="OtherQuickly">Other</label></div>
-        </div>
-        <div id="otherQuicklyInputContainer" class="mt-2" style="display:none;"></div>
-      </div>
-    </div>
-
-    <div class="d-flex justify-content-between">
-      <button type="button" class="btn btn-outline-secondary" onclick="navigateSection(3,2)">Previous</button>
-      <button type="button" class="btn btn-primary" onclick="navigateSection(3,4)">Next</button>
+    <div class="cb-actions mt-4">
+      <button type="button" class="btn btn-outline-light" onclick="navigateSection(4, 3)">Back</button>
+      <button type="button" class="btn btn-primary" onclick="navigateSection(4, 5)">Next</button>
     </div>
   </section>
-  <!-- Section 4: Investment Criteria -->
-  <section id="section-4" class="form-section hidden-section" aria-labelledby="section-4-title" data-step="4">
-    <h4 id="section-4-title" class="mb-3">Investment Criteria</h4>
-    <p class="text-muted small">Tell us the parameters we should use when filtering deals for you.</p>
 
-    <div class="row g-3 mb-3">
+  <!-- Step 5: Property Preferences -->
+  <section id="section-5" class="form-section hidden-section" aria-labelledby="section-5-title" data-step="5" aria-hidden="true">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <h4 id="section-5-title" class="mb-0 text-white">Property Preferences</h4>
+      <small class="text-white-50">Step 5 of 6</small>
+    </div>
+
+    <div class="row g-3 mb-4">
       <div class="col-md-6">
-        <label class="form-label">Price range</label>
-        <div class="form-text small text-muted">Select minimum and maximum price you want to buy within.</div>
-
-        <div class="mt-2">
-          <div class="d-flex gap-2 align-items-center mb-2">
-            <div class="input-group input-group-sm">
-              <span class="input-group-text">From $</span>
-              <input name="PriceRangesMin" type="number" id="PriceRangesMin" class="form-control form-control-sm" placeholder="100000" min="0" />
-            </div>
-            <div class="input-group input-group-sm ms-2">
-              <span class="input-group-text">To $</span>
-              <input name="PriceRangesMax" type="number" id="PriceRangesMax" class="form-control form-control-sm" placeholder="750000" min="0" />
-            </div>
-          </div>
-
-          <!-- Dual range sliders (two inputs overlapped) -->
-          <style>
-            /* Simple dual-range styling */
-            .dual-range { position: relative; height: 40px; }
-            .dual-range input[type=range] { -webkit-appearance: none; appearance: none; width:100%; height:6px; background: transparent; position:absolute; top:14px; margin:0; z-index:6; }
-            .dual-range input[type=range]::-webkit-slider-runnable-track { height:6px; background:transparent; }
-            .dual-range input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width:16px; height:16px; border-radius:50%; background:#fff; border:2px solid #0d6efd; box-shadow:0 0 2px rgba(0,0,0,0.4); margin-top:-5px; }
-            .dual-range input[type=range]::-moz-range-track { height:6px; background:transparent; }
-            .dual-range input[type=range]::-moz-range-thumb { width:16px; height:16px; border-radius:50%; background:#fff; border:2px solid #0d6efd; }
-            .dual-range .range-track { position:absolute; left:0; right:0; top:16px; height:6px; border-radius:4px; background:#e9ecef; pointer-events:none; }
-            .dual-range .range-highlight { position:absolute; top:16px; height:6px; border-radius:4px; background: linear-gradient(90deg,#0d6efd,#6610f2); pointer-events:none; }
-          </style>
-
-          <div class="dual-range">
-            <div class="range-track"></div>
-            <div class="range-highlight" id="priceRangeHighlight" style="left:10%;right:50%"></div>
-            <input type="range" id="priceRangeMinSlider" min="0" max="2000000" step="1000" value="100000" />
-            <input type="range" id="priceRangeMaxSlider" min="0" max="2000000" step="1000" value="750000" />
-          </div>
-
-          <div class="mt-2 small text-muted">Selected: <strong id="priceRangeSummary">$100,000 - $750,000</strong></div>
+        <div data-mdb-input-init class="form-outline">
+          <textarea name="PreferredAreas" id="PreferredAreas" class="text-dark form-control" rows="3" required placeholder="Cities, zip codes, neighborhoods"></textarea>
+          <label class="form-label" for="PreferredAreas">Preferred areas *</label>
+          <div class="invalid-feedback">Required.</div>
         </div>
       </div>
       <div class="col-md-6">
-        <label for="minimumProfit" class="form-label">Minimum profit / ROI</label>
-        <input name="MinimumProfit" type="text" id="minimumProfit" class="form-control form-control-sm" placeholder="e.g., 15% or $50,000" />
-      </div>
-    </div>
-
-    <div class="mb-3">
-      <label for="goodDealCriteria" class="form-label">What constitutes a good deal for you?</label>
-      <textarea name="GoodDealCriteria" id="goodDealCriteria" class="form-control form-control-sm" rows="3" placeholder="e.g., % of ARV, minimum cash profit"></textarea>
-    </div>
-
-    <div class="mb-3">
-      <label for="preferredAreas" class="form-label">Preferred areas</label>
-      <textarea name="PreferredAreas" id="preferredAreas" class="form-control form-control-sm" rows="2" placeholder="e.g., Zip codes, neighborhoods"></textarea>
-    </div>
-
-    <div class="mb-3">
-      <label for="avoidedAreas" class="form-label">Areas/types to avoid</label>
-      <textarea name="AvoidedAreas" id="avoidedAreas" class="form-control form-control-sm" rows="2" placeholder="Avoid Sinkhole"></textarea>
-    </div>
-
-    <div class="d-flex justify-content-between">
-      <button type="button" class="btn btn-outline-secondary" onclick="navigateSection(4,3)">Previous</button>
-      <button type="button" class="btn btn-primary" onclick="navigateSection(4,5)">Next</button>
-    </div>
-  </section>
-  <!-- Section 5: Property Type & Condition -->
-  <section id="section-5" class="form-section hidden-section" aria-labelledby="section-5-title" data-step="5">
-    <h4 id="section-5-title" class="mb-3">Property Type & Condition</h4>
-    <p class="text-muted small">Select property types and condition preferences.</p>
-
-    <div class="mb-3">
-      <label class="form-label">Property types</label>
-      <div class="d-flex gap-2 flex-wrap">
-        <div class="form-check"><input name="PropertyType" class="form-check-input" type="checkbox" value="Condos" id="Condos" /><label class="form-check-label" for="Condos">Condos</label></div>
-        <div class="form-check"><input name="PropertyType" class="form-check-input" type="checkbox" value="Land" id="Land" /><label class="form-check-label" for="Land">Land</label></div>
-        <div class="form-check"><input name="PropertyType" class="form-check-input" type="checkbox" value="Mobile Homes" id="MobileHomes" /><label class="form-check-label" for="MobileHomes">Mobile Homes</label></div>
-        <div class="form-check"><input name="PropertyType" class="form-check-input" type="checkbox" value="Multi-Family" id="MultiFamily" /><label class="form-check-label" for="MultiFamily">Multi-Family</label></div>
-        <div class="form-check"><input name="PropertyType" class="form-check-input" type="checkbox" value="Single-Family" id="SingleFamily" /><label class="form-check-label" for="SingleFamily">Single-Family</label></div>
-        <div class="form-check"><input name="PropertyTypeOther" class="form-check-input" type="checkbox" value="Other" id="PropertyOther" onclick="toggleOtherPropertyInput()" /><label class="form-check-label" for="PropertyOther">Other</label></div>
-      </div>
-      <div id="propertyOtherInputContainer" class="mt-2" style="display:none;"><input name="PropertyTypeOther" type="text" id="propertyOtherInput" class="form-control form-control-sm" placeholder="Please specify other property type" /></div>
-    </div>
-
-    <div class="mb-3">
-      <label class="form-label">Work type / Condition</label>
-      <div class="d-flex gap-2 flex-wrap">
-        <div class="form-check"><input name="WorkType" class="form-check-input" type="checkbox" value="Cosmetic Jobs" id="CosmeticJobs" /><label class="form-check-label" for="CosmeticJobs">Cosmetic Jobs</label></div>
-        <div class="form-check"><input name="WorkType" class="form-check-input" type="checkbox" value="Full Renovations" id="FullRenovations" /><label class="form-check-label" for="FullRenovations">Full Renovations</label></div>
-        <div class="form-check"><input name="WorkType" class="form-check-input" type="checkbox" value="Add Square Footage" id="AddSquareFootage" /><label class="form-check-label" for="AddSquareFootage">Add Square Footage</label></div>
-        <div class="form-check"><input name="WorkType" class="form-check-input" type="checkbox" value="New Development" id="NewDevelopment" /><label class="form-check-label" for="NewDevelopment">New Development</label></div>
-        <div class="form-check"><input name="WorkType" class="form-check-input" type="checkbox" value="Medium Rehab" id="MediumRehab" /><label class="form-check-label" for="MediumRehab">Medium Rehab</label></div>
-        <div class="form-check"><input name="WorkTypeOther" class="form-check-input" type="checkbox" value="Other" id="WorkTypeOther" onclick="toggleWorkTypeInput()" /><label class="form-check-label" for="WorkTypeOther">Other</label></div>
-      </div>
-      <div data-mdb-input-init class="mt-3 form-outline" id="workTypeOtherInputContainer" style="display: none;">
-        <input name="WorkTypeOther" type="text" id="workTypeOtherInput" class="text-dark form-control form-control-sm" placeholder="Please specify other work type:" />
-      </div>
-    </div>
-
-    <div class="row mb-4">
-      <div class="col">
         <div data-mdb-input-init class="form-outline">
-          <input name="MaxPropertyAge" type="number" id="maxPropertyAge" placeholder="e.g., 50 years" class="text-dark form-control form-control-sm" />
-          <label class="form-label" for="maxPropertyAge">Maximum Age of Properties You’ll Buy</label>
+          <textarea name="AvoidedAreas" id="AvoidedAreas" class="text-dark form-control" rows="3" required placeholder="Areas to avoid, HOA, flood zones, etc."></textarea>
+          <label class="form-label" for="AvoidedAreas">Areas to avoid *</label>
+          <div class="invalid-feedback">Required.</div>
         </div>
       </div>
     </div>
 
-    <div class="row mb-4">
-      <div class="col">
+    <div class="mb-4">
+      <div class="cb-field-title">Property type(s) *</div>
+      <div class="d-flex gap-3 flex-wrap cb-checks" data-required-group-container="PropertyType">
+        <div class="form-check"><input name="PropertyType" class="form-check-input" type="checkbox" value="Single Family" id="PropertyTypeSfh" data-required-group="PropertyType" /><label class="form-check-label" for="PropertyTypeSfh">Single family</label></div>
+        <div class="form-check"><input name="PropertyType" class="form-check-input" type="checkbox" value="Multi Family" id="PropertyTypeMulti" data-required-group="PropertyType" /><label class="form-check-label" for="PropertyTypeMulti">Multi family</label></div>
+        <div class="form-check"><input name="PropertyType" class="form-check-input" type="checkbox" value="Condo" id="PropertyTypeCondo" data-required-group="PropertyType" /><label class="form-check-label" for="PropertyTypeCondo">Condo</label></div>
+        <div class="form-check"><input name="PropertyType" class="form-check-input" type="checkbox" value="Townhome" id="PropertyTypeTownhome" data-required-group="PropertyType" /><label class="form-check-label" for="PropertyTypeTownhome">Townhome</label></div>
+        <div class="form-check"><input name="PropertyType" class="form-check-input" type="checkbox" value="Mobile Home" id="PropertyTypeMobile" data-required-group="PropertyType" /><label class="form-check-label" for="PropertyTypeMobile">Mobile home</label></div>
+        <div class="form-check"><input name="PropertyType" class="form-check-input" type="checkbox" value="Land" id="PropertyTypeLand" data-required-group="PropertyType" /><label class="form-check-label" for="PropertyTypeLand">Land</label></div>
+        <div class="form-check"><input name="PropertyType" class="form-check-input" type="checkbox" value="Commercial" id="PropertyTypeCommercial" data-required-group="PropertyType" /><label class="form-check-label" for="PropertyTypeCommercial">Commercial</label></div>
+        <div class="form-check"><input name="PropertyType" class="form-check-input" type="checkbox" value="Other" id="PropertyTypeOther" data-required-group="PropertyType" /><label class="form-check-label" for="PropertyTypeOther">Other</label></div>
+      </div>
+      <div class="invalid-feedback cb-group-feedback" data-required-group-feedback="PropertyType">Please select at least one property type.</div>
+      <div id="propertyOtherInputContainer" class="mt-3" style="display:none;">
         <div data-mdb-input-init class="form-outline">
-          <input name="Mins" type="text" id="Mins" placeholder="e.g. 2 bed, 2 bath min…prefer 3/2, 1200 sq Ft min" class="text-dark form-control form-control-sm" />
-          <label class="form-label" for="Mins"><small>Minimum bedrooms/bathrooms or square footage required?</small></label>
+          <input name="PropertyTypeOtherDetails" type="text" id="PropertyTypeOtherDetails" class="text-dark form-control" />
+          <label class="form-label" for="PropertyTypeOtherDetails">Other property type (optional)</label>
         </div>
       </div>
     </div>
 
-    <div class="row mb-4">
-      <div class="col">
+    <div class="mb-4">
+      <div class="cb-field-title">Work type / Condition *</div>
+      <div class="d-flex gap-3 flex-wrap cb-checks" data-required-group-container="WorkType">
+        <div class="form-check"><input name="WorkType" class="form-check-input" type="checkbox" value="Cosmetic Jobs" id="WorkTypeCosmetic" data-required-group="WorkType" /><label class="form-check-label" for="WorkTypeCosmetic">Cosmetic jobs</label></div>
+        <div class="form-check"><input name="WorkType" class="form-check-input" type="checkbox" value="Tear Down" id="WorkTypeTearDown" data-required-group="WorkType" /><label class="form-check-label" for="WorkTypeTearDown">Tear down</label></div>
+        <div class="form-check"><input name="WorkType" class="form-check-input" type="checkbox" value="Medium Rehab" id="WorkTypeMedium" data-required-group="WorkType" /><label class="form-check-label" for="WorkTypeMedium">Medium rehab</label></div>
+        <div class="form-check"><input name="WorkType" class="form-check-input" type="checkbox" value="Full Renovations" id="WorkTypeFullReno" data-required-group="WorkType" /><label class="form-check-label" for="WorkTypeFullReno">Full renovations</label></div>
+        <div class="form-check"><input name="WorkType" class="form-check-input" type="checkbox" value="Add Square Footage" id="WorkTypeAddSqft" data-required-group="WorkType" /><label class="form-check-label" for="WorkTypeAddSqft">Add square footage</label></div>
+        <div class="form-check"><input name="WorkType" class="form-check-input" type="checkbox" value="New Development" id="WorkTypeNewDev" data-required-group="WorkType" /><label class="form-check-label" for="WorkTypeNewDev">New development</label></div>
+        <div class="form-check"><input name="WorkType" class="form-check-input" type="checkbox" value="Other" id="WorkTypeOther" data-required-group="WorkType" /><label class="form-check-label" for="WorkTypeOther">Other</label></div>
+      </div>
+      <div class="invalid-feedback cb-group-feedback" data-required-group-feedback="WorkType">Please select at least one option.</div>
+      <div id="workTypeOtherInputContainer" class="mt-3" style="display:none;">
         <div data-mdb-input-init class="form-outline">
-          <textarea name="IdealProperty" id="idealProperty" placeholder="Help us envision your ideal investment property!" class="text-dark form-control form-control-sm" rows="3"></textarea>
-          <label class="form-label" for="idealProperty"><small>What does your ideal property look like?</small></label>
+          <input name="WorkTypeOtherDetails" type="text" id="WorkTypeOtherDetails" class="text-dark form-control" placeholder="Please specify" />
+          <label class="form-label" for="WorkTypeOtherDetails">Other (please specify)</label>
         </div>
       </div>
     </div>
 
-    <div class="row mb-4">
-      <div class="col">
-        <label class="form-label">Are you looking for properties to rehab and resell, or do you plan to buy and hold?</label>
-        <br>
-        <div class="form-check form-check-inline">
-          <input name="InvestmentStrategy" class="form-check-input" type="radio" value="Rehab and Resell" id="RehabAndResell" required aria-required="true" />
-          <label class="form-check-label" for="RehabAndResell">Rehab and Resell</label>
+    <div class="row g-3 mb-4">
+      <div class="col-md-6">
+        <div data-mdb-input-init class="form-outline">
+          <input name="MaxPropertyAge" type="number" id="MaxPropertyAge" class="text-dark form-control" required min="0" inputmode="numeric" />
+          <label class="form-label" for="MaxPropertyAge">Maximum property age (years) *</label>
+          <div class="invalid-feedback">Required (0 or more).</div>
         </div>
-        <div class="form-check form-check-inline">
-          <input name="InvestmentStrategy" class="form-check-input" type="radio" value="Buy and Hold" id="BuyAndHold" />
-          <label class="form-check-label" for="BuyAndHold">Buy and Hold</label>
+      </div>
+      <div class="col-md-6">
+        <div data-mdb-input-init class="form-outline">
+          <input name="Mins" type="text" id="Mins" class="text-dark form-control" placeholder="e.g., 3/2, 1200+ sqft" />
+          <label class="form-label" for="Mins">Minimum beds/baths or sqft (optional)</label>
+        </div>
+      </div>
+      <div class="col-12">
+        <div data-mdb-input-init class="form-outline">
+          <textarea name="IdealProperty" id="IdealProperty" class="text-dark form-control" rows="3" required placeholder="Describe your ideal deal: condition, layout, ARV, etc."></textarea>
+          <label class="form-label" for="IdealProperty">Ideal property details *</label>
+          <div class="invalid-feedback">Required.</div>
         </div>
       </div>
     </div>
 
-    <div class="text-center bg-transparent">
-      <button type="button" class="btn btn-secondary" onclick="navigateSection(5, 4)">Previous</button>
+    <div class="mb-4">
+      <div class="cb-field-title">Strategy *</div>
+      <div class="d-flex gap-4 flex-wrap">
+        <div class="form-check">
+          <input name="InvestmentStrategy" class="form-check-input" type="radio" value="Rehab and Resell" id="InvestmentStrategyFlip" required />
+          <label class="form-check-label" for="InvestmentStrategyFlip">Rehab and resell</label>
+        </div>
+        <div class="form-check">
+          <input name="InvestmentStrategy" class="form-check-input" type="radio" value="Buy and Hold" id="InvestmentStrategyHold" />
+          <label class="form-check-label" for="InvestmentStrategyHold">Buy and hold</label>
+        </div>
+      </div>
+      <div class="invalid-feedback">Required.</div>
+    </div>
+
+    <div class="cb-actions mt-4">
+      <button type="button" class="btn btn-outline-light" onclick="navigateSection(5, 4)">Back</button>
       <button type="button" class="btn btn-primary" onclick="navigateSection(5, 6)">Next</button>
     </div>
   </section>
-  <!-- Section 6: Additional Information -->
-  <section id="section-6" class="form-section hidden-section" aria-labelledby="section-6-title" data-step="6">
-    <h4 id="section-6-title">Additional Information</h4>
-    <br><br>
-    <div class="row mb-4">
-      <div class="col">
-  <label for="purchaseReadinessSlider" class="form-label">
-          On a scale of 1-10, how ready are you to make a purchase within the next 30 days?
-          <small>(1 = Just browsing, 10 = Ready to close today)</small>
-        </label>
-        <input type="range" id="purchaseReadinessSlider" name="PurchaseReadiness" min="1" max="10" value="1"
-          class="form-range" oninput="updateReadinessLabel(this.value)" />
-        <div class="mt-2">
-          <span id="purchaseReadinessLabel">Just browsing</span>
-        </div>
+
+  <!-- Step 6: Additional Information -->
+  <section id="section-6" class="form-section hidden-section" aria-labelledby="section-6-title" data-step="6" aria-hidden="true">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <h4 id="section-6-title" class="mb-0 text-white">Finish</h4>
+      <small class="text-white-50">Step 6 of 6</small>
+    </div>
+
+    <div class="mb-4">
+      <label for="purchaseReadinessSlider" class="form-label text-white">
+        Purchase readiness (optional)
+        <small class="text-white-50 d-block">1 = browsing, 10 = ready to close</small>
+      </label>
+      <input type="range" id="purchaseReadinessSlider" name="PurchaseReadiness" min="1" max="10" value="1" class="form-range" />
+      <div class="mt-2 text-white-50">
+        <span id="purchaseReadinessLabel">Just browsing</span>
       </div>
     </div>
-    <div class="row mb-4">
-      <div class="col">
-        <div data-mdb-input-init class="form-outline">
-          <textarea name="AdditionalComments" id="additionalComments"
-            placeholder="Provide any additional comments or questions here..."
-            class="text-dark form-control form-control-sm" rows="4"></textarea>
-          <label class="form-label" for="additionalComments">Additional Comments or Questions</label>
-        </div>
+
+    <div class="mb-4">
+      <div data-mdb-input-init class="form-outline">
+        <textarea name="AdditionalComments" id="AdditionalComments" class="text-dark form-control" rows="4"
+          placeholder="Anything else we should know? (optional)"></textarea>
+        <label class="form-label" for="AdditionalComments">Additional comments (optional)</label>
       </div>
     </div>
-    <div class="text-center bg-transparent">
-      <button type="button" class="btn btn-secondary" onclick="navigateSection(6, 5)">Previous</button>
-      <button type="button" class="btn btn-primary" onclick="submitForm('cash-buyer-form')">Submit</button>
+
+    <div class="cb-actions mt-4">
+      <button type="button" class="btn btn-outline-light" onclick="navigateSection(6, 5)">Back</button>
+      <button type="button" class="btn btn-success" onclick="submitForm('cash-buyer-form')">Submit</button>
     </div>
   </section>
 </form>
-
-  
-<script>
-(function(){
-  // Enhanced form validation and required field handling
-  const form = document.getElementById('cash-buyer-form');
-  if(!form) return;
-
-  // List of optional fields that should not be required
-  const optionalFields = ['CompanyName', 'Website', 'PropertyTypeOther', 'WorkTypeOther'];
-  
-  function addStarsAndSetRequired(){
-    const sections = form.querySelectorAll('.form-section');
-    sections.forEach(section => {
-      const inputs = section.querySelectorAll('input:not([type=button]):not([type=submit]):not([type=hidden]), textarea, select');
-      const handledNames = new Set();
-      
-      inputs.forEach(inp => {
-        const type = (inp.type || '').toLowerCase();
-        const name = inp.name || inp.id;
-        if(!name || handledNames.has(name)) return;
-        handledNames.add(name);
-        
-        // Skip optional fields from being required
-        if(optionalFields.includes(name)) return;
-        
-        // Find associated label
-        let label = section.querySelector(`label[for="${inp.id}"]`);
-        if(!label) {
-          label = inp.closest('div')?.querySelector('label') || 
-                 inp.parentElement?.querySelector('label');
-        }
-        
-        // Add star to required fields
-        if(label && !label.querySelector('.required-star')){
-          const star = document.createElement('span');
-          star.className = 'text-danger required-star';
-          star.textContent = ' *';
-          label.appendChild(star);
-        }
-        
-        // Set required attribute based on input type
-        if(type === 'radio') {
-          const group = section.querySelectorAll(`input[type="radio"][name="${name}"]`);
-          group.forEach(r => {
-            r.required = true;
-            r.setAttribute('aria-required', 'true');
-          });
-        } else if(type === 'checkbox') {
-          const group = section.querySelectorAll(`input[type="checkbox"][name="${name}"]`);
-          if(group.length > 1) {
-            group.forEach(c => c.dataset.groupRequired = 'true');
-          } else {
-            inp.required = true;
-          }
-          inp.setAttribute('aria-required', 'true');
-        } else if(type !== 'file') {
-          inp.required = true;
-          inp.setAttribute('aria-required', 'true');
-        }
-      });
-    });
-  }
-  
-  function validateSection(current){
-    const section = document.getElementById('section-'+current);
-    if(!section) return true;
-    
-    section.querySelectorAll('.is-invalid').forEach(e => 
-      e.classList.remove('is-invalid')
-    );
-    
-    let valid = true;
-    const inputs = section.querySelectorAll('input:not([type=button]):not([type=submit]):not([type=hidden]), textarea, select');
-    const namesChecked = new Set();
-    
-    inputs.forEach(inp => {
-      const name = inp.name || inp.id;
-      if(!name || namesChecked.has(name) || optionalFields.includes(name)) return;
-      namesChecked.add(name);
-      
-      const type = (inp.type || '').toLowerCase();
-      if(type === 'radio') {
-        const group = section.querySelectorAll(`input[type="radio"][name="${name}"]`);
-        const anyChecked = Array.from(group).some(r => r.checked);
-        if(!anyChecked && !optionalFields.includes(name)) {
-          valid = false;
-          group.forEach(r => r.classList.add('is-invalid'));
-        }
-      } else if(type === 'checkbox' && inp.dataset.groupRequired === 'true') {
-        const group = section.querySelectorAll(`input[type="checkbox"][name="${name}"]`);
-        const anyChecked = Array.from(group).some(c => c.checked);
-        if(!anyChecked) {
-          valid = false;
-          group.forEach(c => c.classList.add('is-invalid'));
-        }
-      } else if(!optionalFields.includes(name)) {
-        const el = section.querySelector(`[name="${name}"]`) || 
-                  section.querySelector('#'+name);
-        if(el && !el.checkValidity()) {
-          valid = false;
-          el.classList.add('is-invalid');
-        }
-      }
-    });
-    return valid;
-  }
-  
-  window.navigateSection = function(current,target){
-    if(!validateSection(current)){
-      const section = document.getElementById('section-'+current);
-      const firstInvalid = section && section.querySelector('.is-invalid');
-      if(firstInvalid) firstInvalid.focus();
-      
-      if(section && !section.querySelector('.section-alert')){
-        const alert = document.createElement('div');
-        alert.className = 'alert alert-danger mt-2 section-alert';
-        alert.role = 'alert';
-        alert.innerText = 'Please fill in all required fields marked with *';
-        const btnArea = section.querySelector('.d-flex') || section.lastChild;
-        section.insertBefore(alert, btnArea);
-      }
-      return;
-    }
-    
-    const cur = document.getElementById('section-'+current);
-    const tgt = document.getElementById('section-'+target);
-    if(cur) cur.classList.add('hidden-section');
-    if(tgt) tgt.classList.remove('hidden-section');
-    
-    const totalSteps = document.querySelectorAll('.form-section').length;
-    const progress = Math.round((target-1)/(totalSteps-1)*100);
-    const bar = document.getElementById('form-progress');
-    if(bar) {
-      bar.style.width = progress+'%';
-      bar.setAttribute('aria-valuenow', progress);
-    }
-    
-    // Remove any existing alert when moving to new section
-    if(tgt) {
-      const ta = tgt.querySelector('.section-alert');
-      if(ta) ta.remove();
-    }
-  }
-
-  // Preserve existing helper functions
-  window.toggleOtherInput = function(){
-    const c = document.getElementById('OtherFinancing');
-    const cont = document.getElementById('otherInputContainer');
-    if(c && cont) cont.style.display = c.checked ? 'block' : 'none';
-  }
-  
-  window.toggleProofUpload = function(show){
-    const c = document.getElementById('proofUploadContainer');
-    if(c) c.style.display = show ? 'block' : 'none';
-  }
-  
-  window.toggleOtherPropertyInput = function(){
-    const c = document.getElementById('PropertyOther');
-    const cont = document.getElementById('propertyOtherInputContainer');
-    if(c && cont) cont.style.display = c.checked ? 'block' : 'none';
-  }
-  
-  window.toggleWorkTypeInput = function(){
-    const c = document.getElementById('WorkTypeOther');
-    const cont = document.getElementById('workTypeOtherInputContainer');
-    if(c && cont) cont.style.display = c.checked ? 'block' : 'none';
-  }
-  
-  window.updateReadinessLabel = function(val){
-    const el = document.getElementById('purchaseReadinessLabel');
-    if(!el) return;
-    if(val==1) el.textContent = 'Just browsing';
-    else if(val==10) el.textContent = 'Ready to close today';
-    else el.textContent = ''+val;
-  }
-
-  // Initialize on page load
-  document.addEventListener('DOMContentLoaded', function(){
-    addStarsAndSetRequired();
-  });
-})();
-</script>

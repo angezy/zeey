@@ -22,7 +22,14 @@ const validateAndSanitize = [
   body('PropertiesPerYear').isInt({ min: 0 }).withMessage('Properties per year is required and must be a non-negative number.'),
 
   // Financial Details
-  body('SourceFinancing').isIn(['Cash on Hand', 'Hard Money','Private Money' ,'Traditional' ,'JV Partner' ,'Seller Financing' ,'Subject To' , 'Other']).withMessage('Valid financing source is required.'),
+  body('SourceFinancing')
+    .toArray()
+    .custom((vals) => {
+      const allowed = ['Cash on Hand', 'Hard Money', 'Private Money', 'Traditional', 'JV Partner', 'Seller Financing', 'Subject To', 'Other'];
+      if (!Array.isArray(vals) || vals.length === 0) return false;
+      return vals.every(v => allowed.includes(v));
+    })
+    .withMessage('Valid financing source is required.'),
   body('FundingInPlace').isIn(['Yes', 'No']).withMessage('Funding in place status is required.'),
   body('ProofOfFunds').isIn(['Yes', 'No']).withMessage('Proof of funds status is required.'),
   body('ProofOfFundsFile').optional().trim().escape(),
