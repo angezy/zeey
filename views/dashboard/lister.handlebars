@@ -117,6 +117,7 @@
           <div class="modal-body">
             <form id="editListingForm" novalidate>
               <input type="hidden" id="editListingId">
+              <input type="hidden" id="editPhotoFile">
               <div class="row g-3">
                 <div class="col-md-6">
                   <label class="form-label">Title</label>
@@ -346,6 +347,7 @@
         const editModal = editModalEl ? new bootstrap.Modal(editModalEl) : null;
         const editFields = {
           id: document.getElementById('editListingId'),
+          photoFile: document.getElementById('editPhotoFile'),
           title: document.getElementById('editTitle'),
           price: document.getElementById('editAskingPrice'),
           arv: document.getElementById('editARV'),
@@ -375,24 +377,30 @@
           description: document.getElementById('editDescription')
         };
 
-        function renderCurrentPhotos(item){
+        const editPhotoState = { files: [] };
+
+        function setEditPhotosFromItem(item){
+          editPhotoState.files = parsePhotoList(item?.PhotoFile).map(s => s.trim()).filter(Boolean);
+          if(editFields.photoFile) editFields.photoFile.value = editPhotoState.files.join(',');
+        }
+
+        function renderCurrentPhotos(){
           if(!editFields.currentPhotos) return;
           const container = editFields.currentPhotos;
           container.innerHTML = '';
-          const photos = parsePhotoList(item.PhotoFile);
-          const fallbackUrl = (item.PhotoURL || '').trim();
-          const list = photos.length ? photos : (fallbackUrl ? [fallbackUrl] : []);
+          const fallbackUrl = (editFields.photoUrl?.value || '').trim();
+          const list = editPhotoState.files.length ? editPhotoState.files.slice() : (fallbackUrl ? [fallbackUrl] : []);
           if(!list.length){
             container.innerHTML = '<span class="text-muted small">No photos uploaded yet.</span>';
             return;
           }
-          const maxThumbs = 8;
           const frag = document.createDocumentFragment();
-          list.slice(0, maxThumbs).forEach(function(raw, idx){
+          list.forEach(function(raw, idx){
             const src = normalizePhotoPath(raw);
             if(!src) return;
             const wrapper = document.createElement('div');
-            wrapper.className = 'd-flex flex-column align-items-center';
+            wrapper.className = 'position-relative d-flex flex-column align-items-center';
+            wrapper.style.width = '78px';
             const img = document.createElement('img');
             img.src = src;
             img.style.width = '74px';
@@ -400,19 +408,36 @@
             img.style.objectFit = 'cover';
             img.className = 'rounded border shadow-sm';
             wrapper.appendChild(img);
+
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'btn btn-sm btn-danger';
+            removeBtn.textContent = '×';
+            removeBtn.setAttribute('aria-label', 'Remove photo');
+            removeBtn.style.position = 'absolute';
+            removeBtn.style.top = '2px';
+            removeBtn.style.right = '2px';
+            removeBtn.style.padding = '0 6px';
+            removeBtn.style.lineHeight = '1.2';
+            removeBtn.addEventListener('click', function(){
+              if(editPhotoState.files.length){
+                editPhotoState.files.splice(idx, 1);
+                if(editFields.photoFile) editFields.photoFile.value = editPhotoState.files.join(',');
+                renderCurrentPhotos();
+              } else {
+                if(editFields.photoUrl) editFields.photoUrl.value = '';
+                renderCurrentPhotos();
+              }
+            });
+            wrapper.appendChild(removeBtn);
+
             const caption = document.createElement('div');
             caption.className = 'small text-muted mt-1';
-            caption.textContent = `Photo ${idx + 1}`;
+            caption.textContent = editPhotoState.files.length ? `Photo ${idx + 1}` : 'URL';
             wrapper.appendChild(caption);
             frag.appendChild(wrapper);
           });
           container.appendChild(frag);
-          if(list.length > maxThumbs){
-            const more = document.createElement('div');
-            more.className = 'small text-muted align-self-center';
-            more.textContent = `+${list.length - maxThumbs} more saved photo${(list.length - maxThumbs) > 1 ? 's' : ''}`;
-            container.appendChild(more);
-          }
         }
 
         document.querySelectorAll('.edit-listing').forEach(btn => {
@@ -450,7 +475,8 @@
           editFields.photoUrl.value = decodeHtmlEntities(item.PhotoURL || '');
           editFields.available.checked = !!item.Available;
           if(editFields.description) editFields.description.value = decodeHtmlEntities(item.Description || '');
-          renderCurrentPhotos(item);
+          setEditPhotosFromItem(item);
+          renderCurrentPhotos();
           if(editFields.photoPreview){
             editFields.photoPreview.innerHTML = '<span class="text-muted small">No new files selected yet.</span>';
           }
@@ -519,6 +545,7 @@
           if (editFields.comps2) formData.append('Comps2', editFields.comps2.value.trim());
           if (editFields.comps3) formData.append('Comps3', editFields.comps3.value.trim());
           formData.append('PhotoURL', editFields.photoUrl.value.trim());
+          if (editFields.photoFile) formData.append('PhotoFile', editFields.photoFile.value);
           formData.append('Available', editFields.available.checked ? 1 : 0);
           if (editFields.description) {
             formData.append('Description', editFields.description.value.trim());
@@ -539,7 +566,8 @@
               const item = listings.find(x => String(x.listingId) === String(id));
               if(item){
                 Object.assign(item, data.listing || {});
-                renderCurrentPhotos(item);
+                setEditPhotosFromItem(item);
+                renderCurrentPhotos();
               }
               const card = document.querySelector(`.listing-card[data-id="${id}"]`);
               if(card){
