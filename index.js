@@ -169,6 +169,10 @@ Handlebars.registerHelper('sanitize', function (value) {
       if (match === '/') return match;
       return '/';
     });
+    // Normalize newlines (and common escaped variants) to spaces
+    s = s.replace(/(?:\r\n|\r|\n|\\n|\/n)/g, ' ');
+    // Collapse extra whitespace so UI doesn't render odd gaps
+    s = s.replace(/\s+/g, ' ').trim();
     return s;
   } catch(e) { return String(value); }
 });
