@@ -7,6 +7,7 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 const multer = require('multer');
+const { getClientIp } = require('../utils/clientIp');
 const router = express.Router();
 require('dotenv').config();
 const dbConfig = require('../config/db');
@@ -52,7 +53,7 @@ router.get('/cbForm/restore', (req, res) => {
 router.post('/cbForm', upload.single('ProofOfFundsFile'), validateAndSanitize, async (req, res) => {
     const formData = req.body;
     const referrer = req.get('Referer');
-    const userIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    const userIP = getClientIp(req);
 
     // Validate the incoming data
     const errors = validationResult(req);

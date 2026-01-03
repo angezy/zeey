@@ -3,6 +3,7 @@ const sql = require('mssql');
 const { body, validationResult } = require('express-validator');
 const validator = require('validator');
 const router = express.Router();
+const { getClientIp } = require('../utils/clientIp');
 require('dotenv').config();
 const dbConfig = require('../config/db');
 
@@ -21,7 +22,7 @@ router.post(
     async (req, res) => {
       const formData = req.body;
       const referrer = req.get('Referer');
-      const userIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+      const userIP = getClientIp(req);
       try {
         // Check for validation errors
         const errors = validationResult(req);

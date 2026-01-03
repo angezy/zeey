@@ -5,6 +5,7 @@ const validator = require('validator');
 const router = express.Router();
 const axios = require('axios'); // Add axios for making HTTP requests
 const upload = require('../utils/fileUpload');
+const { getClientIp } = require('../utils/clientIp');
 require('dotenv').config();
 const dbConfig = require('../config/db');
 
@@ -12,7 +13,7 @@ const dbConfig = require('../config/db');
 router.post('/fastSell', upload.array('propertyImages', 10), async (req, res) => {
     const formData = req.body;
     const referrer = req.get('Referer');
-    const userIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    const userIP = getClientIp(req);
     console.log("formData", formData);
 
     // Validate the incoming data
@@ -172,8 +173,7 @@ router.post(
     const formData = req.body;
     console.log("🧾 Raw formData:", formData);
 
-    const userIP =
-      req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+    const userIP = getClientIp(req);
     const referrer = req.get("Referer") || "";
     console.log("🌐 User IP:", userIP);
     console.log("📄 Referrer:", referrer);

@@ -9,6 +9,7 @@ const fs = require('fs');
 const router = express.Router();
 require('dotenv').config();
 const dbConfig = require('../config/db');
+const { getClientIp } = require('../utils/clientIp');
 
 // Configure multer for multiple file uploads
 const uploadDir = path.join(__dirname, '..', 'public', 'images', 'uploads');
@@ -94,7 +95,7 @@ router.post('/listing', handleListingUpload, async (req, res) => {
     const requestId = req.requestId || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
     const formData = (req.session && req.session.formData) || req.body;
     const referrer = req.get('Referer') || '/';
-    const userIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    const userIP = getClientIp(req);
     
     // Handle multiple files
     const imageFiles = req.files ? req.files.map(file => `public/images/uploads/${file.filename}`).join(',') : null;

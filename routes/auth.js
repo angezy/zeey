@@ -5,11 +5,12 @@ const jwt = require('jsonwebtoken');
 const findUserByEmail = require('../models/User');
 const sql = require('mssql');
 const dbConfig = require('../config/db');
+const { getClientIp } = require('../utils/clientIp');
 require('dotenv').config();
 
 router.post('/signin', async (req, res) => {
     const { Email, Password, rememberMe } = req.body;
-    const userIP = req.ip; // Retrieve the user's IP address
+    const userIP = getClientIp(req); // Retrieve the user's IP address
     const currentDateTime = new Date(); // Current datetime for lastLogin
 
     try {

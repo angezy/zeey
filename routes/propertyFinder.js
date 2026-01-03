@@ -6,6 +6,7 @@ const router = express.Router();
 require('dotenv').config();
 const dbConfig = require('../config/db');
 const { sendEmail } = require('../models/mailer');
+const { getClientIp } = require('../utils/clientIp');
 
 const normalizeCheckbox = (value) => {
     if (typeof value === 'boolean') return value;
@@ -43,7 +44,7 @@ router.post(
         }
 
         const payload = req.body || {};
-        const userIP = req.headers['x-forwarded-for'] || req.connection?.remoteAddress || '';
+        const userIP = getClientIp(req);
 
         const sanitizedData = {
             fullName: validator.trim(payload.fullName || ''),
@@ -172,7 +173,7 @@ router.post(
         }
 
         const payload = req.body || {};
-        const userIP = req.headers['x-forwarded-for'] || req.connection?.remoteAddress || '';
+        const userIP = getClientIp(req);
         const agreementDate = parseDateInput(payload.agreementDate);
         const submitDate = new Date();
 

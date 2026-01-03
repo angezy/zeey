@@ -1,0 +1,188 @@
+</head>
+
+<body class="g-sidenav-show bg-gray-100">
+  <div class="min-height-300 bg-primary position-absolute w-100"></div>
+  {{> __dsidenav}}
+  <main class="main-content position-relative border-radius-lg">
+    {{> __dashnavbar}}
+
+    <div class="container-fluid py-4">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <h5 class="text-white mb-0">Edit Cash Buyer</h5>
+          <small class="text-light opacity-75">Buyer ID: {{buyer.buyerID}}</small>
+        </div>
+        <a href="/dashboard/cashBuyers" class="btn btn-sm btn-light">Back to list</a>
+      </div>
+
+      <div class="card mt-4">
+        <div class="card-body">
+          <form method="POST" action="/dashboard/cashBuyers/{{buyer.buyerID}}/edit">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Full Name</label>
+                <input class="form-control" name="FullName" value="{{buyer.FullName}}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Company Name</label>
+                <input class="form-control" name="CompanyName" value="{{buyer.CompanyName}}">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Email</label>
+                <input class="form-control" type="email" name="Email" value="{{buyer.Email}}">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Cell Phone</label>
+                <input class="form-control" name="CellPhone" value="{{buyer.CellPhone}}">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Website</label>
+                <input class="form-control" name="Website" value="{{buyer.Website}}">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">City / State</label>
+                <input class="form-control" name="Address" value="{{buyer.Address}}">
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">Years In Business</label>
+                <input class="form-control" type="number" min="0" name="YearsInBusiness" value="{{buyer.YearsInBusiness}}">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Completed Projects</label>
+                <input class="form-control" type="number" min="0" name="CompletedProjects" value="{{buyer.CompletedProjects}}">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Properties (Next 6 Months)</label>
+                <input class="form-control" type="number" min="0" name="PropertiesNext6Months" value="{{buyer.PropertiesNext6Months}}">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Properties Per Year</label>
+                <input class="form-control" type="number" min="0" name="PropertiesPerYear" value="{{buyer.PropertiesPerYear}}">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Funding In Place</label>
+                <select class="form-select" name="FundingInPlace">
+                  <option value="">—</option>
+                  <option value="Yes" {{#if (eq buyer.FundingInPlace "Yes")}}selected{{/if}}>Yes</option>
+                  <option value="No" {{#if (eq buyer.FundingInPlace "No")}}selected{{/if}}>No</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Proof Of Funds</label>
+                <select class="form-select" name="ProofOfFunds">
+                  <option value="">—</option>
+                  <option value="Yes" {{#if (eq buyer.ProofOfFunds "Yes")}}selected{{/if}}>Yes</option>
+                  <option value="No" {{#if (eq buyer.ProofOfFunds "No")}}selected{{/if}}>No</option>
+                </select>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Can Buy 3 Deals Next Month?</label>
+                <select class="form-select" name="TripleDeals">
+                  <option value="">—</option>
+                  <option value="Yes" {{#if (eq buyer.TripleDeals "Yes")}}selected{{/if}}>Yes</option>
+                  <option value="No" {{#if (eq buyer.TripleDeals "No")}}selected{{/if}}>No</option>
+                  <option value="Maybe" {{#if (eq buyer.TripleDeals "Maybe")}}selected{{/if}}>Maybe</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">How Quickly Can Close</label>
+                <select class="form-select" name="Quickly">
+                  <option value="">—</option>
+                  <option value="One Day" {{#if (eq buyer.Quickly "One Day")}}selected{{/if}}>One Day</option>
+                  <option value="Within a Week" {{#if (eq buyer.Quickly "Within a Week")}}selected{{/if}}>Within a Week</option>
+                  <option value="Within Two Weeks" {{#if (eq buyer.Quickly "Within Two Weeks")}}selected{{/if}}>Within Two Weeks</option>
+                  <option value="Within a Month" {{#if (eq buyer.Quickly "Within a Month")}}selected{{/if}}>Within a Month</option>
+                  <option value="Over a Month" {{#if (eq buyer.Quickly "Over a Month")}}selected{{/if}}>Over a Month</option>
+                  <option value="Other Timeline" {{#if (eq buyer.Quickly "Other Timeline")}}selected{{/if}}>Other Timeline</option>
+                </select>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Price Ranges</label>
+                <input class="form-control" name="PriceRanges" value="{{buyer.PriceRanges}}" placeholder="e.g., 100000 - 250000">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Minimum Profit</label>
+                <input class="form-control" name="MinimumProfit" value="{{buyer.MinimumProfit}}">
+              </div>
+
+              <div class="col-12">
+                <label class="form-label">Good Deal Criteria</label>
+                <input class="form-control" name="GoodDealCriteria" value="{{buyer.GoodDealCriteria}}">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Preferred Areas</label>
+                <input class="form-control" name="PreferredAreas" value="{{buyer.PreferredAreas}}">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Avoided Areas</label>
+                <input class="form-control" name="AvoidedAreas" value="{{buyer.AvoidedAreas}}">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Property Type</label>
+                <input class="form-control" name="PropertyType" value="{{buyer.PropertyType}}">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Work Type</label>
+                <input class="form-control" name="WorkType" value="{{buyer.WorkType}}">
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">Max Property Age</label>
+                <input class="form-control" type="number" min="0" name="MaxPropertyAge" value="{{buyer.MaxPropertyAge}}">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Minutes From Location</label>
+                <input class="form-control" name="Mins" value="{{buyer.Mins}}">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Purchase Readiness (0+)</label>
+                <input class="form-control" type="number" min="0" name="PurchaseReadiness" value="{{buyer.PurchaseReadiness}}">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Ideal Property</label>
+                <input class="form-control" name="IdealProperty" value="{{buyer.IdealProperty}}">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Investment Strategy</label>
+                <input class="form-control" name="InvestmentStrategy" value="{{buyer.InvestmentStrategy}}">
+              </div>
+
+              <div class="col-12">
+                <label class="form-label">Source Financing</label>
+                <input class="form-control" name="SourceFinancing" value="{{buyer.SourceFinancing}}" placeholder="Comma-separated">
+              </div>
+
+              <div class="col-12">
+                <label class="form-label">Additional Comments</label>
+                <textarea class="form-control" name="AdditionalComments" rows="4">{{buyer.AdditionalComments}}</textarea>
+              </div>
+            </div>
+
+            <div class="d-flex gap-2 mt-4">
+              <button type="submit" class="btn btn-primary">Save Changes</button>
+              <a href="/dashboard/cashBuyers" class="btn btn-light">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        const success = "{{success}}";
+        const msg = "{{message}}";
+        if (success && success !== "false") {
+          try { Swal.fire({ icon: 'success', title: 'Saved', text: msg || 'Cash buyer updated.' }); } catch (e) {}
+        }
+      })();
+    </script>
+

@@ -19,10 +19,14 @@ const sql = require('mssql');
 const dbConfig = require("./config/db");
 const Handlebars = require('handlebars');
 const session = require('express-session');
+const validator = require('validator');
+const { normalizeIp } = require('./utils/clientIp');
 const { ensureListingsArvColumn } = require('./utils/dbMigrations');
 
 const app = express();
 const port = process.env.PORT;
+// Respect X-Forwarded-For / X-Real-IP when behind a proxy (e.g., Nginx/Cloudflare)
+app.set('trust proxy', true);
 
 // Lightweight DB migrations (best-effort, non-fatal)
 (async () => {
@@ -175,6 +179,9 @@ Handlebars.registerHelper('sanitize', function (value) {
     s = s.replace(/\s+/g, ' ').trim();
     return s;
   } catch(e) { return String(value); }
+});
+Handlebars.registerHelper('cleanIp', function (value) {
+  return normalizeIp(value) || '';
 });
 Handlebars.registerHelper('split', function (value, delimiter) {
   if(value === null || value === undefined) return [];
@@ -503,6 +510,157 @@ app.get('/dashboard/cashBuyers', authMiddleware, async (req, res) => {
   } finally {
     sql.close();
 }
+});
+
+app.get('/dashboard/cashBuyers/:buyerID/edit', authMiddleware, async (req, res) => {
+  const buyerID = Number.parseInt(req.params.buyerID, 10);
+  if (!Number.isFinite(buyerID)) return res.status(400).send('Invalid buyerID');
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    const result = await pool.request()
+      .input('buyerID', sql.Int, buyerID)
+      .query('SELECT TOP 1 * FROM dbo.cashbuyers_tbl WHERE buyerID = @buyerID');
+
+    const buyer = (result.recordset || [])[0];
+    if (!buyer) return res.status(404).send('Cash buyer not found');
+
+    res.render('cashBuyerEdit', {
+      title: 'Edit Cash Buyer',
+      layout: '__dashboard',
+      buyer,
+      success: req.query.success,
+      message: req.query.message
+    });
+  } catch (err) {
+    console.error('Error loading Cash Buyer edit page:', err);
+    res.status(500).send('Error loading Cash Buyer edit page');
+  } finally {
+    sql.close();
+  }
+});
+
+app.post('/dashboard/cashBuyers/:buyerID/edit', authMiddleware, async (req, res) => {
+  const buyerID = Number.parseInt(req.params.buyerID, 10);
+  if (!Number.isFinite(buyerID)) return res.status(400).send('Invalid buyerID');
+
+  const formData = req.body || {};
+  const sanitized = {
+    FullName: validator.escape(formData.FullName || ''),
+    CompanyName: validator.escape(formData.CompanyName || ''),
+    Website: validator.isURL(formData.Website || '', { require_protocol: false }) ? String(formData.Website) : '',
+    CellPhone: validator.escape(formData.CellPhone || ''),
+    Email: validator.normalizeEmail(formData.Email || '') || '',
+    Address: validator.escape(formData.Address || ''),
+    YearsInBusiness: validator.isInt(String(formData.YearsInBusiness || ''), { min: 0 }) ? Number.parseInt(formData.YearsInBusiness, 10) : null,
+    CompletedProjects: validator.isInt(String(formData.CompletedProjects || ''), { min: 0 }) ? Number.parseInt(formData.CompletedProjects, 10) : null,
+    CurrentProjects: validator.escape(formData.CurrentProjects || ''),
+    PropertiesNext6Months: validator.isInt(String(formData.PropertiesNext6Months || ''), { min: 0 }) ? Number.parseInt(formData.PropertiesNext6Months, 10) : null,
+    PropertiesPerYear: validator.isInt(String(formData.PropertiesPerYear || ''), { min: 0 }) ? Number.parseInt(formData.PropertiesPerYear, 10) : null,
+    SourceFinancing: validator.escape(formData.SourceFinancing || ''),
+    FundingInPlace: validator.escape(formData.FundingInPlace || ''),
+    ProofOfFunds: validator.escape(formData.ProofOfFunds || ''),
+    TripleDeals: validator.escape(formData.TripleDeals || ''),
+    Quickly: validator.escape(formData.Quickly || ''),
+    PriceRanges: validator.escape(formData.PriceRanges || ''),
+    MinimumProfit: validator.escape(formData.MinimumProfit || ''),
+    GoodDealCriteria: validator.escape(formData.GoodDealCriteria || ''),
+    PreferredAreas: validator.escape(formData.PreferredAreas || ''),
+    AvoidedAreas: validator.escape(formData.AvoidedAreas || ''),
+    PropertyType: validator.escape(formData.PropertyType || ''),
+    WorkType: validator.escape(formData.WorkType || ''),
+    MaxPropertyAge: validator.isInt(String(formData.MaxPropertyAge || ''), { min: 0 }) ? Number.parseInt(formData.MaxPropertyAge, 10) : null,
+    Mins: validator.escape(formData.Mins || ''),
+    IdealProperty: validator.escape(formData.IdealProperty || ''),
+    InvestmentStrategy: validator.escape(formData.InvestmentStrategy || ''),
+    PurchaseReadiness: validator.isInt(String(formData.PurchaseReadiness || ''), { min: 0 }) ? Number.parseInt(formData.PurchaseReadiness, 10) : null,
+    AdditionalComments: validator.escape(formData.AdditionalComments || '')
+  };
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    const request = pool.request().input('buyerID', sql.Int, buyerID);
+
+    const addInput = (name, type, value) => {
+      request.input(name, type, value === undefined ? null : value);
+    };
+
+    // strings
+    addInput('FullName', sql.NVarChar, sanitized.FullName);
+    addInput('CompanyName', sql.NVarChar, sanitized.CompanyName);
+    addInput('Website', sql.NVarChar, sanitized.Website);
+    addInput('CellPhone', sql.NVarChar, sanitized.CellPhone);
+    addInput('Email', sql.NVarChar, sanitized.Email);
+    addInput('Address', sql.NVarChar, sanitized.Address);
+    addInput('CurrentProjects', sql.NVarChar, sanitized.CurrentProjects);
+    addInput('SourceFinancing', sql.NVarChar, sanitized.SourceFinancing);
+    addInput('FundingInPlace', sql.NVarChar, sanitized.FundingInPlace);
+    addInput('ProofOfFunds', sql.NVarChar, sanitized.ProofOfFunds);
+    addInput('TripleDeals', sql.NVarChar, sanitized.TripleDeals);
+    addInput('Quickly', sql.NVarChar, sanitized.Quickly);
+    addInput('PriceRanges', sql.NVarChar, sanitized.PriceRanges);
+    addInput('MinimumProfit', sql.NVarChar, sanitized.MinimumProfit);
+    addInput('GoodDealCriteria', sql.NVarChar, sanitized.GoodDealCriteria);
+    addInput('PreferredAreas', sql.NVarChar, sanitized.PreferredAreas);
+    addInput('AvoidedAreas', sql.NVarChar, sanitized.AvoidedAreas);
+    addInput('PropertyType', sql.NVarChar, sanitized.PropertyType);
+    addInput('WorkType', sql.NVarChar, sanitized.WorkType);
+    addInput('Mins', sql.NVarChar, sanitized.Mins);
+    addInput('IdealProperty', sql.NVarChar, sanitized.IdealProperty);
+    addInput('InvestmentStrategy', sql.NVarChar, sanitized.InvestmentStrategy);
+    addInput('AdditionalComments', sql.NVarChar, sanitized.AdditionalComments);
+
+    // ints
+    addInput('YearsInBusiness', sql.Int, sanitized.YearsInBusiness);
+    addInput('CompletedProjects', sql.Int, sanitized.CompletedProjects);
+    addInput('PropertiesNext6Months', sql.Int, sanitized.PropertiesNext6Months);
+    addInput('PropertiesPerYear', sql.Int, sanitized.PropertiesPerYear);
+    addInput('MaxPropertyAge', sql.Int, sanitized.MaxPropertyAge);
+    addInput('PurchaseReadiness', sql.Int, sanitized.PurchaseReadiness);
+
+    const updateQuery = `
+      UPDATE dbo.cashbuyers_tbl SET
+        FullName = @FullName,
+        CompanyName = @CompanyName,
+        Website = @Website,
+        CellPhone = @CellPhone,
+        Email = @Email,
+        Address = @Address,
+        YearsInBusiness = @YearsInBusiness,
+        CompletedProjects = @CompletedProjects,
+        CurrentProjects = @CurrentProjects,
+        PropertiesNext6Months = @PropertiesNext6Months,
+        PropertiesPerYear = @PropertiesPerYear,
+        SourceFinancing = @SourceFinancing,
+        FundingInPlace = @FundingInPlace,
+        ProofOfFunds = @ProofOfFunds,
+        TripleDeals = @TripleDeals,
+        Quickly = @Quickly,
+        PriceRanges = @PriceRanges,
+        MinimumProfit = @MinimumProfit,
+        GoodDealCriteria = @GoodDealCriteria,
+        PreferredAreas = @PreferredAreas,
+        AvoidedAreas = @AvoidedAreas,
+        PropertyType = @PropertyType,
+        WorkType = @WorkType,
+        MaxPropertyAge = @MaxPropertyAge,
+        Mins = @Mins,
+        IdealProperty = @IdealProperty,
+        InvestmentStrategy = @InvestmentStrategy,
+        PurchaseReadiness = @PurchaseReadiness,
+        AdditionalComments = @AdditionalComments
+      WHERE buyerID = @buyerID
+    `;
+
+    await request.query(updateQuery);
+    const msg = encodeURIComponent('Cash buyer updated.');
+    return res.redirect(`/dashboard/cashBuyers/${buyerID}/edit?success=true&message=${msg}`);
+  } catch (err) {
+    console.error('Error updating Cash Buyer:', err);
+    return res.status(500).send('Error updating Cash Buyer');
+  } finally {
+    try { sql.close(); } catch (e) {}
+  }
 });
 app.get('/dashboard/fastSeller', authMiddleware, async (req, res) => {
   try {

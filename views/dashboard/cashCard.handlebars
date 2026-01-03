@@ -81,7 +81,13 @@
                                 <span class="meta-icon text-muted"><i class="fa-solid fa-network-wired"></i></span>
                                 <div>
                                     <div class="meta-label">IP Address</div>
-                                    <div class="meta-value"><a href="https://ipinfo.io/{{this.CashBuyerIP}}" target="_blank">{{this.CashBuyerIP}}</a></div>
+                                    <div class="meta-value">
+                                        {{#if (cleanIp this.CashBuyerIP)}}
+                                        <a href="https://ipinfo.io/{{cleanIp this.CashBuyerIP}}" target="_blank">{{cleanIp this.CashBuyerIP}}</a>
+                                        {{else}}
+                                        —
+                                        {{/if}}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -115,7 +121,12 @@
                                                     <p class="modal-kicker mb-1">Buyer profile</p>
                                                     <h5 class="modal-title" id="buyerDetailModalLabel">Details</h5>
                                                 </div>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <a id="buyerEditLink" href="#" class="btn btn-sm btn-light d-none">
+                                                        <i class="fa-solid fa-pen-to-square me-1"></i> Edit
+                                                    </a>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
                                             </div>
                                             <div class="modal-body" id="buyerDetailBody"></div>
                                             <div class="modal-footer border-0 pt-0">
@@ -128,6 +139,7 @@
 
                                 const buyerModalEl = document.getElementById('buyerDetailModal');
                                 const buyerModal = new bootstrap.Modal(buyerModalEl);
+                                const buyerEditLink = document.getElementById('buyerEditLink');
 
                                 function fmtPriceRange(raw) {
                                     if (!raw) return '';
@@ -137,6 +149,15 @@
                                         return fmt(nums[0]) + ' - ' + fmt(nums[1]);
                                     }
                                     return raw;
+                                }
+
+                                function cleanIpValue(raw) {
+                                    if (!raw) return '';
+                                    var ip = String(raw).trim();
+                                    if (ip.indexOf(',') !== -1) ip = ip.split(',')[0].trim();
+                                    if (ip.toLowerCase().startsWith('::ffff:')) ip = ip.slice(7);
+                                    if (ip === '127.0.0.1' || ip === '::1' || ip === '0.0.0.0') return '';
+                                    return ip;
                                 }
 
                                 function chip(label, value, tone) {
@@ -160,8 +181,20 @@
                                 document.querySelectorAll('.buyer-detail').forEach(button => {
                                         button.addEventListener('click', function () {
                                                 const buyerID = this.getAttribute('data-id');
+                                                try {
+                                                    if (buyerEditLink) {
+                                                        buyerEditLink.href = '#';
+                                                        buyerEditLink.classList.add('d-none');
+                                                    }
+                                                } catch (e) {}
                                                 const buyerData = cashbuyers.find(buyer => String(buyer.buyerID) === String(buyerID));
                                                 if (buyerData) {
+                                                        try {
+                                                            if (buyerEditLink) {
+                                                                buyerEditLink.href = `/dashboard/cashBuyers/${encodeURIComponent(buyerID)}/edit`;
+                                                                buyerEditLink.classList.remove('d-none');
+                                                            }
+                                                        } catch (e) {}
                                                         const name = buyerData.FullName || 'Buyer';
                                                         const years = buyerData.YearsInBusiness || '';
                                                         const email = buyerData.Email || '';
@@ -191,7 +224,10 @@
                                                             ${metaItem('ni ni-money-coins text-success', 'Price Range', priceRange || buyerData.PriceRanges)}
                                                             ${metaItem('fa-solid fa-map-location-dot text-info', 'Preferred Areas', buyerData.PreferredAreas)}
                                                             ${metaItem('fa-solid fa-house-chimney text-primary', 'Property Type', buyerData.PropertyType)}
-                                                            ${metaItem('fa-solid fa-network-wired text-muted', 'IP Address', buyerData.CashBuyerIP ? `<a href="https://ipinfo.io/${buyerData.CashBuyerIP}" target="_blank">${buyerData.CashBuyerIP}</a>` : '')}
+                                                            ${metaItem('fa-solid fa-network-wired text-muted', 'IP Address', (function(){
+                                                                var ip = cleanIpValue(buyerData.CashBuyerIP);
+                                                                return ip ? `<a href="https://ipinfo.io/${ip}" target="_blank">${ip}</a>` : '';
+                                                            })())}
                                                         `;
 
                                                         const extraTable = Object.entries(buyerData).reduce(function (acc, [key, value]) {
