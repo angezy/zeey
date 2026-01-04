@@ -6,12 +6,12 @@
 
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="{{#if postt.SeoDescription}}{{sanitize postt.SeoDescription}}{{else}}{{sanitize postt.Description}}{{/if}}">
+  <meta name="description" content="{{sanitize postt.Description}}">
 
     <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png">
   <link rel="icon" type="image/png" href="../assets/img/favicon.png">
 
-  <title>{{#if postt.SeoTitle}}{{postt.SeoTitle}}{{else}}{{title}}{{/if}}</title>
+  <title>{{title}}</title>
 
   {{#if postt.SeoJsonLd}}
   <script type="application/ld+json">

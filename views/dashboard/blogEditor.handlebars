@@ -80,14 +80,6 @@
             <textarea class="form-control" id="editDescription" name="description" rows="2"></textarea>
           </div>
           <div class="mb-3">
-            <label for="editSeoTitle" class="form-label">SEO Title</label>
-            <input type="text" class="form-control" id="editSeoTitle" name="seoTitle" placeholder="Optional title override for search">
-          </div>
-          <div class="mb-3">
-            <label for="editSeoDescription" class="form-label">SEO Meta Description</label>
-            <textarea class="form-control" id="editSeoDescription" name="seoDescription" rows="2" placeholder="Optional meta description"></textarea>
-          </div>
-          <div class="mb-3">
             <label for="editSeoJsonLd" class="form-label">SEO JSON-LD (FAQ or other schema)</label>
             <textarea class="form-control" id="editSeoJsonLd" name="seoJsonLd" rows="6" placeholder="Paste JSON only (no &lt;script&gt; tag)"></textarea>
           </div>
@@ -150,14 +142,6 @@
           <div class="mb-3">
             <label for="description" class="form-label">Article Description</label>
             <textarea class="form-control" id="description" name="description" rows="2" required></textarea>
-          </div>
-          <div class="mb-3">
-            <label for="addSeoTitle" class="form-label">SEO Title</label>
-            <input type="text" class="form-control" id="addSeoTitle" name="seoTitle" placeholder="Optional title override for search">
-          </div>
-          <div class="mb-3">
-            <label for="addSeoDescription" class="form-label">SEO Meta Description</label>
-            <textarea class="form-control" id="addSeoDescription" name="seoDescription" rows="2" placeholder="Optional meta description"></textarea>
           </div>
           <div class="mb-3">
             <label for="addSeoJsonLd" class="form-label">SEO JSON-LD (FAQ or other schema)</label>
@@ -237,8 +221,6 @@
         document.getElementById('editBlogId').value = id; // Set ID
         document.getElementById('editTitle').value = post.Title || ''; // Set Title
         document.getElementById('editDescription').value = post.Description || ''; // Set Description
-        document.getElementById('editSeoTitle').value = post.SeoTitle || ''; // Set SEO Title
-        document.getElementById('editSeoDescription').value = post.SeoDescription || ''; // Set SEO Description
         document.getElementById('editSeoJsonLd').value = post.SeoJsonLd || ''; // Set SEO JSON-LD
         document.getElementById('editContents').value = post.Contents || ''; // Set Contents
 

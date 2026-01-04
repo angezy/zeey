@@ -264,7 +264,7 @@ const fetchBlogPost = async (postId) => {
     let pool = await sql.connect(dbConfig);
     let result = await pool.request()
       .input('PostId', sql.Int, postId)
-      .query('SELECT Title, Imag, Contents, Description, SeoTitle, SeoDescription, SeoJsonLd FROM dbo.BlogPosts_tbl WHERE postId = @PostId');
+      .query('SELECT Title, Imag, Contents, Description, SeoJsonLd FROM dbo.BlogPosts_tbl WHERE postId = @PostId');
     return result.recordset[0];
   } catch (err) {
     console.error('Database query error:', err);
@@ -276,7 +276,7 @@ async function fetchBlogPosts() {
   try {
     let pool = await sql.connect(dbConfig);
     let result = await pool.request()
-    .query('SELECT postId, Title, Description, Imag, Contents, SeoTitle, SeoDescription, SeoJsonLd, CreatedAt FROM dbo.BlogPosts_tbl');
+    .query('SELECT postId, Title, Description, Imag, Contents, SeoJsonLd, CreatedAt FROM dbo.BlogPosts_tbl');
     return result.recordset;
   } catch (err) {
     console.error('Error fetching blog posts:', err);
@@ -704,7 +704,7 @@ app.get('/dashboard/blogEditor', authMiddleware, async (req, res) => {
   try {
     let pool = await sql.connect(dbConfig);
     let result = await pool.request()
-    .query('SELECT postId, Title, Description, Imag, Contents, SeoTitle, SeoDescription, SeoJsonLd, CreatedAt FROM dbo.BlogPosts_tbl');
+    .query('SELECT postId, Title, Description, Imag, Contents, SeoJsonLd, CreatedAt FROM dbo.BlogPosts_tbl');
     const blogPosts = result.recordset;
     res.render('blogEditor', { layout: '__dashboard', title: ' Blog Editor', blogs: blogPosts });
   } catch (err) {
@@ -749,10 +749,32 @@ app.get('/dashboard/contacts', authMiddleware, async (req, res)=>{
 } catch (err) {
     console.error("Database Error:", err);
     res.status(500).send("Error retrieving contacts from database");
-} finally {
+  } finally {
     sql.close();
 }
 })
+
+app.get('/dashboard/property-finder', authMiddleware, async (req, res) => {
+  try {
+    const pool = await sql.connect(dbConfig);
+    const leadsResult = await pool.request()
+      .query('SELECT * FROM dbo.birddog_leads ORDER BY SubmitDate DESC');
+    const contractsResult = await pool.request()
+      .query('SELECT * FROM dbo.birddog_contracts ORDER BY SubmitDate DESC');
+
+    res.render('dashboard/propertyFinder', {
+      title: 'Property Finder Leads',
+      layout: '__dashboard',
+      leads: leadsResult.recordset || [],
+      contracts: contractsResult.recordset || []
+    });
+  } catch (err) {
+    console.error('Error fetching property finder leads:', err);
+    res.status(500).send('Error fetching property finder leads');
+  } finally {
+    sql.close();
+  }
+});
 
 
 // Global error handler

@@ -41,7 +41,7 @@ const normalizeJsonLd = (value) => {
 // Route to add a new blog post
 router.post('/add-blog', upload.single('imag'), async (req, res) => {
     const referrer = req.get('Referer');
-    const { title, description, contents, seoTitle, seoDescription, seoJsonLd } = req.body;
+    const { title, description, contents, seoJsonLd } = req.body;
     const imageFile = req.file ? `public/images/uploads/${req.file.filename}` : null;
     const normalizedJsonLd = normalizeJsonLd(seoJsonLd);
     try {
@@ -52,12 +52,10 @@ router.post('/add-blog', upload.single('imag'), async (req, res) => {
             .input('Description', sql.NVarChar, description)
             .input('Imag', sql.NVarChar, imageFile)
             .input('Contents', sql.NText, contents)
-            .input('SeoTitle', sql.NVarChar(255), seoTitle || null)
-            .input('SeoDescription', sql.NVarChar(500), seoDescription || null)
             .input('SeoJsonLd', sql.NVarChar(sql.MAX), normalizedJsonLd)
             .query(`
-                INSERT INTO dbo.BlogPosts_tbl (Title, Description, Imag, Contents, SeoTitle, SeoDescription, SeoJsonLd, CreatedAt)
-                VALUES (@Title, @Description, @Imag, @Contents, @SeoTitle, @SeoDescription, @SeoJsonLd, GETDATE())
+                INSERT INTO dbo.BlogPosts_tbl (Title, Description, Imag, Contents, SeoJsonLd, CreatedAt)
+                VALUES (@Title, @Description, @Imag, @Contents, @SeoJsonLd, GETDATE())
             `); 
     
         return res.redirect(`${referrer}?success=Blog+post+added+successfully`);
@@ -110,7 +108,7 @@ router.post('/delete-blog/:id', async (req, res) => {
 // Route to edit a blog post
 router.post('/edit-blog/:id', upload.single('imag'), async (req, res) => {
     const { id } = req.params; // Post ID
-    const { title, description, contents, seoTitle, seoDescription, seoJsonLd } = req.body;
+    const { title, description, contents, seoJsonLd } = req.body;
     const imageFile = req.file ? `public/images/uploads/${req.file.filename}` : null;
     const referer = req.get('Referer') || '/'; // Default to home page if no referrer
     const normalizedJsonLd = normalizeJsonLd(seoJsonLd);
@@ -145,8 +143,6 @@ router.post('/edit-blog/:id', upload.single('imag'), async (req, res) => {
                     Description = @Description,
                     Imag = @Imag,
                     Contents = @Contents,
-                    SeoTitle = @SeoTitle,
-                    SeoDescription = @SeoDescription,
                     SeoJsonLd = @SeoJsonLd,
                     CreatedAt = GETDATE()
                 WHERE postId = @PostId
@@ -156,8 +152,6 @@ router.post('/edit-blog/:id', upload.single('imag'), async (req, res) => {
                 SET Title = @Title,
                     Description = @Description,
                     Contents = @Contents,
-                    SeoTitle = @SeoTitle,
-                    SeoDescription = @SeoDescription,
                     SeoJsonLd = @SeoJsonLd,
                     CreatedAt = GETDATE()
                 WHERE postId = @PostId
@@ -168,8 +162,6 @@ router.post('/edit-blog/:id', upload.single('imag'), async (req, res) => {
             .input('Title', sql.NVarChar, title)
             .input('Description', sql.NVarChar, description)
             .input('Contents', sql.NText, contents)
-            .input('SeoTitle', sql.NVarChar(255), seoTitle || null)
-            .input('SeoDescription', sql.NVarChar(500), seoDescription || null)
             .input('SeoJsonLd', sql.NVarChar(sql.MAX), normalizedJsonLd)
             .input('PostId', sql.Int, id);
 
