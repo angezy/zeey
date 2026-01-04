@@ -100,6 +100,9 @@
       color: #6b7280;
       margin-bottom: 1.2rem;
     }
+    .property-description {
+      white-space: pre-line;
+    }
 
     .cta-card {
       margin-top: 1.75rem;
@@ -241,7 +244,7 @@
       <div class="col-lg-6">
         <article class="property-card">
           <h3>Overview</h3>
-          <p>{{#if listPost.Description}}{{sanitize listPost.Description}}{{else}}No description provided.{{/if}}</p>
+          <p class="property-description">{{#if listPost.Description}}{{sanitize listPost.Description}}{{else}}No description provided.{{/if}}</p>
         </article>
       </div>
 
