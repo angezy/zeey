@@ -21,7 +21,7 @@ const Handlebars = require('handlebars');
 const session = require('express-session');
 const validator = require('validator');
 const { normalizeIp } = require('./utils/clientIp');
-const { ensureListingsArvColumn } = require('./utils/dbMigrations');
+const { ensureListingsArvColumn, ensureBlogSeoColumns } = require('./utils/dbMigrations');
 
 const app = express();
 const port = process.env.PORT;
@@ -34,6 +34,8 @@ app.set('trust proxy', true);
     const pool = await sql.connect(dbConfig);
     const { changed } = await ensureListingsArvColumn(pool);
     if (changed) console.log('[db] Added missing column dbo.listings_tbl.ARV');
+    const { changed: seoChanged } = await ensureBlogSeoColumns(pool);
+    if (seoChanged) console.log('[db] Added missing SEO columns to dbo.BlogPosts_tbl');
   } catch (err) {
     console.error('[db] Migration error:', err && err.message ? err.message : err);
   } finally {
@@ -162,6 +164,15 @@ Handlebars.registerHelper('eq', function (a, b) {
 Handlebars.registerHelper('json', function (context) {
   return JSON.stringify(context);
 });
+Handlebars.registerHelper('jsonSafe', function (context) {
+  try {
+    const json = JSON.stringify(context);
+    const safe = json.replace(/<\/script/gi, '<\\/script');
+    return new Handlebars.SafeString(safe);
+  } catch (e) {
+    return new Handlebars.SafeString('[]');
+  }
+});
 // Sanitize strings for display: normalize only problematic slashes
 Handlebars.registerHelper('sanitize', function (value) {
   if(value === null || value === undefined) return '';
@@ -253,7 +264,7 @@ const fetchBlogPost = async (postId) => {
     let pool = await sql.connect(dbConfig);
     let result = await pool.request()
       .input('PostId', sql.Int, postId)
-      .query('SELECT Title, Imag, Contents, Description FROM dbo.BlogPosts_tbl WHERE postId = @PostId');
+      .query('SELECT Title, Imag, Contents, Description, SeoTitle, SeoDescription, SeoJsonLd FROM dbo.BlogPosts_tbl WHERE postId = @PostId');
     return result.recordset[0];
   } catch (err) {
     console.error('Database query error:', err);
@@ -265,7 +276,7 @@ async function fetchBlogPosts() {
   try {
     let pool = await sql.connect(dbConfig);
     let result = await pool.request()
-    .query('SELECT postId, Title, Description, Imag, Contents, CreatedAt FROM dbo.BlogPosts_tbl');
+    .query('SELECT postId, Title, Description, Imag, Contents, SeoTitle, SeoDescription, SeoJsonLd, CreatedAt FROM dbo.BlogPosts_tbl');
     return result.recordset;
   } catch (err) {
     console.error('Error fetching blog posts:', err);
@@ -693,7 +704,7 @@ app.get('/dashboard/blogEditor', authMiddleware, async (req, res) => {
   try {
     let pool = await sql.connect(dbConfig);
     let result = await pool.request()
-    .query('SELECT postId, Title, Description, Imag, Contents, CreatedAt FROM dbo.BlogPosts_tbl');
+    .query('SELECT postId, Title, Description, Imag, Contents, SeoTitle, SeoDescription, SeoJsonLd, CreatedAt FROM dbo.BlogPosts_tbl');
     const blogPosts = result.recordset;
     res.render('blogEditor', { layout: '__dashboard', title: ' Blog Editor', blogs: blogPosts });
   } catch (err) {

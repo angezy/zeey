@@ -23,7 +23,32 @@ const ensureListingsArvColumn = async (pool) => {
   return { changed: true };
 };
 
-module.exports = {
-  ensureListingsArvColumn,
+const ensureBlogSeoColumns = async (pool) => {
+  let changed = false;
+  const table = 'BlogPosts_tbl';
+
+  const seoTitleExists = await columnExists(pool, { schema: 'dbo', table, column: 'SeoTitle' });
+  if (!seoTitleExists) {
+    await pool.request().query(`ALTER TABLE dbo.${table} ADD SeoTitle NVARCHAR(255) NULL`);
+    changed = true;
+  }
+
+  const seoDescriptionExists = await columnExists(pool, { schema: 'dbo', table, column: 'SeoDescription' });
+  if (!seoDescriptionExists) {
+    await pool.request().query(`ALTER TABLE dbo.${table} ADD SeoDescription NVARCHAR(500) NULL`);
+    changed = true;
+  }
+
+  const seoJsonLdExists = await columnExists(pool, { schema: 'dbo', table, column: 'SeoJsonLd' });
+  if (!seoJsonLdExists) {
+    await pool.request().query(`ALTER TABLE dbo.${table} ADD SeoJsonLd NVARCHAR(MAX) NULL`);
+    changed = true;
+  }
+
+  return { changed };
 };
 
+module.exports = {
+  ensureListingsArvColumn,
+  ensureBlogSeoColumns,
+};

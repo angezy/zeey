@@ -6,19 +6,18 @@
 
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="Explore the best properties in Florida with Nick House Buyer.
-   Fast cash offers for your home with expert real estate solutions.">
+  <meta name="description" content="{{#if postt.SeoDescription}}{{sanitize postt.SeoDescription}}{{else}}{{sanitize postt.Description}}{{/if}}">
 
     <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png">
   <link rel="icon" type="image/png" href="../assets/img/favicon.png">
 
-  <title>
+  <title>{{#if postt.SeoTitle}}{{postt.SeoTitle}}{{else}}{{title}}{{/if}}</title>
 
-
-    {{title}}
-
-
-  </title>
+  {{#if postt.SeoJsonLd}}
+  <script type="application/ld+json">
+{{{postt.SeoJsonLd}}}
+  </script>
+  {{/if}}
 
   <!--     Fonts and icons     -->
   <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700,900" />
@@ -99,4 +98,3 @@
   </div>
 
   <script src="/public/js/material-kit.min.js?v=3.1.0" type="text/javascript"></script>
-

@@ -39,9 +39,7 @@
                 data-id={{this.postId}}>
                 <i class="far fa-trash-alt me-2"></i>Delete
               </a>
-              <a class="btn btn-link text-dark px-3 mb-0 edit-btn" href="javascript:;" data-id={{this.postId}}
-                data-title="{{this.Title}} " data-description="{{this.Description}} " data-image={{this.Imag}}
-                data-contents="{{this.Contents}} " data-en="{{this.En}} ">
+              <a class="btn btn-link text-dark px-3 mb-0 edit-btn" href="javascript:;" data-id={{this.postId}}>
                 <i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i>Edit
               </a>
             </div>
@@ -59,6 +57,7 @@
   </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script id="blog-data" type="application/json">{{{jsonSafe blogs}}}</script>
 
 <!-- Edit Blog Modal -->
 <div class="modal modal-xl fade" id="editBlogModal" style="z-index:9999" tabindex="-1"
@@ -79,6 +78,18 @@
           <div class="mb-3">
             <label for="editDescription" class="form-label">Article Description</label>
             <textarea class="form-control" id="editDescription" name="description" rows="2"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="editSeoTitle" class="form-label">SEO Title</label>
+            <input type="text" class="form-control" id="editSeoTitle" name="seoTitle" placeholder="Optional title override for search">
+          </div>
+          <div class="mb-3">
+            <label for="editSeoDescription" class="form-label">SEO Meta Description</label>
+            <textarea class="form-control" id="editSeoDescription" name="seoDescription" rows="2" placeholder="Optional meta description"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="editSeoJsonLd" class="form-label">SEO JSON-LD (FAQ or other schema)</label>
+            <textarea class="form-control" id="editSeoJsonLd" name="seoJsonLd" rows="6" placeholder="Paste JSON only (no &lt;script&gt; tag)"></textarea>
           </div>
           <div class="mb-3">
             <label for="editImage" class="form-label">Upload New Image (Optional)</label>
@@ -141,6 +152,18 @@
             <textarea class="form-control" id="description" name="description" rows="2" required></textarea>
           </div>
           <div class="mb-3">
+            <label for="addSeoTitle" class="form-label">SEO Title</label>
+            <input type="text" class="form-control" id="addSeoTitle" name="seoTitle" placeholder="Optional title override for search">
+          </div>
+          <div class="mb-3">
+            <label for="addSeoDescription" class="form-label">SEO Meta Description</label>
+            <textarea class="form-control" id="addSeoDescription" name="seoDescription" rows="2" placeholder="Optional meta description"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="addSeoJsonLd" class="form-label">SEO JSON-LD (FAQ or other schema)</label>
+            <textarea class="form-control" id="addSeoJsonLd" name="seoJsonLd" rows="6" placeholder="Paste JSON only (no &lt;script&gt; tag)"></textarea>
+          </div>
+          <div class="mb-3">
             <label for="imag" class="form-label">Upload Image</label>
             <input type="file" class="form-control" id="image" name="imag" accept="image/*" required>
           </div>
@@ -178,6 +201,10 @@
 </script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
+    const blogDataEl = document.getElementById('blog-data');
+    const blogData = blogDataEl ? JSON.parse(blogDataEl.textContent || '[]') : [];
+    const blogMap = new Map(blogData.map(item => [String(item.postId), item]));
+
     // Handle delete button click
     document.querySelectorAll('.delete-btn').forEach(button => {
       button.addEventListener('click', () => {
@@ -197,10 +224,8 @@
     document.querySelectorAll('.edit-btn').forEach(button => {
       button.addEventListener('click', function () {
         const id = this.getAttribute('data-id');
-        const title = this.getAttribute('data-title');
-        const description = this.getAttribute('data-description');
-        const image = this.getAttribute('data-image');
-        const contents = this.getAttribute('data-contents');
+        const post = blogMap.get(String(id));
+        if (!post) return;
 
 
         // Set form action to include the postId
@@ -210,16 +235,19 @@
 
         // Populate the form fields
         document.getElementById('editBlogId').value = id; // Set ID
-        document.getElementById('editTitle').value = title; // Set Title
-        document.getElementById('editDescription').value = description; // Set Description
-        document.getElementById('editContents').value = contents; // Set Contents
+        document.getElementById('editTitle').value = post.Title || ''; // Set Title
+        document.getElementById('editDescription').value = post.Description || ''; // Set Description
+        document.getElementById('editSeoTitle').value = post.SeoTitle || ''; // Set SEO Title
+        document.getElementById('editSeoDescription').value = post.SeoDescription || ''; // Set SEO Description
+        document.getElementById('editSeoJsonLd').value = post.SeoJsonLd || ''; // Set SEO JSON-LD
+        document.getElementById('editContents').value = post.Contents || ''; // Set Contents
 
 
         // Handle TinyMCE content
         const contentField = document.getElementById('editContents');
-        contentField.value = contents; // Set the raw content for fallback
+        contentField.value = post.Contents || ''; // Set the raw content for fallback
         if (tinymce.get('editContents')) {
-          tinymce.get('editContents').setContent(contents); // Set content in TinyMCE
+          tinymce.get('editContents').setContent(post.Contents || ''); // Set content in TinyMCE
         }
 
 
