@@ -226,7 +226,7 @@
                     <div class="col-12">
                       <div class="form-outline">
                         <label class="form-label d-block text-start text-white-50" for="propertyImages">Property Images (Max 10 images)</label>
-                        <input type="file" name="propertyImages" id="propertyImages" class="form-control" accept="image/*" multiple 
+                        <input type="file" name="propertyImages" id="propertyImages" class="form-control" accept="image/*,.heic,.heif" multiple 
                           onchange="previewImages(event)" />
                       </div>
                       <div id="imagePreview" class="mt-3 d-flex flex-wrap gap-2"></div>
@@ -259,6 +259,7 @@
   <!-- MDB -->
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.1.0/mdb.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
   <!--   Core JS Files   -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="/assets/js/form.js"></script>
@@ -267,8 +268,27 @@
     const MAX_DIMENSION = 1600;
     const JPEG_QUALITY = 0.7;
 
+    const isHeicFile = (file) => {
+      if (!file) return false;
+      const name = (file.name || '').toLowerCase();
+      const type = (file.type || '').toLowerCase();
+      return name.endsWith('.heic') || name.endsWith('.heif') || type.includes('heic') || type.includes('heif');
+    };
+
+    async function convertHeicToJpeg(file){
+      if (!isHeicFile(file) || !window.heic2any) return file;
+      try {
+        const blob = await window.heic2any({ blob: file, toType: 'image/jpeg', quality: JPEG_QUALITY });
+        const baseName = (file.name || 'image').replace(/\.(heic|heif)$/i, '');
+        return new File([blob], `${baseName}.jpg`, { type: 'image/jpeg', lastModified: Date.now() });
+      } catch (e) {
+        return file;
+      }
+    }
+
     async function compressImageFile(file){
-      if(!file || !file.type.startsWith('image/')) return file;
+      const prepared = await convertHeicToJpeg(file);
+      if(!prepared || !prepared.type.startsWith('image/')) return prepared;
       return new Promise(resolve => {
         const img = new Image();
         img.onload = () => {
@@ -290,15 +310,15 @@
           ctx.drawImage(img, 0, 0, width, height);
           canvas.toBlob(blob => {
             if(blob){
-              const compressed = new File([blob], file.name.replace(/\.[^/.]+$/, '') + '.jpg', { type:'image/jpeg', lastModified: Date.now() });
+              const compressed = new File([blob], prepared.name.replace(/\.[^/.]+$/, '') + '.jpg', { type:'image/jpeg', lastModified: Date.now() });
               resolve(compressed);
             } else {
-              resolve(file);
+              resolve(prepared);
             }
           }, 'image/jpeg', JPEG_QUALITY);
         };
-        img.onerror = () => resolve(file);
-        img.src = URL.createObjectURL(file);
+        img.onerror = () => resolve(prepared);
+        img.src = URL.createObjectURL(prepared);
       });
     }
 

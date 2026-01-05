@@ -183,7 +183,7 @@
                   {{#each (split listPost.PhotoFile ',')}}
                     {{#if this}}
                     <div class="carousel-item">
-                      <img src="{{photoUrl this}}" alt="Property image">
+                      <img src="{{photoUrl this}}" alt="Property image" onerror="this.onerror=null;this.src='/public/images/bg_1.jpg';">
                     </div>
                     {{/if}}
                   {{/each}}
@@ -200,12 +200,12 @@
               <div class="hero-thumbs">
                 {{#each (split listPost.PhotoFile ',')}}
                   {{#if this}}
-                  <img src="{{photoUrl this}}" alt="Property thumbnail">
+                  <img src="{{photoUrl this}}" alt="Property thumbnail" onerror="this.onerror=null;this.src='/public/images/bg_1.jpg';">
                   {{/if}}
                 {{/each}}
               </div>
             {{else if listPost.PhotoURL}}
-              <img src="{{listPost.PhotoURL}}" class="w-100 rounded-4" style="max-height:420px;object-fit:cover;" alt="Property image">
+              <img src="{{listPost.PhotoURL}}" class="w-100 rounded-4" style="max-height:420px;object-fit:cover;" alt="Property image" onerror="this.onerror=null;this.src='/public/images/bg_1.jpg';">
             {{else}}
               <img src="/public/images/bg_1.jpg" class="w-100 rounded-4" style="max-height:420px;object-fit:cover;" alt="Property placeholder">
             {{/if}}

@@ -11,6 +11,24 @@
     return Array.from((root || document).querySelectorAll(selector));
   }
 
+  function isHeicFile(file) {
+    if (!file) return false;
+    const name = (file.name || '').toLowerCase();
+    const type = (file.type || '').toLowerCase();
+    return name.endsWith('.heic') || name.endsWith('.heif') || type.includes('heic') || type.includes('heif');
+  }
+
+  async function convertHeicToJpeg(file) {
+    if (!isHeicFile(file) || !window.heic2any) return file;
+    try {
+      const blob = await window.heic2any({ blob: file, toType: 'image/jpeg', quality: 0.8 });
+      const baseName = (file.name || 'image').replace(/\.(heic|heif)$/i, '');
+      return new File([blob], `${baseName}.jpg`, { type: 'image/jpeg', lastModified: Date.now() });
+    } catch (e) {
+      return file;
+    }
+  }
+
   function getForm() {
     return document.getElementById('cash-buyer-form');
   }
@@ -443,6 +461,19 @@
     toggleOtherPropertyType();
     toggleOtherWorkType();
     syncPriceRangeUI();
+
+    const proofUpload = qs('#proofUpload', form);
+    if (proofUpload) {
+      proofUpload.addEventListener('change', async () => {
+        const file = proofUpload.files && proofUpload.files[0];
+        if (!file || !isHeicFile(file)) return;
+        const converted = await convertHeicToJpeg(file);
+        if (!converted || converted === file) return;
+        const dt = new DataTransfer();
+        dt.items.add(converted);
+        proofUpload.files = dt.files;
+      });
+    }
   }
 
   function applyValues(values) {

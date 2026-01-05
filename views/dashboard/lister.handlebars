@@ -99,8 +99,11 @@
       .badge.bg-info{ background:#e7f3ff; color:#0b63d6; }
       /* Ensure consistent card height and remove inner gutters */
       .listing-card .row.g-0 { height:100%; }
-      .listing-card .col-5, .listing-card .col-7 { padding:0; }
+  .listing-card .col-5, .listing-card .col-7 { padding:0; }
   .listing-card .card-body { padding:14px; }
+  .photo-draggable { cursor: grab; }
+  .photo-draggable.dragging { opacity: 0.6; }
+  .photo-draggable.photo-drag-over { outline: 2px dashed #94a3b8; outline-offset: 2px; border-radius: 10px; }
   @media (max-width:767px){
     .card-img-left{ min-height:160px; }
   }
@@ -209,7 +212,7 @@
                 </div>
                 <div class="col-md-4">
                   <label class="form-label">Upload New Photos</label>
-                  <input type="file" class="form-control" id="editPhotoFiles" name="PhotoFiles" accept="image/*" multiple>
+                  <input type="file" class="form-control" id="editPhotoFiles" name="PhotoFiles" accept="image/*,.heic,.heif" multiple>
                   <small class="text-muted d-block mt-1">Select up to 60 images to add to this listing.</small>
                   <div id="editPhotoPreview" class="mt-2 d-flex gap-2 flex-wrap"></div>
                 </div>
@@ -241,6 +244,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
     <script>
       document.addEventListener('DOMContentLoaded', function(){
 
@@ -291,6 +295,24 @@
           if(/^https?:\/\//i.test(str)) return str;
           str = str.replace(/^\/+/, '');
           return str ? '/' + str : '';
+        }
+
+        function isHeicFile(file){
+          if(!file) return false;
+          var name = (file.name || '').toLowerCase();
+          var type = (file.type || '').toLowerCase();
+          return name.endsWith('.heic') || name.endsWith('.heif') || type.includes('heic') || type.includes('heif');
+        }
+
+        async function convertHeicToJpeg(file){
+          if(!isHeicFile(file) || !window.heic2any) return file;
+          try{
+            var blob = await window.heic2any({ blob: file, toType: 'image/jpeg', quality: 0.8 });
+            var baseName = (file.name || 'image').replace(/\.(heic|heif)$/i, '');
+            return new File([blob], baseName + '.jpg', { type:'image/jpeg', lastModified: Date.now() });
+          } catch(e){
+            return file;
+          }
         }
 
         function getFirstPhotoPath(raw){
@@ -408,6 +430,42 @@
             img.style.objectFit = 'cover';
             img.className = 'rounded border shadow-sm';
             wrapper.appendChild(img);
+            if(editPhotoState.files.length){
+              wrapper.classList.add('photo-draggable');
+              wrapper.draggable = true;
+              wrapper.dataset.index = String(idx);
+              wrapper.addEventListener('dragstart', function(e){
+                try { e.dataTransfer.setData('text/plain', String(idx)); } catch (err) {}
+                e.dataTransfer.effectAllowed = 'move';
+                wrapper.classList.add('dragging');
+              });
+              wrapper.addEventListener('dragend', function(){
+                wrapper.classList.remove('dragging');
+              });
+              wrapper.addEventListener('dragover', function(e){
+                e.preventDefault();
+                wrapper.classList.add('photo-drag-over');
+                e.dataTransfer.dropEffect = 'move';
+              });
+              wrapper.addEventListener('dragleave', function(){
+                wrapper.classList.remove('photo-drag-over');
+              });
+              wrapper.addEventListener('drop', function(e){
+                e.preventDefault();
+                wrapper.classList.remove('photo-drag-over');
+                let from = -1;
+                try { from = parseInt(e.dataTransfer.getData('text/plain'), 10); } catch (err) {}
+                const to = idx;
+                if(!Number.isFinite(from) || from < 0) return;
+                if(from === to) return;
+                const next = editPhotoState.files.slice();
+                const moved = next.splice(from, 1)[0];
+                next.splice(to, 0, moved);
+                editPhotoState.files = next;
+                if(editFields.photoFile) editFields.photoFile.value = editPhotoState.files.join(',');
+                renderCurrentPhotos();
+              });
+            }
 
             const removeBtn = document.createElement('button');
             removeBtn.type = 'button';
@@ -482,8 +540,16 @@
           }
           if(editFields.photoFiles){
             editFields.photoFiles.value = '';
-            editFields.photoFiles.onchange = function(){
+            editFields.photoFiles.onchange = async function(){
               if(!editFields.photoPreview) return;
+              const rawFiles = Array.from(this.files || []);
+              const convertedList = [];
+              for(const file of rawFiles){
+                convertedList.push(await convertHeicToJpeg(file));
+              }
+              const dt = new DataTransfer();
+              convertedList.forEach(f => f && dt.items.add(f));
+              this.files = dt.files;
               const files = Array.from(this.files || []);
               editFields.photoPreview.innerHTML = '';
               if(!files.length){
