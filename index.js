@@ -21,7 +21,7 @@ const Handlebars = require('handlebars');
 const session = require('express-session');
 const validator = require('validator');
 const { normalizeIp } = require('./utils/clientIp');
-const { ensureListingsArvColumn, ensureBlogSeoColumns } = require('./utils/dbMigrations');
+const { ensureBirdDogTables, ensureListingsArvColumn, ensureBlogSeoColumns } = require('./utils/dbMigrations');
 
 const app = express();
 const port = process.env.PORT;
@@ -36,6 +36,8 @@ app.set('trust proxy', true);
     if (changed) console.log('[db] Added missing column dbo.listings_tbl.ARV');
     const { changed: seoChanged } = await ensureBlogSeoColumns(pool);
     if (seoChanged) console.log('[db] Added missing SEO columns to dbo.BlogPosts_tbl');
+    const { changed: birdDogChanged } = await ensureBirdDogTables(pool);
+    if (birdDogChanged) console.log('[db] Created missing bird dog tables');
   } catch (err) {
     console.error('[db] Migration error:', err && err.message ? err.message : err);
   } finally {
@@ -757,10 +759,31 @@ app.get('/dashboard/contacts', authMiddleware, async (req, res)=>{
 app.get('/dashboard/property-finder', authMiddleware, async (req, res) => {
   try {
     const pool = await sql.connect(dbConfig);
-    const leadsResult = await pool.request()
-      .query('SELECT * FROM dbo.birddog_leads ORDER BY SubmitDate DESC');
-    const contractsResult = await pool.request()
-      .query('SELECT * FROM dbo.birddog_contracts ORDER BY SubmitDate DESC');
+    const leadsTableCheck = await pool.request()
+      .input('table', sql.NVarChar, 'birddog_leads')
+      .query(`
+        SELECT 1 AS ok
+        FROM INFORMATION_SCHEMA.TABLES
+        WHERE LOWER(TABLE_SCHEMA) = 'dbo'
+          AND LOWER(TABLE_NAME) = LOWER(@table)
+      `);
+    const contractsTableCheck = await pool.request()
+      .input('table', sql.NVarChar, 'birddog_contracts')
+      .query(`
+        SELECT 1 AS ok
+        FROM INFORMATION_SCHEMA.TABLES
+        WHERE LOWER(TABLE_SCHEMA) = 'dbo'
+          AND LOWER(TABLE_NAME) = LOWER(@table)
+      `);
+    const leadsExists = !!(leadsTableCheck.recordset && leadsTableCheck.recordset.length);
+    const contractsExists = !!(contractsTableCheck.recordset && contractsTableCheck.recordset.length);
+
+    const leadsResult = leadsExists
+      ? await pool.request().query('SELECT * FROM dbo.birddog_leads ORDER BY SubmitDate DESC')
+      : { recordset: [] };
+    const contractsResult = contractsExists
+      ? await pool.request().query('SELECT * FROM dbo.birddog_contracts ORDER BY SubmitDate DESC')
+      : { recordset: [] };
 
     res.render('dashboard/propertyFinder', {
       title: 'Property Finder Leads',
