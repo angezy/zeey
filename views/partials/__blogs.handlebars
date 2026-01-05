@@ -19,9 +19,9 @@
         <div class="row mt-4">
               {{#each blogs}}
           <div class="col-md-6">
-            <a href=/blog/{{this.postId}} class="center">
+            <a href="/blog/{{this.postId}}" class="center">
               <div class="card move-on-hover">
-                <img class="w-100" src={{this.Imag}} alt={{this.Title}}>
+                <img class="w-100" src="{{photoUrl this.Imag}}" alt="{{this.Title}}">
                  <h4 class="">{{this.Title}} </h4>
                  <h6 class="text-secondary font-weight-normal">{{this.Description}}</h6>
               </div>

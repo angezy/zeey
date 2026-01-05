@@ -44,7 +44,7 @@
               </a>
             </div>
              <div>
-               <img src=/{{this.Imag}} class="blog-card-img" alt={{this.Imag}} 
+               <img src="{{photoUrl this.Imag}}" class="blog-card-img" alt="{{this.Imag}}" 
                style=" height: 100px; max-width: 100%; margin-top: 10px;">
 
             </div>           
@@ -268,10 +268,12 @@
 
   if (successMessage) {
     Swal.fire({ title: 'Success', text: successMessage, icon: 'success' }); // Show success message
+    try { window.history.replaceState({}, document.title, window.location.pathname); } catch (e) {}
   }
 
   if (errorMessage) {
     Swal.fire({ title: 'Error', text: errorMessage, icon: 'error' }); // Show error message
+    try { window.history.replaceState({}, document.title, window.location.pathname); } catch (e) {}
   }
 
 </script>

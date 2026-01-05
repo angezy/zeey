@@ -13,43 +13,11 @@
   <link rel="apple-touch-icon" sizes="80x40" href="/assets/img/apple-icon.png">
   <link rel="icon" type="image/png" sizes="80x40" href="/assets/img/favicon.png">
   <title>{{title}}</title>
+  {{#if jsonLd}}
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "url": "{{site.url}}",
-    "name": "{{site.name}}",
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": "{{site.url}}/search?q={search_term_string}",
-      "query-input": "required name=search_term_string"
-    },
-    "publisher": {
-      "@type": "Organization",
-      "name": "{{site.name}}"
-    }
-  }
+{{{jsonSafe jsonLd}}}
   </script>
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "LocalBusiness",
-    "name": "{{site.name}}",
-    "url": "{{site.url}}",
-    "telephone": "{{site.phone}}",
-    "address": {
-      "@type": "PostalAddress",
-      "addressLocality": "{{geo.placename}}",
-      "addressRegion": "{{geo.region}}",
-      "addressCountry": "{{geo.country}}"
-    },
-    "geo": {
-      "@type": "GeoCoordinates",
-      "latitude": "{{geo.lat}}",
-      "longitude": "{{geo.lon}}"
-    }
-  }
-  </script>
+  {{/if}}
 <!-- Core fonts and icons -->
 <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700,900&display=swap" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" />

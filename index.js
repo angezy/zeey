@@ -60,6 +60,172 @@ app.locals.site = {
 
 // Expose contact phone (use env or fallback to provided US number)
 app.locals.site.phone = process.env.SITE_PHONE || '+13235531922';
+app.locals.site.logo = process.env.SITE_LOGO || '/assets/img/favicon.png';
+app.locals.site.socials = (process.env.SITE_SOCIALS || '')
+  .split(',')
+  .map(s => s.trim())
+  .filter(Boolean);
+app.locals.site.ratingValue = process.env.SITE_RATING_VALUE || '';
+app.locals.site.reviewCount = process.env.SITE_REVIEW_COUNT || '';
+
+const getBaseUrl = () => app.locals.site.url.replace(/\/$/, '');
+const getPageUrl = (req) => `${getBaseUrl()}${(req.originalUrl || req.path || '/').split('?')[0]}`;
+const toAbsoluteUrl = (base, value) => {
+  if (!value) return '';
+  if (/^https?:\/\//i.test(value)) return value;
+  const pathPart = value.startsWith('/') ? value : `/${value}`;
+  return `${base}${pathPart}`;
+};
+const toIsoDate = (value) => {
+  if (!value) return null;
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return null;
+  return d.toISOString();
+};
+const buildBreadcrumb = (items) => ({
+  "@type": "BreadcrumbList",
+  "itemListElement": items.map((item, index) => ({
+    "@type": "ListItem",
+    "position": index + 1,
+    "name": item.name,
+    "item": item.url
+  }))
+});
+const buildBaseGraph = (req) => {
+  const baseUrl = getBaseUrl();
+  const logoUrl = toAbsoluteUrl(baseUrl, app.locals.site.logo);
+  const orgId = `${baseUrl}#organization`;
+  const localBusinessId = `${baseUrl}#localbusiness`;
+  const websiteId = `${baseUrl}#website`;
+  const organization = {
+    "@type": "Organization",
+    "@id": orgId,
+    "name": app.locals.site.name,
+    "url": baseUrl,
+    "logo": {
+      "@type": "ImageObject",
+      "url": logoUrl
+    }
+  };
+  if (app.locals.site.socials.length) {
+    organization.sameAs = app.locals.site.socials;
+  }
+
+  const localBusiness = {
+    "@type": ["LocalBusiness", "RealEstateAgent"],
+    "@id": localBusinessId,
+    "name": app.locals.site.name,
+    "url": baseUrl,
+    "telephone": app.locals.site.phone,
+    "image": logoUrl,
+    "address": {
+      "@type": "PostalAddress",
+      "addressRegion": "FL",
+      "addressCountry": "US"
+    },
+    "areaServed": [
+      { "@type": "City", "name": "Tampa", "addressRegion": "FL", "addressCountry": "US" },
+      { "@type": "City", "name": "Orlando", "addressRegion": "FL", "addressCountry": "US" },
+      { "@type": "City", "name": "Miami", "addressRegion": "FL", "addressCountry": "US" },
+      { "@type": "City", "name": "Jacksonville", "addressRegion": "FL", "addressCountry": "US" }
+    ],
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": app.locals.geo.lat,
+      "longitude": app.locals.geo.lon
+    }
+  };
+  const ratingValue = parseFloat(app.locals.site.ratingValue);
+  const reviewCount = parseInt(app.locals.site.reviewCount, 10);
+  if (Number.isFinite(ratingValue) && Number.isFinite(reviewCount) && reviewCount > 0) {
+    localBusiness.aggregateRating = {
+      "@type": "AggregateRating",
+      "ratingValue": ratingValue,
+      "reviewCount": reviewCount
+    };
+  }
+
+  const website = {
+    "@type": "WebSite",
+    "@id": websiteId,
+    "url": baseUrl,
+    "name": app.locals.site.name,
+    "publisher": { "@id": orgId },
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": `${baseUrl}/properties?q={search_term_string}`,
+      "query-input": "required name=search_term_string"
+    }
+  };
+
+  return [organization, localBusiness, website];
+};
+const buildServiceSchema = () => {
+  const baseUrl = getBaseUrl();
+  return {
+    "@type": "Service",
+    "@id": `${baseUrl}#service-cash-offer`,
+    "name": "Sell House Fast for Cash in Florida",
+    "serviceType": "Cash home buying",
+    "areaServed": {
+      "@type": "State",
+      "name": "Florida"
+    },
+    "provider": { "@id": `${baseUrl}#localbusiness` }
+  };
+};
+const buildOfferSchema = () => {
+  const baseUrl = getBaseUrl();
+  return {
+    "@type": "Offer",
+    "@id": `${baseUrl}#cash-offer`,
+    "name": "Cash offer for Florida homes",
+    "priceCurrency": "USD",
+    "availability": "https://schema.org/InStock",
+    "itemOffered": { "@id": `${baseUrl}#service-cash-offer` },
+    "description": "Cash offer amount is based on property condition and local market data."
+  };
+};
+const buildBlogPostingSchema = (post, postId) => {
+  const baseUrl = getBaseUrl();
+  const url = `${baseUrl}/blog/${postId}`;
+  const imageUrl = toAbsoluteUrl(baseUrl, post.Imag || app.locals.site.logo);
+  const published = toIsoDate(post.CreatedAt);
+  const modified = toIsoDate(post.UpdatedAt) || published;
+  const schema = {
+    "@type": "BlogPosting",
+    "@id": `${url}#blogposting`,
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": url
+    },
+    "headline": post.Title,
+    "description": post.Description,
+    "image": imageUrl ? [imageUrl] : undefined,
+    "author": { "@type": "Organization", "@id": `${baseUrl}#organization`, "name": app.locals.site.name },
+    "publisher": { "@id": `${baseUrl}#organization` }
+  };
+  if (published) schema.datePublished = published;
+  if (modified) schema.dateModified = modified;
+  if (!schema.image) delete schema.image;
+  return schema;
+};
+const buildFaqSchema = (questions, pageUrl) => ({
+  "@type": "FAQPage",
+  "@id": `${pageUrl}#faq`,
+  "mainEntity": questions.map(item => ({
+    "@type": "Question",
+    "name": item.question,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": item.answer
+    }
+  }))
+});
+const buildJsonLd = (graph) => ({
+  "@context": "https://schema.org",
+  "@graph": graph
+});
 
 // Sitemap route (dynamic) to produce sitemap.xml based on known public routes
 app.get('/sitemap.xml', async (req, res) => {
@@ -128,6 +294,13 @@ app.use(session({
 
 // Middleware to parse JSON requests (keep limit in sync)
 app.use(express.json({ limit: bodyLimit }));
+
+// Default JSON-LD for public pages (can be overridden per-route)
+app.use((req, res, next) => {
+  if (req.method !== 'GET') return next();
+  res.locals.jsonLd = buildJsonLd(buildBaseGraph(req));
+  next();
+});
 
 // Set up Handlebars
 app.engine('handlebars', engine({
@@ -266,7 +439,7 @@ const fetchBlogPost = async (postId) => {
     let pool = await sql.connect(dbConfig);
     let result = await pool.request()
       .input('PostId', sql.Int, postId)
-      .query('SELECT Title, Imag, Contents, Description, SeoJsonLd FROM dbo.BlogPosts_tbl WHERE postId = @PostId');
+      .query('SELECT Title, Imag, Contents, Description, SeoJsonLd, CreatedAt, UpdatedAt FROM dbo.BlogPosts_tbl WHERE postId = @PostId');
     return result.recordset[0];
   } catch (err) {
     console.error('Database query error:', err);
@@ -341,7 +514,14 @@ app.get('/', async (req, res) => {
   try {
     const blogPosts = await fetchBlogPosts();
     const recentPosts = blogPosts.slice(0, 4);
-    res.render('index', { title: `Nick House Buyer`, blogs: recentPosts })
+    const baseGraph = buildBaseGraph(req);
+    const pageUrl = getPageUrl(req);
+    baseGraph.push(
+      buildServiceSchema(),
+      buildOfferSchema(),
+      buildBreadcrumb([{ name: 'Home', url: pageUrl }])
+    );
+    res.render('index', { title: `Nick House Buyer`, blogs: recentPosts, jsonLd: buildJsonLd(baseGraph) })
 } catch (err) {
     res.status(500).send(err.message);
 } finally {
@@ -349,10 +529,59 @@ app.get('/', async (req, res) => {
 }
 });
 app.get('/about', (req, res) => {
-  res.render('about', { title: 'About Nick House Buyer' });
+  const baseGraph = buildBaseGraph(req);
+  const pageUrl = getPageUrl(req);
+  baseGraph.push(buildBreadcrumb([
+    { name: 'Home', url: `${getBaseUrl()}/` },
+    { name: 'About', url: pageUrl }
+  ]));
+  res.render('about', { title: 'About Nick House Buyer', jsonLd: buildJsonLd(baseGraph) });
 });
 app.get('/faq', (req, res) => {
-  res.render('faq', { title: `Frequently Asked Questions` });
+  const pageUrl = getPageUrl(req);
+  const baseGraph = buildBaseGraph(req);
+  const faqItems = [
+    {
+      question: 'Are you listing my house on the MLS or buying it directly?',
+      answer: 'We buy houses directly. We are not listing your property or acting as a real estate agent.'
+    },
+    {
+      question: 'Do you pay fair prices?',
+      answer: 'We make fair, realistic offers based on market data and the property condition.'
+    },
+    {
+      question: 'How do you determine the offer price?',
+      answer: 'We review the location, recent comparable sales, and the scope of repairs needed to make the home market-ready.'
+    },
+    {
+      question: 'What is the process from start to close?',
+      answer: 'Share your property details, receive a no-obligation cash offer, and close with a local title company on your timeline.'
+    },
+    {
+      question: 'How fast can you close?',
+      answer: 'Many closings happen in about 7 to 10 days, or later if you need more time.'
+    },
+    {
+      question: 'Do I need to make repairs or clean up first?',
+      answer: 'No. We buy houses as-is, even if they need repairs or clean-out.'
+    },
+    {
+      question: 'Are there fees or commissions?',
+      answer: 'No agent commissions. We explain any standard closing costs up front.'
+    },
+    {
+      question: 'Can you help if I am behind on payments or facing foreclosure?',
+      answer: 'Yes. Timing matters, so reach out early and we can review options for a fast sale.'
+    }
+  ];
+  baseGraph.push(
+    buildFaqSchema(faqItems, pageUrl),
+    buildBreadcrumb([
+      { name: 'Home', url: `${getBaseUrl()}/` },
+      { name: 'FAQ', url: pageUrl }
+    ])
+  );
+  res.render('faq', { title: `Frequently Asked Questions`, jsonLd: buildJsonLd(baseGraph) });
 });
 app.get('/property-finder', (req, res) => {
   res.render('propertyFinder', {
@@ -462,7 +691,13 @@ app.get('/property/:id', async (req, res) => {
 app.get('/Blogs', async (req, res) => {
   try {
     const blogPosts = await fetchBlogPosts();
-    res.render('blogs', { layout: 'main', title: 'All Blog Posts', blogs: blogPosts });
+    const baseGraph = buildBaseGraph(req);
+    const pageUrl = getPageUrl(req);
+    baseGraph.push(buildBreadcrumb([
+      { name: 'Home', url: `${getBaseUrl()}/` },
+      { name: 'Blog', url: pageUrl }
+    ]));
+    res.render('blogs', { layout: 'main', title: 'All Blog Posts', blogs: blogPosts, jsonLd: buildJsonLd(baseGraph) });
   } catch (err) {
     res.status(500).send(err.message);
   } finally {
@@ -476,7 +711,17 @@ app.get('/blog/:id', async (req, res) => {
       if (!post) {
           return res.status(404).send('Blog post not found');
       }
-      res.render('blog', { layout: false , title: post.Title, postt: post });
+      const baseGraph = buildBaseGraph(req);
+      const pageUrl = getPageUrl(req);
+      baseGraph.push(
+        buildBlogPostingSchema(post, postId),
+        buildBreadcrumb([
+          { name: 'Home', url: `${getBaseUrl()}/` },
+          { name: 'Blog', url: `${getBaseUrl()}/blogs` },
+          { name: post.Title, url: pageUrl }
+        ])
+      );
+      res.render('blog', { layout: false , title: post.Title, postt: post, jsonLd: buildJsonLd(baseGraph) });
     } catch (err) {
       res.status(500).send('Error retrieving blog post');
   } finally {
