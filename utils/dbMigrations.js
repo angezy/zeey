@@ -40,6 +40,13 @@ const ensureBlogSeoColumns = async (pool) => {
   let changed = false;
   const table = 'BlogPosts_tbl';
 
+  const ensureColumn = async (column, typeSql) => {
+    const exists = await columnExists(pool, { schema: 'dbo', table, column });
+    if (exists) return false;
+    await pool.request().query(`ALTER TABLE dbo.${table} ADD ${column} ${typeSql} NULL`);
+    return true;
+  };
+
   const seoTitleExists = await columnExists(pool, { schema: 'dbo', table, column: 'SeoTitle' });
   if (!seoTitleExists) {
     await pool.request().query(`ALTER TABLE dbo.${table} ADD SeoTitle NVARCHAR(255) NULL`);
@@ -54,8 +61,27 @@ const ensureBlogSeoColumns = async (pool) => {
 
   const seoJsonLdExists = await columnExists(pool, { schema: 'dbo', table, column: 'SeoJsonLd' });
   if (!seoJsonLdExists) {
-    await pool.request().query(`ALTER TABLE dbo.${table} ADD SeoJsonLd NVARCHAR(MAX) NULL`);
+    await pool.request().query(`ALTER TABLE dbo.${table} ADD SeoJsonLd NVARCHAR(255) NULL`);
     changed = true;
+  }
+
+  const blogMetadataColumns = [
+    ['Category', 'NVARCHAR(255)'],
+    ['PrimaryKeyword', 'NVARCHAR(255)'],
+    ['SecondaryKeywords', 'NVARCHAR(255)'],
+    ['Slug', 'NVARCHAR(255)'],
+    ['FeaturedImageIdea', 'NVARCHAR(255)'],
+    ['FeaturedImageAltText', 'NVARCHAR(255)'],
+    ['Tags', 'NVARCHAR(255)'],
+    ['ArticleTitle', 'NVARCHAR(255)'],
+    ['ArticleDescription', 'NVARCHAR(255)'],
+    ['Content', 'NVARCHAR(255)'],
+    ['Cta', 'NVARCHAR(255)'],
+  ];
+
+  for (const [column, typeSql] of blogMetadataColumns) {
+    const didAdd = await ensureColumn(column, typeSql);
+    if (didAdd) changed = true;
   }
 
   return { changed };

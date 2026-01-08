@@ -31,7 +31,18 @@ const run = async () => {
     pool = await sql.connect(dbConfig);
     await addColumnIfMissing(pool, 'SeoTitle', 'NVARCHAR(255)');
     await addColumnIfMissing(pool, 'SeoDescription', 'NVARCHAR(500)');
-    await addColumnIfMissing(pool, 'SeoJsonLd', 'NVARCHAR(MAX)');
+    await addColumnIfMissing(pool, 'SeoJsonLd', 'NVARCHAR(255)');
+    await addColumnIfMissing(pool, 'Category', 'NVARCHAR(255)');
+    await addColumnIfMissing(pool, 'PrimaryKeyword', 'NVARCHAR(255)');
+    await addColumnIfMissing(pool, 'SecondaryKeywords', 'NVARCHAR(255)');
+    await addColumnIfMissing(pool, 'Slug', 'NVARCHAR(255)');
+    await addColumnIfMissing(pool, 'FeaturedImageIdea', 'NVARCHAR(255)');
+    await addColumnIfMissing(pool, 'FeaturedImageAltText', 'NVARCHAR(255)');
+    await addColumnIfMissing(pool, 'Tags', 'NVARCHAR(255)');
+    await addColumnIfMissing(pool, 'ArticleTitle', 'NVARCHAR(255)');
+    await addColumnIfMissing(pool, 'ArticleDescription', 'NVARCHAR(255)');
+    await addColumnIfMissing(pool, 'Content', 'NVARCHAR(255)');
+    await addColumnIfMissing(pool, 'Cta', 'NVARCHAR(255)');
   } catch (err) {
     console.error('[db] Migration error:', err && err.message ? err.message : err);
     process.exitCode = 1;

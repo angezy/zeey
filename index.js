@@ -951,7 +951,10 @@ app.get('/dashboard/blogEditor', authMiddleware, async (req, res) => {
   try {
     let pool = await sql.connect(dbConfig);
     let result = await pool.request()
-    .query('SELECT postId, Title, Description, Imag, Contents, SeoJsonLd, CreatedAt FROM dbo.BlogPosts_tbl');
+    .query(`SELECT postId, Title, Description, Imag, Contents, SeoJsonLd, CreatedAt,
+      Category, PrimaryKeyword, SecondaryKeywords, Slug, FeaturedImageIdea, FeaturedImageAltText,
+      Tags, ArticleTitle, ArticleDescription, Content, Cta
+      FROM dbo.BlogPosts_tbl`);
     const blogPosts = result.recordset;
     res.render('blogEditor', { layout: '__dashboard', title: ' Blog Editor', blogs: blogPosts });
   } catch (err) {

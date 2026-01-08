@@ -73,15 +73,47 @@
           <input type="hidden" id="editBlogId" name="postId">
           <div class="mb-3">
             <label for="editTitle" class="form-label">Article Title</label>
-            <input type="text" class="form-control" id="editTitle" name="title">
+            <input type="text" class="form-control" id="editTitle" name="articleTitle">
           </div>
           <div class="mb-3">
             <label for="editDescription" class="form-label">Article Description</label>
-            <textarea class="form-control" id="editDescription" name="description" rows="2"></textarea>
+            <textarea class="form-control" id="editDescription" name="articleDescription" rows="2"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="editCategory" class="form-label">Category</label>
+            <input type="text" class="form-control" id="editCategory" name="category">
+          </div>
+          <div class="mb-3">
+            <label for="editPrimaryKeyword" class="form-label">Primary Keyword</label>
+            <input type="text" class="form-control" id="editPrimaryKeyword" name="primaryKeyword">
+          </div>
+          <div class="mb-3">
+            <label for="editSecondaryKeywords" class="form-label">Secondary Keywords</label>
+            <input type="text" class="form-control" id="editSecondaryKeywords" name="secondaryKeywords" placeholder="Comma-separated">
+          </div>
+          <div class="mb-3">
+            <label for="editSlug" class="form-label">Slug</label>
+            <input type="text" class="form-control" id="editSlug" name="slug">
+          </div>
+          <div class="mb-3">
+            <label for="editFeaturedImageIdea" class="form-label">Featured Image Idea</label>
+            <input type="text" class="form-control" id="editFeaturedImageIdea" name="featuredImageIdea">
+          </div>
+          <div class="mb-3">
+            <label for="editFeaturedImageAltText" class="form-label">Featured Image Alt Text</label>
+            <input type="text" class="form-control" id="editFeaturedImageAltText" name="featuredImageAltText">
+          </div>
+          <div class="mb-3">
+            <label for="editTags" class="form-label">Tags</label>
+            <input type="text" class="form-control" id="editTags" name="tags" placeholder="Comma-separated">
           </div>
           <div class="mb-3">
             <label for="editSeoJsonLd" class="form-label">SEO JSON-LD (FAQ or other schema)</label>
             <textarea class="form-control" id="editSeoJsonLd" name="seoJsonLd" rows="6" placeholder="Paste JSON only (no &lt;script&gt; tag)"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="editCta" class="form-label">CTA</label>
+            <input type="text" class="form-control" id="editCta" name="cta">
           </div>
           <div class="mb-3">
             <label for="editImage" class="form-label">Upload New Image (Optional)</label>
@@ -90,7 +122,7 @@
 
           <div class="mb-3">
             <label for="editContents" class="form-label">Content</label>
-            <textarea id="editContents" name="contents"></textarea>
+            <textarea id="editContents" name="content"></textarea>
           </div>
         </div>
         <div class="modal-footer">
@@ -137,23 +169,55 @@
         <div class="modal-body">
           <div class="mb-3">
             <label for="title" class="form-label">Article Title</label>
-            <input type="text" class="form-control" id="title" name="title" required>
+            <input type="text" class="form-control" id="title" name="articleTitle" required>
           </div>
           <div class="mb-3">
             <label for="description" class="form-label">Article Description</label>
-            <textarea class="form-control" id="description" name="description" rows="2" required></textarea>
+            <textarea class="form-control" id="description" name="articleDescription" rows="2" required></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="addCategory" class="form-label">Category</label>
+            <input type="text" class="form-control" id="addCategory" name="category">
+          </div>
+          <div class="mb-3">
+            <label for="addPrimaryKeyword" class="form-label">Primary Keyword</label>
+            <input type="text" class="form-control" id="addPrimaryKeyword" name="primaryKeyword">
+          </div>
+          <div class="mb-3">
+            <label for="addSecondaryKeywords" class="form-label">Secondary Keywords</label>
+            <input type="text" class="form-control" id="addSecondaryKeywords" name="secondaryKeywords" placeholder="Comma-separated">
+          </div>
+          <div class="mb-3">
+            <label for="addSlug" class="form-label">Slug</label>
+            <input type="text" class="form-control" id="addSlug" name="slug">
+          </div>
+          <div class="mb-3">
+            <label for="addFeaturedImageIdea" class="form-label">Featured Image Idea</label>
+            <input type="text" class="form-control" id="addFeaturedImageIdea" name="featuredImageIdea">
+          </div>
+          <div class="mb-3">
+            <label for="addFeaturedImageAltText" class="form-label">Featured Image Alt Text</label>
+            <input type="text" class="form-control" id="addFeaturedImageAltText" name="featuredImageAltText">
+          </div>
+          <div class="mb-3">
+            <label for="addTags" class="form-label">Tags</label>
+            <input type="text" class="form-control" id="addTags" name="tags" placeholder="Comma-separated">
           </div>
           <div class="mb-3">
             <label for="addSeoJsonLd" class="form-label">SEO JSON-LD (FAQ or other schema)</label>
             <textarea class="form-control" id="addSeoJsonLd" name="seoJsonLd" rows="6" placeholder="Paste JSON only (no &lt;script&gt; tag)"></textarea>
           </div>
           <div class="mb-3">
+            <label for="addCta" class="form-label">CTA</label>
+            <input type="text" class="form-control" id="addCta" name="cta">
+          </div>
+          <div class="mb-3">
             <label for="imag" class="form-label">Upload Image</label>
-            <input type="file" class="form-control" id="image" name="imag" accept="image/*" required>
+            <input type="file" class="form-control" id="image" name="imag" accept="image/*" >
           </div>
           <div class="mb-3">
             <label for="contents" class="form-label">Content</label>
-            <textarea id="contents" name="contents"></textarea>
+            <textarea id="contents" name="content"></textarea>
           </div>
         </div>
         <div class="modal-footer">
@@ -219,17 +283,25 @@
 
         // Populate the form fields
         document.getElementById('editBlogId').value = id; // Set ID
-        document.getElementById('editTitle').value = post.Title || ''; // Set Title
-        document.getElementById('editDescription').value = post.Description || ''; // Set Description
+        document.getElementById('editTitle').value = post.ArticleTitle || post.Title || ''; // Set Title
+        document.getElementById('editDescription').value = post.ArticleDescription || post.Description || ''; // Set Description
+        document.getElementById('editCategory').value = post.Category || '';
+        document.getElementById('editPrimaryKeyword').value = post.PrimaryKeyword || '';
+        document.getElementById('editSecondaryKeywords').value = post.SecondaryKeywords || '';
+        document.getElementById('editSlug').value = post.Slug || '';
+        document.getElementById('editFeaturedImageIdea').value = post.FeaturedImageIdea || '';
+        document.getElementById('editFeaturedImageAltText').value = post.FeaturedImageAltText || '';
+        document.getElementById('editTags').value = post.Tags || '';
         document.getElementById('editSeoJsonLd').value = post.SeoJsonLd || ''; // Set SEO JSON-LD
-        document.getElementById('editContents').value = post.Contents || ''; // Set Contents
+        document.getElementById('editCta').value = post.Cta || '';
+        document.getElementById('editContents').value = post.Content || post.Contents || ''; // Set Contents
 
 
         // Handle TinyMCE content
         const contentField = document.getElementById('editContents');
-        contentField.value = post.Contents || ''; // Set the raw content for fallback
+        contentField.value = post.Content || post.Contents || ''; // Set the raw content for fallback
         if (tinymce.get('editContents')) {
-          tinymce.get('editContents').setContent(post.Contents || ''); // Set content in TinyMCE
+          tinymce.get('editContents').setContent(post.Content || post.Contents || ''); // Set content in TinyMCE
         }
 
 
