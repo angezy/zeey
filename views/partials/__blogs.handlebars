@@ -21,9 +21,19 @@
           <div class="col-md-6">
             <a href="/blog/{{this.postId}}" class="center">
               <div class="card move-on-hover">
-                <img class="w-100" src="{{photoUrl this.Imag}}" alt="{{this.Title}}">
-                 <h4 class="">{{this.Title}} </h4>
-                 <h6 class="text-secondary font-weight-normal">{{this.Description}}</h6>
+                <img class="w-100" src="{{photoUrl this.Imag}}" alt="{{#if this.FeaturedImageAltText}}{{this.FeaturedImageAltText}}{{else}}{{#if this.ArticleTitle}}{{this.ArticleTitle}}{{else}}{{this.Title}}{{/if}}{{/if}}">
+                 <h4 class="">
+                  {{#if this.ArticleTitle}}{{this.ArticleTitle}}{{else}}{{this.Title}}{{/if}}
+                 </h4>
+                 <h6 class="text-secondary font-weight-normal">
+                  {{#if this.ArticleDescription}}{{this.ArticleDescription}}{{else}}{{this.Description}}{{/if}}
+                 </h6>
+                 {{#if this.Category}}
+                  <div class="text-xs text-secondary">{{this.Category}}</div>
+                 {{/if}}
+                 {{#if this.Tags}}
+                  <div class="text-xs text-secondary">{{this.Tags}}</div>
+                 {{/if}}
               </div>
               <div class="mt-2 ms-2">
 

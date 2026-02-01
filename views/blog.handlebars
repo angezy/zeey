@@ -6,7 +6,7 @@
 
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="{{sanitize postt.Description}}">
+  <meta name="description" content="{{#if postt.ArticleDescription}}{{sanitize postt.ArticleDescription}}{{else}}{{sanitize postt.Description}}{{/if}}">
 
     <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png">
   <link rel="icon" type="image/png" href="../assets/img/favicon.png">
@@ -45,13 +45,13 @@
   {{> __newnav}}
 
   <div     class=" page-header ima min-vh-180 hero-wrap hero-wrap-2 ftco-degree-bg js-fullheight"
-   style="background-image: url('{{photoUrl postt.Imag}}')" alt="{{postt.Title}}">
+   style="background-image: url('{{photoUrl postt.Imag}}')" alt="{{#if postt.ArticleTitle}}{{postt.ArticleTitle}}{{else}}{{postt.Title}}{{/if}}">
     <span class="mask bg-gradient-dark opacity-6"></span>
     <div class="container">
       <div class="row">
         <div class="col-md-8 mx-auto">
           <div class="text-center">
-            <h1 class="text-white">{{postt.Title}}</h1>
+            <h1 class="text-white">{{#if postt.ArticleTitle}}{{postt.ArticleTitle}}{{else}}{{postt.Title}}{{/if}}</h1>
           </div>
         </div>
       </div>
@@ -68,13 +68,45 @@
 
             <div class="row">
               <div class="col-lg-12">
-                <p class="py-3 my-3 text-center text-dark">{{postt.Description}}</p>
+                <p class="py-3 my-3 text-center text-dark">{{#if postt.ArticleDescription}}{{postt.ArticleDescription}}{{else}}{{postt.Description}}{{/if}}</p>
               </div>
 
               <div class="col-lg-8">
+                <div class="mb-3 text-sm text-secondary">
+                  {{#if postt.Category}}
+                    <div>Category: {{postt.Category}}</div>
+                  {{/if}}
+                  {{#if postt.Tags}}
+                    <div>Tags: {{postt.Tags}}</div>
+                  {{/if}}
+                  {{#if postt.PrimaryKeyword}}
+                    <div>Primary Keyword: {{postt.PrimaryKeyword}}</div>
+                  {{/if}}
+                  {{#if postt.SecondaryKeywords}}
+                    <div>Secondary Keywords: {{postt.SecondaryKeywords}}</div>
+                  {{/if}}
+                  {{#if postt.Slug}}
+                    <div>Slug: {{postt.Slug}}</div>
+                  {{/if}}
+                  {{#if postt.FeaturedImageIdea}}
+                    <div>Featured Image Idea: {{postt.FeaturedImageIdea}}</div>
+                  {{/if}}
+                  {{#if postt.FeaturedImageAltText}}
+                    <div>Featured Image Alt Text: {{postt.FeaturedImageAltText}}</div>
+                  {{/if}}
+                </div>
                 <span>
-                  {{{postt.Contents}}}
+                  {{#if postt.Contents}}
+                    {{{postt.Contents}}}
+                  {{else}}
+                    {{postt.Content}}
+                  {{/if}}
                 </span>
+                {{#if postt.Cta}}
+                <div class="mt-4 p-3 border rounded">
+                  <strong>CTA:</strong> {{postt.Cta}}
+                </div>
+                {{/if}}
               </div>
 
 
@@ -83,7 +115,7 @@
                   style="top:100px !important; ">
                   <div class="card-body rounded-4 ">
                     <img class="page-header imac" src="{{photoUrl postt.Imag}}">
-                    <P class="text-center  text-dark">{{postt.Title}}</P>
+                    <P class="text-center  text-dark">{{#if postt.ArticleTitle}}{{postt.ArticleTitle}}{{else}}{{postt.Title}}{{/if}}</P>
                   </div>
                 </div>
               </div>

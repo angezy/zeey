@@ -192,6 +192,8 @@ const buildBlogPostingSchema = (post, postId) => {
   const imageUrl = toAbsoluteUrl(baseUrl, post.Imag || app.locals.site.logo);
   const published = toIsoDate(post.CreatedAt);
   const modified = toIsoDate(post.UpdatedAt) || published;
+  const headline = post.ArticleTitle || post.Title;
+  const description = post.ArticleDescription || post.Description;
   const schema = {
     "@type": "BlogPosting",
     "@id": `${url}#blogposting`,
@@ -199,8 +201,8 @@ const buildBlogPostingSchema = (post, postId) => {
       "@type": "WebPage",
       "@id": url
     },
-    "headline": post.Title,
-    "description": post.Description,
+    "headline": headline,
+    "description": description,
     "image": imageUrl ? [imageUrl] : undefined,
     "author": { "@type": "Organization", "@id": `${baseUrl}#organization`, "name": app.locals.site.name },
     "publisher": { "@id": `${baseUrl}#organization` }
@@ -439,7 +441,10 @@ const fetchBlogPost = async (postId) => {
     let pool = await sql.connect(dbConfig);
     let result = await pool.request()
       .input('PostId', sql.Int, postId)
-      .query('SELECT Title, Imag, Contents, Description, SeoJsonLd, CreatedAt, UpdatedAt FROM dbo.BlogPosts_tbl WHERE postId = @PostId');
+      .query(`SELECT Title, Imag, Contents, Description, SeoJsonLd, CreatedAt, UpdatedAt,
+        Category, PrimaryKeyword, SecondaryKeywords, Slug, FeaturedImageIdea, FeaturedImageAltText,
+        Tags, ArticleTitle, ArticleDescription, Content, Cta
+        FROM dbo.BlogPosts_tbl WHERE postId = @PostId`);
     return result.recordset[0];
   } catch (err) {
     console.error('Database query error:', err);
@@ -451,7 +456,10 @@ async function fetchBlogPosts() {
   try {
     let pool = await sql.connect(dbConfig);
     let result = await pool.request()
-    .query('SELECT postId, Title, Description, Imag, Contents, SeoJsonLd, CreatedAt FROM dbo.BlogPosts_tbl');
+    .query(`SELECT postId, Title, Description, Imag, Contents, SeoJsonLd, CreatedAt,
+      Category, PrimaryKeyword, SecondaryKeywords, Slug, FeaturedImageIdea, FeaturedImageAltText,
+      Tags, ArticleTitle, ArticleDescription, Content, Cta
+      FROM dbo.BlogPosts_tbl`);
     return result.recordset;
   } catch (err) {
     console.error('Error fetching blog posts:', err);
@@ -691,13 +699,41 @@ app.get('/property/:id', async (req, res) => {
 app.get('/Blogs', async (req, res) => {
   try {
     const blogPosts = await fetchBlogPosts();
+    const sortedPosts = blogPosts
+      .slice()
+      .sort((a, b) => {
+        const aTime = a.CreatedAt ? new Date(a.CreatedAt).getTime() : 0;
+        const bTime = b.CreatedAt ? new Date(b.CreatedAt).getTime() : 0;
+        return bTime - aTime;
+      });
+    const releaseBlogs = sortedPosts.slice(0, 6);
+    const recommendBlogs = sortedPosts.slice(6, 12);
+    const categoryMap = new Map();
+    sortedPosts.forEach((post) => {
+      const category = (post.Category || '').trim() || 'Uncategorized';
+      if (!categoryMap.has(category)) categoryMap.set(category, []);
+      categoryMap.get(category).push(post);
+    });
+    const categoryGroups = Array.from(categoryMap.entries()).map(([category, posts]) => ({
+      category,
+      posts,
+    }));
+
     const baseGraph = buildBaseGraph(req);
     const pageUrl = getPageUrl(req);
     baseGraph.push(buildBreadcrumb([
       { name: 'Home', url: `${getBaseUrl()}/` },
       { name: 'Blog', url: pageUrl }
     ]));
-    res.render('blogs', { layout: 'main', title: 'All Blog Posts', blogs: blogPosts, jsonLd: buildJsonLd(baseGraph) });
+    res.render('blogs', {
+      layout: 'main',
+      title: 'All Blog Posts',
+      blogs: blogPosts,
+      releaseBlogs,
+      recommendBlogs,
+      categoryGroups,
+      jsonLd: buildJsonLd(baseGraph)
+    });
   } catch (err) {
     res.status(500).send(err.message);
   } finally {
@@ -713,15 +749,16 @@ app.get('/blog/:id', async (req, res) => {
       }
       const baseGraph = buildBaseGraph(req);
       const pageUrl = getPageUrl(req);
+      const pageTitle = post.ArticleTitle || post.Title;
       baseGraph.push(
         buildBlogPostingSchema(post, postId),
         buildBreadcrumb([
           { name: 'Home', url: `${getBaseUrl()}/` },
           { name: 'Blog', url: `${getBaseUrl()}/blogs` },
-          { name: post.Title, url: pageUrl }
+          { name: pageTitle, url: pageUrl }
         ])
       );
-      res.render('blog', { layout: false , title: post.Title, postt: post, jsonLd: buildJsonLd(baseGraph) });
+      res.render('blog', { layout: false , title: pageTitle, postt: post, jsonLd: buildJsonLd(baseGraph) });
     } catch (err) {
       res.status(500).send('Error retrieving blog post');
   } finally {
