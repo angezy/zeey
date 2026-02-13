@@ -3,12 +3,11 @@
 
 <head>
 
-
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="description" content="{{#if postt.ArticleDescription}}{{sanitize postt.ArticleDescription}}{{else}}{{sanitize postt.Description}}{{/if}}">
 
-    <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png">
   <link rel="icon" type="image/png" href="../assets/img/favicon.png">
 
   <title>{{title}}</title>
@@ -26,7 +25,7 @@
   {{/if}}
 
   <!--     Fonts and icons     -->
-  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700,900" />
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700&family=Playfair+Display:700&display=swap" />
   <!-- Nucleo Icons -->
   <link href="/public/css/nucleo-icons.css" rel="stylesheet" />
   <link href="/public/css/nucleo-svg.css" rel="stylesheet" />
@@ -39,100 +38,429 @@
   <link rel="stylesheet" href="/public/css/mdb.min.css" />
   <link id="pagestyle" href="/public/css/material-kit.css?v=3.1.0" rel="stylesheet" />
 
+  <style>
+    :root {
+      --primary-color: #1e293b;
+      --secondary-color: #0f766e;
+      --accent-color: #f59e0b;
+      --light-bg: #f8fafc;
+      --border-color: #e2e8f0;
+    }
+
+    * {
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .blog-header {
+      position: relative;
+      height: 400px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .blog-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.75) 0%, rgba(15, 118, 110, 0.75) 100%);
+      z-index: 1;
+    }
+
+    .blog-header-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      color: white;
+      max-width: 90%;
+      margin: 0 auto;
+    }
+
+    .blog-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      line-height: 1.2;
+      letter-spacing: -0.5px;
+    }
+
+    @media (max-width: 768px) {
+      .blog-title {
+        font-size: 1.8rem;
+      }
+      .blog-header {
+        height: 300px;
+      }
+    }
+
+    .blog-meta-header {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      font-size: 0.95rem;
+      opacity: 0.95;
+    }
+
+    .blog-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .blog-content-wrapper {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+      margin-top: -60px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .blog-main {
+      padding: 3rem 2rem;
+    }
+
+    .blog-description {
+      font-size: 1.2rem;
+      line-height: 1.8;
+      color: #475569;
+      margin-bottom: 2rem;
+      font-weight: 500;
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 2rem;
+    }
+
+    .blog-metadata {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+      padding: 1.5rem;
+      background: var(--light-bg);
+      border-radius: 8px;
+    }
+
+    .metadata-item {
+      padding: 1rem;
+    }
+
+    .metadata-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--secondary-color);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .metadata-value {
+      font-size: 1rem;
+      color: var(--primary-color);
+      word-break: break-word;
+    }
+
+    .blog-content-body {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      color: #1e293b;
+      margin-bottom: 2rem;
+    }
+
+    .blog-content-body h1,
+    .blog-content-body h2,
+    .blog-content-body h3,
+    .blog-content-body h4,
+    .blog-content-body h5,
+    .blog-content-body h6 {
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      color: var(--primary-color);
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+    }
+
+    .blog-content-body p {
+      margin-bottom: 1.5rem;
+    }
+
+    .blog-content-body ul,
+    .blog-content-body ol {
+      margin-left: 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .blog-content-body li {
+      margin-bottom: 0.75rem;
+    }
+
+    .blog-content-body blockquote {
+      border-left: 4px solid var(--secondary-color);
+      padding: 1rem 1.5rem;
+      margin: 2rem 0;
+      background: var(--light-bg);
+      font-style: italic;
+      color: #475569;
+    }
+
+    .blog-sidebar {
+      position: sticky;
+      top: 100px;
+    }
+
+    .sidebar-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+      overflow: hidden;
+      margin-bottom: 2rem;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .sidebar-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 20px rgba(0, 0, 0, 0.12);
+    }
+
+    .sidebar-image {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .sidebar-card-body {
+      padding: 1.5rem;
+    }
+
+    .sidebar-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin-bottom: 0.5rem;
+      line-height: 1.3;
+    }
+
+    .cta-box {
+      background: linear-gradient(135deg, var(--secondary-color) 0%, #14b8a6 100%);
+      color: white;
+      padding: 2rem;
+      border-radius: 12px;
+      margin-top: 2rem;
+      box-shadow: 0 10px 25px rgba(15, 118, 110, 0.2);
+    }
+
+    .cta-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      font-family: 'Playfair Display', serif;
+    }
+
+    .cta-content {
+      font-size: 1rem;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+      opacity: 0.95;
+    }
+
+    .cta-button {
+      display: inline-block;
+      background: var(--accent-color);
+      color: white;
+      padding: 0.75rem 2rem;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .cta-button:hover {
+      background: #d97706;
+      transform: translateX(5px);
+    }
+
+    .tags-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 2px solid var(--border-color);
+    }
+
+    .tag {
+      background: var(--light-bg);
+      color: var(--secondary-color);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      border: 1px solid var(--border-color);
+      transition: all 0.3s ease;
+    }
+
+    .tag:hover {
+      background: var(--secondary-color);
+      color: white;
+    }
+
+    .keyword-badge {
+      display: inline-block;
+      background: var(--accent-color);
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      margin-right: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+  </style>
+
 </head>
 
-<body>
+<body style="background-color: #f8fafc;">
   {{> __newnav}}
 
-  <div     class=" page-header ima min-vh-180 hero-wrap hero-wrap-2 ftco-degree-bg js-fullheight"
-   style="background-image: url('{{photoUrl postt.Imag}}')" alt="{{#if postt.ArticleTitle}}{{postt.ArticleTitle}}{{else}}{{postt.Title}}{{/if}}">
-    <span class="mask bg-gradient-dark opacity-6"></span>
-    <div class="container">
-      <div class="row">
-        <div class="col-md-8 mx-auto">
-          <div class="text-center">
-            <h1 class="text-white">{{#if postt.ArticleTitle}}{{postt.ArticleTitle}}{{else}}{{postt.Title}}{{/if}}</h1>
-          </div>
-        </div>
-      </div>
+  <!-- Blog Header -->
+  <div class="blog-header" style="background-image: url('{{photoUrl postt.Imag}}')">
+    <div class="blog-header-content">
+      <h1 class="blog-title">{{#if postt.ArticleTitle}}{{postt.ArticleTitle}}{{else}}{{postt.Title}}{{/if}}</h1>
     </div>
   </div>
-  <div class="card card-body shadow-xl mx-3 mx-md-4 mt-n6">
+
+  <!-- Blog Content Wrapper -->
+  <div class="blog-content-wrapper">
     <div class="container">
-      <div class="section">
+      <div class="blog-main">
+        
+        <!-- Blog Description -->
+        <div class="blog-description">
+          {{#if postt.ArticleDescription}}{{postt.ArticleDescription}}{{else}}{{postt.Description}}{{/if}}
+        </div>
 
-        <!-- Courses Course Details Section -->
-        <section id="courses-course-details" class="courses-course-details section">
-
-          <div class="container" data-aos="fade-up">
-
-            <div class="row">
-              <div class="col-lg-12">
-                <p class="py-3 my-3 text-center text-dark">{{#if postt.ArticleDescription}}{{postt.ArticleDescription}}{{else}}{{postt.Description}}{{/if}}</p>
+        <!-- Metadata Section -->
+        {{#if postt.Category}}
+          <div class="blog-metadata">
+            {{#if postt.Category}}
+              <div class="metadata-item">
+                <span class="metadata-label"><i class="fas fa-folder-open"></i> Category</span>
+                <div class="metadata-value">{{postt.Category}}</div>
               </div>
-
-              <div class="col-lg-8">
-                <div class="mb-3 text-sm text-secondary">
-                  {{#if postt.Category}}
-                    <div>Category: {{postt.Category}}</div>
-                  {{/if}}
-                  {{#if postt.Tags}}
-                    <div>Tags: {{postt.Tags}}</div>
-                  {{/if}}
-                  {{#if postt.PrimaryKeyword}}
-                    <div>Primary Keyword: {{postt.PrimaryKeyword}}</div>
-                  {{/if}}
-                  {{#if postt.SecondaryKeywords}}
-                    <div>Secondary Keywords: {{postt.SecondaryKeywords}}</div>
-                  {{/if}}
-                  {{#if postt.Slug}}
-                    <div>Slug: {{postt.Slug}}</div>
-                  {{/if}}
-                  {{#if postt.FeaturedImageIdea}}
-                    <div>Featured Image Idea: {{postt.FeaturedImageIdea}}</div>
-                  {{/if}}
-                  {{#if postt.FeaturedImageAltText}}
-                    <div>Featured Image Alt Text: {{postt.FeaturedImageAltText}}</div>
-                  {{/if}}
-                </div>
-                <span>
-                  {{#if postt.Contents}}
-                    {{{postt.Contents}}}
-                  {{else}}
-                    {{postt.Content}}
-                  {{/if}}
-                </span>
-                {{#if postt.Cta}}
-                <div class="mt-4 p-3 border rounded">
-                  <strong>CTA:</strong> {{postt.Cta}}
-                </div>
-                {{/if}}
+            {{/if}}
+            {{#if postt.PrimaryKeyword}}
+              <div class="metadata-item">
+                <span class="metadata-label"><i class="fas fa-key"></i> Primary Keyword</span>
+                <span class="keyword-badge">{{postt.PrimaryKeyword}}</span>
               </div>
-
-
-              <div class="col-md-4">
-                <div class="card move-on-hover border shadow-0 mb-3 glass-card py-4 my-4 position-sticky"
-                  style="top:100px !important; ">
-                  <div class="card-body rounded-4 ">
-                    <img class="page-header imac" src="{{photoUrl postt.Imag}}">
-                    <P class="text-center  text-dark">{{#if postt.ArticleTitle}}{{postt.ArticleTitle}}{{else}}{{postt.Title}}{{/if}}</P>
-                  </div>
-                </div>
+            {{/if}}
+            {{#if postt.FeaturedImageAltText}}
+              <div class="metadata-item">
+                <span class="metadata-label"><i class="fas fa-image"></i> Image Alt</span>
+                <div class="metadata-value">{{postt.FeaturedImageAltText}}</div>
               </div>
+            {{/if}}
+          </div>
+        {{/if}}
 
+        <div class="row">
+          <!-- Main Content -->
+          <div class="col-lg-8">
+            <div class="blog-content-body">
+              {{#if postt.Contents}}
+                {{{postt.Contents}}}
+              {{else}}
+                {{postt.Content}}
+              {{/if}}
             </div>
 
+            <!-- Tags Section -->
+            {{#if postt.Tags}}
+              <div class="tags-container">
+                <strong style="width: 100%; color: var(--primary-color); margin-bottom: 0.5rem;"><i class="fas fa-tags"></i> Tags:</strong>
+                {{#each (split postt.Tags)}}
+                  <span class="tag">{{this}}</span>
+                {{/each}}
+              </div>
+            {{/if}}
+
+            <!-- Secondary Keywords -->
+            {{#if postt.SecondaryKeywords}}
+              <div style="margin-top: 2rem; padding: 1.5rem; background: var(--light-bg); border-radius: 8px;">
+                <strong style="color: var(--primary-color); display: block; margin-bottom: 1rem;"><i class="fas fa-search"></i> Related Keywords:</strong>
+                <div>
+                  {{#each (split postt.SecondaryKeywords)}}
+                    <span class="keyword-badge">{{this}}</span>
+                  {{/each}}
+                </div>
+              </div>
+            {{/if}}
+
+            <!-- CTA Section -->
+            {{#if postt.Cta}}
+              <div class="cta-box">
+                <div class="cta-title"><i class="fas fa-bullhorn"></i> Call to Action</div>
+                <div class="cta-content">{{postt.Cta}}</div>
+                <a href="#contact" class="cta-button">Get Started</a>
+              </div>
+            {{/if}}
           </div>
-        </section><!-- /Courses Course Details Section -->
 
+          <!-- Sidebar -->
+          <div class="col-lg-4">
+            <aside class="blog-sidebar">
+              <!-- Featured Image Card -->
+              <div class="sidebar-card">
+                <img src="{{photoUrl postt.Imag}}" alt="{{#if postt.ArticleTitle}}{{postt.ArticleTitle}}{{else}}{{postt.Title}}{{/if}}" class="sidebar-image">
+                <div class="sidebar-card-body">
+                  <h3 class="sidebar-title">{{#if postt.ArticleTitle}}{{postt.ArticleTitle}}{{else}}{{postt.Title}}{{/if}}</h3>
+                </div>
+              </div>
 
+              <!-- Slug Info Card -->
+              {{#if postt.Slug}}
+                <div class="sidebar-card">
+                  <div class="sidebar-card-body" style="padding: 1.5rem;">
+                    <h4 style="font-size: 0.95rem; color: var(--secondary-color); font-weight: 600; margin-bottom: 0.75rem;">
+                      <i class="fas fa-link"></i> Post Slug
+                    </h4>
+                    <p style="margin: 0; color: #475569; word-break: break-all; font-size: 0.9rem;">{{postt.Slug}}</p>
+                  </div>
+                </div>
+              {{/if}}
 
-
-        {{> __newfooter}}
-
+              <!-- Featured Image Idea Card -->
+              {{#if postt.FeaturedImageIdea}}
+                <div class="sidebar-card">
+                  <div class="sidebar-card-body" style="padding: 1.5rem;">
+                    <h4 style="font-size: 0.95rem; color: var(--secondary-color); font-weight: 600; margin-bottom: 0.75rem;">
+                      <i class="fas fa-lightbulb"></i> Image Insight
+                    </h4>
+                    <p style="margin: 0; color: #475569; font-size: 0.9rem;">{{postt.FeaturedImageIdea}}</p>
+                  </div>
+                </div>
+              {{/if}}
+            </aside>
+          </div>
+        </div>
 
       </div>
     </div>
   </div>
 
+  {{> __newfooter}}
+
   <script src="/public/js/material-kit.min.js?v=3.1.0" type="text/javascript"></script>
+
+</body>
+
+</html>

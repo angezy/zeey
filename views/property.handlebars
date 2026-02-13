@@ -256,7 +256,7 @@
             <tr><td>Status</td><td>{{#if listPost.Available}}Available{{else}}Pending{{/if}}</td></tr>
             {{#if listPost.ARV}}<tr><td>ARV</td><td>${{formatCurrency listPost.ARV}}</td></tr>{{/if}}
             <tr><td>Reason for selling</td><td>{{#if listPost.ReasonForSelling}}{{sanitize listPost.ReasonForSelling}}{{else}}Not provided{{/if}}</td></tr>
-            <tr><td>Updated</td><td>{{formatDate listPost.UpdatedAt}}</td></tr>
+            <tr><td>Posted</td><td>{{formatDate listPost.CreatedAt}}</td></tr>
           </table>
         </article>
       </div>

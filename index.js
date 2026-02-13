@@ -191,7 +191,7 @@ const buildBlogPostingSchema = (post, postId) => {
   const url = `${baseUrl}/blog/${postId}`;
   const imageUrl = toAbsoluteUrl(baseUrl, post.Imag || app.locals.site.logo);
   const published = toIsoDate(post.CreatedAt);
-  const modified = toIsoDate(post.UpdatedAt) || published;
+  const modified = published; // Use CreatedAt as the modification date
   const headline = post.ArticleTitle || post.Title;
   const description = post.ArticleDescription || post.Description;
   const schema = {
@@ -241,17 +241,17 @@ app.get('/sitemap.xml', async (req, res) => {
     const now = new Date().toISOString();
 
     // Fetch available properties
-    const propsResult = await pool.request().query('SELECT listingId, CreatedAt, UpdatedAt, Available FROM dbo.listings_tbl WHERE Available = 1');
+    const propsResult = await pool.request().query('SELECT listingId, CreatedAt, Available FROM dbo.listings_tbl WHERE Available = 1');
     const properties = (propsResult.recordset || []).map(r => ({
       loc: `${base}/property/${r.listingId}`,
-      lastmod: (r.UpdatedAt || r.CreatedAt) ? new Date(r.UpdatedAt || r.CreatedAt).toISOString() : now
+      lastmod: r.CreatedAt ? new Date(r.CreatedAt).toISOString() : now
     }));
 
     // Fetch blog posts
-    const postsResult = await pool.request().query('SELECT postId, CreatedAt, UpdatedAt FROM dbo.BlogPosts_tbl');
+    const postsResult = await pool.request().query('SELECT postId, CreatedAt FROM dbo.BlogPosts_tbl');
     const posts = (postsResult.recordset || []).map(p => ({
       loc: `${base}/blog/${p.postId}`,
-      lastmod: (p.UpdatedAt || p.CreatedAt) ? new Date(p.UpdatedAt || p.CreatedAt).toISOString() : now
+      lastmod: p.CreatedAt ? new Date(p.CreatedAt).toISOString() : now
     }));
 
     const allUrls = [];
@@ -441,7 +441,7 @@ const fetchBlogPost = async (postId) => {
     let pool = await sql.connect(dbConfig);
     let result = await pool.request()
       .input('PostId', sql.Int, postId)
-      .query(`SELECT Title, Imag, Contents, Description, SeoJsonLd, CreatedAt, UpdatedAt,
+      .query(`SELECT Title, Imag, Contents, Description, SeoJsonLd, CreatedAt,
         Category, PrimaryKeyword, SecondaryKeywords, Slug, FeaturedImageIdea, FeaturedImageAltText,
         Tags, ArticleTitle, ArticleDescription, Content, Cta
         FROM dbo.BlogPosts_tbl WHERE postId = @PostId`);
