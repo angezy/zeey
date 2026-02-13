@@ -40,99 +40,124 @@ const normalizeJsonLd = (value) => {
 
 // Route to add a new blog post
 router.post('/add-blog', upload.single('imag'), async (req, res) => {
-    const referrer = req.get('Referer');
-    const {
-        title,
-        description,
-        contents,
-        seoJsonLd,
-        category,
-        primaryKeyword,
-        secondaryKeywords,
-        slug,
-        featuredImageIdea,
-        featuredImageAltText,
-        tags,
-        articleTitle,
-        articleDescription,
-        content,
-        cta,
-    } = req.body;
-    const resolvedTitle = articleTitle || title;
-    const resolvedDescription = articleDescription || description;
-    const resolvedContent = content || contents;
-    const imageFile = req.file ? `public/images/uploads/${req.file.filename}` : null;
-    const normalizedJsonLd = normalizeJsonLd(seoJsonLd);
-    try {
-        const pool = await sql.connect(dbConfig);
+  const referrer = req.get('Referer');
 
-        await pool.request()
-            .input('Title', sql.NVarChar, resolvedTitle)
-            .input('Description', sql.NVarChar, resolvedDescription)
-            .input('Imag', sql.NVarChar, imageFile)
-            .input('Contents', sql.NText, resolvedContent)
-            .input('Category', sql.NVarChar, category)
-            .input('PrimaryKeyword', sql.NVarChar, primaryKeyword)
-            .input('SecondaryKeywords', sql.NVarChar, secondaryKeywords)
-            .input('Slug', sql.NVarChar, slug)
-            .input('FeaturedImageIdea', sql.NVarChar, featuredImageIdea)
-            .input('FeaturedImageAltText', sql.NVarChar, featuredImageAltText)
-            .input('Tags', sql.NVarChar, tags)
-            .input('ArticleTitle', sql.NVarChar, articleTitle || resolvedTitle)
-            .input('ArticleDescription', sql.NVarChar, articleDescription || resolvedDescription)
-            .input('SeoJsonLd', sql.NVarChar(255), normalizedJsonLd)
-            .input('Content', sql.NVarChar, content || resolvedContent)
-            .input('Cta', sql.NVarChar, cta)
-            .query(`
-                INSERT INTO dbo.BlogPosts_tbl (
-                    Title,
-                    Description,
-                    Imag,
-                    Contents,
-                    Category,
-                    PrimaryKeyword,
-                    SecondaryKeywords,
-                    Slug,
-                    FeaturedImageIdea,
-                    FeaturedImageAltText,
-                    Tags,
-                    ArticleTitle,
-                    ArticleDescription,
-                    SeoJsonLd,
-                    Content,
-                    Cta,
-                    CreatedAt
-                )
-                VALUES (
-                    @Title,
-                    @Description,
-                    @Imag,
-                    @Contents,
-                    @Category,
-                    @PrimaryKeyword,
-                    @SecondaryKeywords,
-                    @Slug,
-                    @FeaturedImageIdea,
-                    @FeaturedImageAltText,
-                    @Tags,
-                    @ArticleTitle,
-                    @ArticleDescription,
-                    @SeoJsonLd,
-                    @Content,
-                    @Cta,
-                    GETDATE()
-                )
-            `); 
-    
-        return res.redirect(`${referrer}?success=Blog+post+added+successfully`);
-    } catch (err) {
-        console.error('Error updating blog post:', err);
-        return res.redirect(`${referrer}?error=Error+adding+blog+post`);
-    } finally {
-        sql.close();
-      }
+  const {
+    title,
+    description,
+    contents,
+    seoJsonLd,
+    category,
+    primaryKeyword,
+    secondaryKeywords,
+    slug,
+    featuredImageIdea,
+    featuredImageAltText,
+    tags,
+    articleTitle,
+    articleDescription,
+    content,
+    cta,
+  } = req.body;
+
+  const resolvedTitle = articleTitle || title;
+  const resolvedDescription = articleDescription || description;
+  const resolvedContent = content || contents;
+
+  const imageFile = req.file ? `public/images/uploads/${req.file.filename}` : null;
+
+  // ✅ Normalize JSON-LD safely
+  const normalizedJsonLd = normalizeJsonLd(seoJsonLd);
+
+  // ✅ OPTION B: Store SecondaryKeywords as JSON string
+  const secondaryKeywordsJson = JSON.stringify(secondaryKeywords || []);
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    await pool.request()
+      .input('Title', sql.NVarChar(sql.MAX), resolvedTitle)
+      .input('Description', sql.NVarChar(sql.MAX), resolvedDescription)
+      .input('Imag', sql.NVarChar(500), imageFile)
+      .input('Contents', sql.NText, resolvedContent)
+      .input('Category', sql.NVarChar(255), category)
+      .input('PrimaryKeyword', sql.NVarChar(255), primaryKeyword)
+      .input('SecondaryKeywords', sql.NVarChar(sql.MAX), secondaryKeywordsJson) // ✅ FIXED
+      .input('Slug', sql.NVarChar(255), slug)
+      .input('FeaturedImageIdea', sql.NVarChar(sql.MAX), featuredImageIdea)
+      .input('FeaturedImageAltText', sql.NVarChar(sql.MAX), featuredImageAltText)
+      .input('Tags', sql.NVarChar(sql.MAX), tags)
+      .input('ArticleTitle', sql.NVarChar(sql.MAX), articleTitle || resolvedTitle)
+      .input('ArticleDescription', sql.NVarChar(sql.MAX), articleDescription || resolvedDescription)
+      .input('SeoJsonLd', sql.NVarChar(sql.MAX), normalizedJsonLd)
+      .input('Content', sql.NVarChar(sql.MAX), resolvedContent)
+      .input('Cta', sql.NVarChar(sql.MAX), cta)
+      .query(`
+        INSERT INTO dbo.BlogPosts_tbl (
+          Title,
+          Description,
+          Imag,
+          Contents,
+          Category,
+          PrimaryKeyword,
+          SecondaryKeywords,
+          Slug,
+          FeaturedImageIdea,
+          FeaturedImageAltText,
+          Tags,
+          ArticleTitle,
+          ArticleDescription,
+          SeoJsonLd,
+          Content,
+          Cta,
+          CreatedAt
+        )
+        VALUES (
+          @Title,
+          @Description,
+          @Imag,
+          @Contents,
+          @Category,
+          @PrimaryKeyword,
+          @SecondaryKeywords,
+          @Slug,
+          @FeaturedImageIdea,
+          @FeaturedImageAltText,
+          @Tags,
+          @ArticleTitle,
+          @ArticleDescription,
+          @SeoJsonLd,
+          @Content,
+          @Cta,
+          GETDATE()
+        )
+      `);
+
+    // ✅ API-safe response for n8n (no redirect if referrer missing)
+    if (!referrer) {
+      return res.status(200).json({
+        success: true,
+        message: 'Blog post added successfully',
+      });
+    }
+
+    return res.redirect(`${referrer}?success=Blog+post+added+successfully`);
+
+  } catch (err) {
+    console.error('Error adding blog post:', err);
+
+    if (!referrer) {
+      return res.status(500).json({
+        success: false,
+        error: 'Error adding blog post',
+      });
+    }
+
+    return res.redirect(`${referrer}?error=Error+adding+blog+post`);
+  } finally {
+    sql.close();
+  }
 });
-
 
 
 // Route to delete a blog post by ID
