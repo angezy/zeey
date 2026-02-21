@@ -39,7 +39,7 @@ const normalizeJsonLd = (value) => {
 };
 
 // Route to add a new blog post
-router.post('/add-blog', upload.single('imag'), async (req, res) => {
+router.post('/add-blog', upload.single('imag') || null, async (req, res) => {
   const referrer = req.get('Referer');
 
   const {
